@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
-import { getPerson } from "@/lib/api/endpoints";
+import { getPerson, getSite } from "@/lib/api/endpoints";
+import { navLabel } from "@/lib/utils";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
@@ -12,7 +13,7 @@ import { InsightCard } from "@/components/sections/cards";
 import { Heading, Section } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { SocialIcon } from "@/components/ui/social-icons";
-import { ActionButton } from "@/components/ui/smart-link";
+import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -28,15 +29,17 @@ async function load(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const p = await load(slug);
-  return pageMetadata(undefined, { title: p.displayName, description: `${p.displayName}, ${p.roleLabel} at SPA Ajibade & Co.`, path: `/people/${slug}` });
+  const [p, site] = await Promise.all([load(slug), getSite()]);
+  return pageMetadata(undefined, { title: p.displayName, description: `${p.displayName}, ${p.roleLabel}, ${site.settings.firmName}`, path: `/people/${slug}` });
 }
 
 // Attorney details exist in Figma as a flow ("ATTORNEY DETAILS"); this follows the same visual language.
 export default async function PersonPage({ params }: Props) {
   const { slug } = await params;
-  const p = await load(slug);
+  const [p, site] = await Promise.all([load(slug), getSite()]);
   const bio = cleanHtml(p.bio);
+  const back = navLabel(site.nav, "/people");
+  const cta = site.contactCallout.primaryCta;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -45,7 +48,7 @@ export default async function PersonPage({ params }: Props) {
     honorificPrefix: p.honorific ?? undefined,
     honorificSuffix: p.postNominals ?? undefined,
     jobTitle: p.roleLabel,
-    worksFor: { "@type": "LegalService", name: "SPA Ajibade & Co.", url: SITE_URL },
+    worksFor: { "@type": "LegalService", name: site.settings.firmName, url: SITE_URL },
     url: `${SITE_URL}/people/${p.slug}`,
     sameAs: p.linkedinUrl ? [p.linkedinUrl] : undefined,
   };
@@ -58,9 +61,11 @@ export default async function PersonPage({ params }: Props) {
             <Media image={p.photo} placeholder="portrait" name={p.displayName} alt={`Portrait of ${p.displayName}`} priority sizes="360px" />
           </div>
           <div className="flex flex-col justify-center">
-            <Link href="/people" className="text-sm text-white/70 hover:text-white">
-              ← Our People
-            </Link>
+            {back ? (
+              <Link href="/people" className="text-sm text-white/70 hover:text-white">
+                ← {back}
+              </Link>
+            ) : null}
             <Heading as="h1" size="display" className="mt-4">
               {p.displayName}
             </Heading>
@@ -71,9 +76,7 @@ export default async function PersonPage({ params }: Props) {
               </p>
             ) : null}
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <ActionButton action="action:mandate" className={buttonClass("light")}>
-                Discuss a Mandate
-              </ActionButton>
+              {cta ? <SmartLink link={cta} className={buttonClass("light")} /> : null}
               {p.linkedinUrl ? (
                 <a href={p.linkedinUrl} target="_blank" rel="noopener noreferrer" className={buttonClass("ghostDark")}>
                   <SocialIcon name="linkedin" className="size-4" /> LinkedIn
