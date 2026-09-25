@@ -21,7 +21,7 @@ const SORTS = [
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("insights");
-  return pageMetadata(page.seo, { title: page.listingSection.title, description: "Articles, regulatory updates, firm news and webinars from SPA Ajibade & Co.", path: "/insights" });
+  return pageMetadata(page.seo, { title: page.listingSection.title, path: "/insights" });
 }
 
 export default async function InsightsPage({ searchParams }: Props) {
