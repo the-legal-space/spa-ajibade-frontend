@@ -2,10 +2,9 @@
   "name": "spa-ajibade-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Public website for SPA Ajibade & Co., built on Next.js against the SPA Ajibade content API.",
+  "description": "Public website for SPA Ajibade & Co. All content is served by the SPA Ajibade content API.",
   "scripts": {
     "dev": "next dev",
-    "dev:mock": "SPA_API_MOCK=1 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
