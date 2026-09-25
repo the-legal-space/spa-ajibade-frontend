@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check } from "lucide-react";
-import { getPracticeArea } from "@/lib/api/endpoints";
+import { getPracticeArea, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
@@ -11,7 +11,8 @@ import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard, PersonCard } from "@/components/sections/cards";
 import { Heading, Section } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
-import { ActionButton } from "@/components/ui/smart-link";
+import { SmartLink } from "@/components/ui/smart-link";
+import { navLabel } from "@/lib/utils";
 import { buttonClass } from "@/components/ui/button";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -34,23 +35,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // This page is not in the Figma yet; it follows the same visual language.
 export default async function PracticeAreaPage({ params }: Props) {
   const { slug } = await params;
-  const area = await load(slug);
+  const [area, site] = await Promise.all([load(slug), getSite()]);
   const body = cleanHtml(area.body);
+  const back = navLabel(site.nav, "/practice-areas");
+  const cta = site.contactCallout.primaryCta;
 
   return (
     <>
       <DetailHero
         eyebrow={
-          <Link href="/practice-areas" className="hover:text-white">
-            ← Practice Areas
-          </Link>
+          back ? (
+            <Link href="/practice-areas" className="hover:text-white">
+              ← {back}
+            </Link>
+          ) : undefined
         }
         title={area.title}
       >
         <p className="mt-5 max-w-3xl text-lg leading-8 text-white/85">{area.summary}</p>
-        <ActionButton action="action:mandate" practiceArea={area.slug} className={buttonClass("light", "mt-8")}>
-          Discuss a Mandate
-        </ActionButton>
+        {cta ? <SmartLink link={cta} practiceArea={area.slug} className={buttonClass("light", "mt-8")} /> : null}
       </DetailHero>
 
       <Section tone="white">
