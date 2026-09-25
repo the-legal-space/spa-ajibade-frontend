@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getInsight } from "@/lib/api/endpoints";
+import { getInsight, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
-import { formatLongDate, initials } from "@/lib/utils";
+import { formatLongDate, initials, navLabel } from "@/lib/utils";
 import { DetailHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard } from "@/components/sections/cards";
@@ -42,8 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function InsightPage({ params }: Props) {
   const { slug } = await params;
-  const i = await load(slug);
+  const [i, site] = await Promise.all([load(slug), getSite()]);
   const body = cleanHtml(i.body);
+  const back = navLabel(site.nav, "/insights");
   const authorName = i.author.type === "person" ? i.author.person.displayName : i.author.name;
   const authorLabel = i.author.type === "person" ? i.author.person.roleLabel : i.author.label;
 
@@ -53,7 +54,7 @@ export default async function InsightPage({ params }: Props) {
     headline: i.title,
     datePublished: i.publishedAt ?? undefined,
     author: { "@type": i.author.type === "person" ? "Person" : "Organization", name: authorName },
-    publisher: { "@type": "Organization", name: "SPA Ajibade & Co.", url: SITE_URL },
+    publisher: { "@type": "Organization", name: site.settings.firmName, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/insights/${i.slug}`,
   };
 
@@ -62,9 +63,11 @@ export default async function InsightPage({ params }: Props) {
       <DetailHero
         eyebrow={
           <div className="flex flex-wrap items-center gap-2">
-            <Link href="/insights" className="hover:text-white">
-              ← Insights &amp; News
-            </Link>
+            {back ? (
+              <Link href="/insights" className="hover:text-white">
+                ← {back}
+              </Link>
+            ) : null}
             {i.categoryLabels.map((c, n) => (
               <Link key={c} href={`/insights?category=${i.categories[n]}`} className="rounded-[4px] border border-white/20 px-2.5 py-1 text-xs hover:bg-white/10">
                 {c}
