@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
-import type { NavItem } from "@/lib/api/schemas";
+import type { ApiLink, NavItem } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { buttonClass } from "@/components/ui/button";
-import { ActionButton } from "@/components/ui/smart-link";
+import { SmartLink } from "@/components/ui/smart-link";
 import { SearchDialog } from "./search-dialog";
 
 function isActive(pathname: string, href: string) {
@@ -16,7 +16,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName: string; descriptor: string }) {
+export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; firmName: string; descriptor: string; cta: ApiLink | null }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -72,9 +72,7 @@ export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName
             >
               <Search className="size-5" strokeWidth={1.5} />
             </button>
-            <ActionButton action="action:mandate" className={buttonClass("light", "hidden px-3 py-2 text-[13px] sm:inline-flex")}>
-              Discuss a Mandate
-            </ActionButton>
+            {cta ? <SmartLink link={cta} className={buttonClass("light", "hidden px-3 py-2 text-[13px] sm:inline-flex")} /> : null}
             <button
               type="button"
               className="grid size-10 place-items-center rounded-full hover:bg-white/10 lg:hidden"
@@ -94,11 +92,11 @@ export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName
               {nav.map((item) => (
                 <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
               ))}
-              <li className="pt-4 sm:hidden">
-                <ActionButton action="action:mandate" className={buttonClass("light", "w-full")}>
-                  Discuss a Mandate
-                </ActionButton>
-              </li>
+              {cta ? (
+                <li className="pt-4 sm:hidden">
+                  <SmartLink link={cta} className={buttonClass("light", "w-full")} />
+                </li>
+              ) : null}
             </ul>
           </nav>
         ) : null}
