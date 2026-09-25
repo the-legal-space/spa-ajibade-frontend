@@ -49,3 +49,13 @@ export function readPage(value: string | string[] | undefined) {
   const n = Number(readString(value));
   return Number.isInteger(n) && n > 0 ? n : 1;
 }
+
+/** Label the CMS navigation uses for a route, so back links read the same as the menu. */
+export function navLabel(nav: { label: string; href: string; children?: { label: string; href: string }[] }[], href: string) {
+  for (const item of nav) {
+    if (item.href === href) return item.label;
+    const child = item.children?.find((c) => c.href === href);
+    if (child) return child.label;
+  }
+  return null;
+}
