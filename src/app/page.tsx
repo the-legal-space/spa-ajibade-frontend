@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import type { Recognition } from "@/lib/api/schemas";
@@ -51,22 +50,11 @@ export default async function HomePage() {
       {/* Recognition */}
       {badges.length > 0 ? (
         <Section tone="mist">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_496px]">
-            <div>
-              <Eyebrow className="mb-3">Recognition</Eyebrow>
-              <RecognitionTabs
-                labels={page.recognitionTabs}
-                achievements={page.recognitions.achievements}
-                recognizedBy={page.recognitions.recognizedBy}
-              />
-              <Link href="/about#recognition" className={buttonClass("dark", "mt-8")}>
-                View Our Recognitions
-              </Link>
-            </div>
-            <div className="hidden aspect-[496/560] overflow-hidden rounded-2xl lg:block">
-              <Media image={null} />
-            </div>
-          </div>
+          <RecognitionTabs
+            labels={page.recognitionTabs}
+            achievements={page.recognitions.achievements}
+            recognizedBy={page.recognitions.recognizedBy}
+          />
         </Section>
       ) : null}
 
