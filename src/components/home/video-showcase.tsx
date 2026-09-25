@@ -11,7 +11,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
     <section className="bg-white py-12" aria-label="Video">
       <div className="container-site">
         <div className="rounded-3xl bg-mist p-3">
-          <VideoEmbed url={showcase.videoUrl} title={showcase.caption ?? "SPA Ajibade & Co."} poster={showcase.poster} />
+          <VideoEmbed url={showcase.videoUrl} title={showcase.caption ?? "Video"} poster={showcase.poster} />
         </div>
         {showcase.caption ? <p className="mx-auto mt-6 max-w-xl text-center font-serif text-xl">{showcase.caption}</p> : null}
       </div>
