@@ -7,10 +7,9 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
       <body style={{ margin: 0, background: "#000", color: "#fff", fontFamily: "Georgia, serif" }}>
         <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
           <div style={{ maxWidth: 560 }}>
-            <p style={{ fontSize: 14, opacity: 0.7, fontFamily: "system-ui, sans-serif" }}>SPA Ajibade &amp; Co.</p>
             <h1 style={{ fontWeight: 400, fontSize: 40, lineHeight: 1.2, margin: "12px 0" }}>We&apos;ll be right back.</h1>
             <p style={{ fontFamily: "system-ui, sans-serif", opacity: 0.8, lineHeight: 1.6 }}>
-              The site is having trouble loading its content. Please try again in a moment. For urgent matters, email frontoffice@spaajibade.com.
+              The site is having trouble loading its content. Please try again in a moment.
             </p>
             <button
               type="button"
