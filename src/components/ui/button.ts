@@ -8,7 +8,7 @@ const base =
 const variants: Record<ButtonVariant, string> = {
   // White button on dark surfaces ("Discuss a Mandate" in the hero).
   light: "rounded-[4px] bg-white px-4 py-3 text-ink hover:bg-mist",
-  // Solid black ("View Our Recognitions", "Learn More" on cards).
+  // Solid black ("Learn More" on cards).
   dark: "rounded-[4px] bg-ink px-4 py-3 text-white hover:bg-ink-700",
   // Translucent on dark imagery ("Explore Our Practice Areas" in the hero).
   ghostDark: "rounded-[4px] border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-sm hover:bg-white/20",
