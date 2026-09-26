@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { getOffices, getPracticeAreas, getSite } from "@/lib/api/endpoints";
 import { SITE_URL } from "@/lib/env";
 import { TopBar } from "@/components/layout/top-bar";
-import { Header } from "@/components/layout/header";
+import { ChatButton, Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ActionsProvider } from "@/components/forms/actions-context";
 import "./globals.css";
@@ -67,6 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </main>
           <Footer site={site} offices={offices} />
+          <ChatButton link={site.faqSection.stillHaveQuestions.actions.find((l) => l.href === "action:chat")} />
         </ActionsProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       </body>
