@@ -8,22 +8,26 @@ const apiOrigin = (() => {
   }
 })();
 
+const isDev = process.env.NODE_ENV !== "production";
+
 // Images come from the API as absolute URLs on a storage host we do not know yet,
 // so img-src allows https broadly. Tighten it once the media host is fixed.
+// In development Next.js needs eval (fast refresh) and a websocket (hot reload); without
+// them the browser blocks all client JavaScript and nothing on the page is clickable.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self'",
-  `connect-src 'self' ${apiOrigin}`,
+  `connect-src 'self' ${apiOrigin}${isDev ? " ws: wss:" : ""}`,
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://challenges.cloudflare.com",
   "media-src 'self' https:",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const securityHeaders = [
