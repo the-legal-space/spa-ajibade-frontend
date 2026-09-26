@@ -48,6 +48,11 @@ export const HeroSchema = z.object({
   title: z.string(),
   subtitle: nullableString.optional(),
   image: NullableImage,
+  /**
+   * Extra slides for the auto-advancing home hero. Not in the API yet (backend request:
+   * `hero.images: Image[]`); optional so the site works before and after it ships.
+   */
+  images: z.array(ImageSchema).optional(),
   primaryCta: NullableLink.optional(),
   secondaryCta: NullableLink.optional(),
 });

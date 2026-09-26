@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 /**
@@ -28,6 +28,27 @@ export function useAutoplay(advance: () => void, { delay = 6000, enabled = true 
     onMouseLeave: () => setPaused(false),
     onFocus: () => setPaused(true),
     onBlur: () => setPaused(false),
+  };
+}
+
+/** Touch swipe for the sliding carousels: a horizontal drag of 40px or more moves one slide. */
+export function useSwipe(onNext: () => void, onPrev: () => void) {
+  const start = useRef<{ x: number; y: number } | null>(null);
+  return {
+    onTouchStart: (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) start.current = { x: t.clientX, y: t.clientY };
+    },
+    onTouchEnd: (e: TouchEvent) => {
+      const s = start.current;
+      const t = e.changedTouches[0];
+      start.current = null;
+      if (!s || !t) return;
+      const dx = t.clientX - s.x;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(t.clientY - s.y)) return;
+      if (dx < 0) onNext();
+      else onPrev();
+    },
   };
 }
 

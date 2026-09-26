@@ -4,17 +4,29 @@ import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { Heading } from "@/components/ui/primitives";
+import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
 
 /**
  * Dark photographic hero used at the top of every page. It slides up under the
  * translucent sticky header (the -mt / pt pair), as in the designs.
  */
 export function PageHero({ hero, size = "md", children, top }: { hero: Hero; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode }) {
+  // hero.image first, then any extra slides; duplicates dropped. Two or more makes a slideshow.
+  const seen = new Set<string>();
+  const images = [hero.image, ...(hero.images ?? [])].filter((img): img is NonNullable<typeof img> => {
+    if (!img?.url || seen.has(img.url)) return false;
+    seen.add(img.url);
+    return true;
+  });
+
   return (
+    <HeroSlideshow count={images.length}>
     <section className={cn("relative -mt-[70px] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
       <div className="absolute inset-0">
-        {hero.image ? (
-          <Media image={hero.image} priority sizes="100vw" />
+        {images.length > 1 ? (
+          <HeroSlides images={images} />
+        ) : images[0] ? (
+          <Media image={images[0]} priority sizes="100vw" />
         ) : (
           <div className="size-full bg-[radial-gradient(ellipse_at_70%_30%,#3a3a3a_0%,#141414_45%,#000_80%)]" aria-hidden />
         )}
@@ -28,6 +40,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
             {hero.title}
           </Heading>
           {hero.subtitle ? <p className="mt-4 max-w-[620px] text-lg leading-8 text-white/85 md:text-xl md:leading-9">{hero.subtitle}</p> : null}
+          <HeroDots className="-ml-1.5 mt-4" />
           {children}
           {hero.primaryCta || hero.secondaryCta ? (
             <div className="mt-6 flex flex-wrap gap-3">
@@ -38,6 +51,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
         </div>
       </div>
     </section>
+    </HeroSlideshow>
   );
 }
 
