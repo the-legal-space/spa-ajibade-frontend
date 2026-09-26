@@ -6,17 +6,19 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import type { InsightCard } from "@/lib/api/schemas";
 import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { useAutoplay } from "@/components/home/scroll-rail";
 
 /** Dark featured carousel at the top of Insights & News. */
 export function FeaturedInsights({ items }: { items: InsightCard[] }) {
   const [i, setI] = useState(0);
+  const autoplay = useAutoplay(() => setI((n) => (n + 1) % Math.max(1, items.length)), { enabled: items.length > 1 });
   if (items.length === 0) return null;
   const go = (n: number) => setI((n + items.length) % items.length);
   const item = items[i]!;
   const date = formatMonthYear(item.publishedAt);
 
   return (
-    <section className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white" aria-roledescription="carousel" aria-label="Featured insights">
+    <section {...autoplay} className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white" aria-roledescription="carousel" aria-label="Featured insights">
       <svg className="pointer-events-none absolute inset-0 size-full text-white/[0.06]" aria-hidden preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 600">
         <path d="M200 -60 L720 330 L1240 -60 M200 720 L720 330 L1240 720" fill="none" stroke="currentColor" strokeWidth="170" />
       </svg>

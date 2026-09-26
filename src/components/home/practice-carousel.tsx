@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { PracticeAreaCard } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { useAutoplay } from "./scroll-rail";
 
 /**
  * Home "Focused Practice Areas": a tab bar of short labels driving a centred card,
@@ -13,6 +14,7 @@ import { Media } from "@/components/ui/media";
  */
 export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
   const [index, setIndex] = useState(Math.min(2, Math.max(0, areas.length - 1)));
+  const autoplay = useAutoplay(() => setIndex((i) => (i + 1) % Math.max(1, areas.length)), { enabled: areas.length > 1 });
   if (areas.length === 0) return null;
   const go = (i: number) => setIndex((i + areas.length) % areas.length);
   const prev = areas[(index - 1 + areas.length) % areas.length]!;
@@ -20,7 +22,7 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
   const current = areas[index]!;
 
   return (
-    <div>
+    <div {...autoplay}>
       <div role="tablist" aria-label="Practice areas" className="hide-scrollbar mx-auto flex w-max max-w-full overflow-x-auto rounded-full bg-ink-700 p-1">
         {areas.map((a, i) => (
           <button
