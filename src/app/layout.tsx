@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { getOffices, getPracticeAreas, getSite } from "@/lib/api/endpoints";
 import { SITE_URL } from "@/lib/env";
 import { TopBar } from "@/components/layout/top-bar";
-import { Header } from "@/components/layout/header";
+import { ChatButton, Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ActionsProvider } from "@/components/forms/actions-context";
 import "./globals.css";
@@ -14,11 +14,12 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite().catch(() => null);
-  const name = site?.settings.firmName ?? "SPA Ajibade & Co.";
-  const description = site?.settings.tagline ?? "Counsel to the institutions building Nigeria's economy.";
+  if (!site) return { metadataBase: new URL(SITE_URL) };
+  const name = site.settings.firmName;
+  const description = site.settings.tagline;
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: `${name} | ${site?.settings.legalDescriptor ?? "Legal Practitioners"}`, template: `%s | ${name}` },
+    title: { default: `${name} | ${site.settings.legalDescriptor}`, template: `%s | ${name}` },
     description,
     applicationName: name,
     openGraph: { type: "website", siteName: name, locale: "en_NG", description },
@@ -59,13 +60,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="sr-only z-[100] rounded bg-white px-4 py-2 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
           Skip to content
         </a>
-        <ActionsProvider phone={site.settings.phone} practiceAreas={practiceAreas} offices={offices}>
+        <ActionsProvider firmName={site.settings.firmName} phone={site.settings.phone} practiceAreas={practiceAreas} offices={offices}>
           <TopBar settings={site.settings} />
-          <Header nav={site.nav} firmName={site.settings.firmName} descriptor={site.settings.legalDescriptor} />
+          <Header nav={site.nav} firmName={site.settings.firmName} descriptor={site.settings.legalDescriptor} cta={site.contactCallout.primaryCta} />
           <main id="main" className="bg-white">
             {children}
           </main>
           <Footer site={site} offices={offices} />
+          <ChatButton link={site.faqSection.stillHaveQuestions.actions.find((l) => l.href === "action:chat")} />
         </ActionsProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       </body>

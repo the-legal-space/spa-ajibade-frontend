@@ -9,7 +9,7 @@ import { Heading } from "@/components/ui/primitives";
  * Dark photographic hero used at the top of every page. It slides up under the
  * translucent sticky header (the -mt / pt pair), as in the designs.
  */
-export function PageHero({ hero, size = "md", children }: { hero: Hero; size?: "lg" | "md"; children?: React.ReactNode }) {
+export function PageHero({ hero, size = "md", children, top }: { hero: Hero; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode }) {
   return (
     <section className={cn("relative -mt-[70px] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
       <div className="absolute inset-0">
@@ -23,6 +23,7 @@ export function PageHero({ hero, size = "md", children }: { hero: Hero; size?: "
 
       <div className={cn("container-site relative flex flex-col justify-center pt-[70px]", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
         <div className="max-w-[720px] py-16">
+          {top ? <div className="mb-3 text-[13px] text-white/85">{top}</div> : null}
           <Heading as="h1" size="display">
             {hero.title}
           </Heading>

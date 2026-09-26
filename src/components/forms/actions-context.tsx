@@ -17,6 +17,7 @@ type DialogKind = "mandate" | "message" | null;
 type ActionsValue = {
   run: (action: string, context?: { practiceArea?: string }) => void;
   phoneHref: string | null;
+  firmName: string;
 };
 
 const ActionsContext = createContext<ActionsValue | null>(null);
@@ -29,11 +30,13 @@ export function useActions() {
 
 export function ActionsProvider({
   children,
+  firmName,
   phone,
   practiceAreas,
   offices,
 }: {
   children: ReactNode;
+  firmName: string;
   phone: string | null;
   practiceAreas: PracticeAreaRef[];
   offices: OfficeRef[];
@@ -65,7 +68,7 @@ export function ActionsProvider({
     [phoneHref],
   );
 
-  const value = useMemo(() => ({ run, phoneHref }), [run, phoneHref]);
+  const value = useMemo(() => ({ run, phoneHref, firmName }), [run, phoneHref, firmName]);
 
   return (
     <ActionsContext.Provider value={value}>

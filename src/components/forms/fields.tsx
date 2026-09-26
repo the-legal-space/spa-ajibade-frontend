@@ -4,6 +4,7 @@ import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttribu
 import { CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CONSENT_TEXT_VERSION } from "@/lib/env";
+import { useActions } from "./actions-context";
 
 const control =
   "w-full rounded-lg border border-mist-300 bg-white px-3.5 py-3 text-[15px] text-ink outline-none transition placeholder:text-stone-400 focus:border-ink aria-[invalid=true]:border-danger";
@@ -60,11 +61,12 @@ export function Select({ label, error, children, className, ...props }: SelectHT
  * sent with every submission so the firm can prove what was shown. If you edit this
  * text, bump NEXT_PUBLIC_CONSENT_TEXT_VERSION.
  */
-export const CONSENT_TEXT =
-  "I agree that SPA Ajibade & Co. may use the information I have provided to respond to this request, in line with the Nigeria Data Protection Act 2023. Sending this form does not create a lawyer-client relationship.";
+export const consentText = (firmName: string) =>
+  `I agree that ${firmName} may use the information I have provided to respond to this request, in line with the Nigeria Data Protection Act 2023. Sending this form does not create a lawyer-client relationship.`;
 
 export function ConsentCheckbox({ error, checked, onChange }: { error?: string; checked: boolean; onChange: (v: boolean) => void }) {
   const id = useId();
+  const { firmName } = useActions();
   return (
     <div>
       <label htmlFor={id} className="flex items-start gap-3 text-sm leading-6 text-ink-700">
@@ -77,7 +79,7 @@ export function ConsentCheckbox({ error, checked, onChange }: { error?: string; 
           aria-invalid={!!error}
           className="mt-1 size-4 shrink-0 accent-ink"
         />
-        <span>{CONSENT_TEXT}</span>
+        <span>{consentText(firmName)}</span>
       </label>
       {error ? <p className="mt-1 text-xs text-danger" role="alert">{error}</p> : null}
       <input type="hidden" name="consentTextVersion" value={CONSENT_TEXT_VERSION} />

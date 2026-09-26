@@ -1,7 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { API_BASE_URL, USE_MOCK_API } from "@/lib/env";
-import { mockResponse } from "./mock";
+import { API_BASE_URL } from "@/lib/env";
 
 /**
  * Server-side fetcher for the public content API.
@@ -45,12 +44,6 @@ function buildPath(path: string, query?: Query) {
 }
 
 async function request(path: string, tags: string[]): Promise<unknown> {
-  if (USE_MOCK_API) {
-    const body = mockResponse(path);
-    if (body === null) throw new ApiNotFoundError(path);
-    return body;
-  }
-
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {

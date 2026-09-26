@@ -5,14 +5,17 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import { API_BASE_URL } from "@/lib/env";
 import { SearchResults, type SearchResults as Results } from "@/lib/api/schemas";
+import { Logo } from "@/components/ui/logo";
+import { InsightCard, PersonCard, PracticeAreaCard } from "@/components/sections/cards";
 
 type State = { status: "idle" } | { status: "loading" } | { status: "error"; message: string } | { status: "done"; results: Results };
 
 /**
- * Header quick search. Calls the public /search endpoint straight from the browser
- * (debounced, per the API's 60 requests/minute limit) and shows grouped results.
+ * Full-screen site search, following the "NAV SEARCH" frames: a white page with the
+ * search field in the header row, an empty state, then result cards.
+ * Calls the public /search endpoint from the browser, debounced (60 requests/minute limit).
  */
-export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function SearchDialog({ open, onClose, firmName, descriptor }: { open: boolean; onClose: () => void; firmName: string; descriptor: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [q, setQ] = useState("");
@@ -23,9 +26,13 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
     if (!el) return;
     if (open && !el.open) {
       el.showModal();
+      document.documentElement.style.overflow = "hidden";
       setTimeout(() => inputRef.current?.focus(), 10);
     }
-    if (!open && el.open) el.close();
+    if (!open && el.open) {
+      el.close();
+      document.documentElement.style.overflow = "";
+    }
   }, [open]);
 
   useEffect(() => {
@@ -59,50 +66,86 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
     };
   }, [q]);
 
-  const total =
-    state.status === "done" ? state.results.practiceAreas.length + state.results.people.length + state.results.insights.length : 0;
+  const close = () => {
+    document.documentElement.style.overflow = "";
+    onClose();
+  };
+
+  const r = state.status === "done" ? state.results : null;
+  const total = r ? r.practiceAreas.length + r.people.length + r.insights.length : 0;
 
   return (
     <dialog
       ref={ref}
-      onClose={onClose}
+      onClose={close}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        close();
       }}
-      onClick={(e) => e.target === ref.current && onClose()}
       aria-label="Search the site"
-      className="mx-auto mt-[12vh] w-[calc(100%-2rem)] max-w-2xl rounded-2xl bg-white p-0 text-ink shadow-2xl backdrop:bg-ink/70 backdrop:backdrop-blur-sm"
+      className="m-0 h-dvh max-h-none w-screen max-w-none bg-white p-0 text-ink backdrop:bg-transparent"
     >
-      <div className="flex items-center gap-3 border-b border-mist-200 px-5">
-        <Search className="size-5 text-stone" aria-hidden />
-        <input
-          ref={inputRef}
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          maxLength={100}
-          placeholder="Search practice areas, attorneys, insights…"
-          aria-label="Search"
-          className="h-16 flex-1 bg-transparent text-base outline-none placeholder:text-stone-400"
-        />
-        {state.status === "loading" ? <Loader2 className="size-4 animate-spin text-stone" aria-label="Searching" /> : null}
-        <button type="button" onClick={onClose} className="grid size-8 place-items-center rounded-full hover:bg-mist" aria-label="Close search">
-          <X className="size-4" />
-        </button>
+      <div className="sticky top-0 z-10 border-b border-mist-200 bg-white">
+        <div className="container-site flex h-[70px] items-center gap-4">
+          <Link href="/" onClick={close} className="hidden shrink-0 md:block" aria-label={`${firmName} home`}>
+            <Logo firmName={firmName} descriptor={descriptor} tone="dark" />
+          </Link>
+          <div className="flex flex-1 items-center gap-3 rounded-full bg-mist px-4 md:mx-8">
+            <Search className="size-4 text-stone" aria-hidden />
+            <input
+              ref={inputRef}
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              maxLength={100}
+              placeholder="Search for anything on our website…"
+              aria-label="Search"
+              className="h-11 flex-1 bg-transparent text-sm outline-none placeholder:text-stone-400"
+            />
+            {state.status === "loading" ? <Loader2 className="size-4 animate-spin text-stone" aria-label="Searching" /> : null}
+          </div>
+          <button type="button" onClick={close} className="grid size-10 place-items-center rounded-full bg-ink text-white hover:bg-ink-700" aria-label="Close search">
+            <X className="size-4" />
+          </button>
+        </div>
       </div>
 
-      <div className="max-h-[60vh] overflow-y-auto p-3" aria-live="polite">
-        {state.status === "idle" ? <p className="px-3 py-6 text-sm text-stone">Type at least two characters.</p> : null}
-        {state.status === "error" ? <p className="px-3 py-6 text-sm text-danger">{state.message}</p> : null}
-        {state.status === "done" && total === 0 ? (
-          <p className="px-3 py-6 text-sm text-stone">No results for “{q.trim()}”.</p>
+      <div className="container-site py-10" aria-live="polite">
+        {state.status === "idle" || state.status === "loading" ? (
+          <EmptyState title="Search The Firm's Site" text="Find practice areas, attorneys and insights. Type at least two characters." />
         ) : null}
-        {state.status === "done" && total > 0 ? (
-          <div className="space-y-4">
-            <Group title="Practice areas" items={state.results.practiceAreas.map((p) => ({ href: `/practice-areas/${p.slug}`, title: p.title, meta: p.shortLabel }))} onPick={onClose} />
-            <Group title="Attorneys" items={state.results.people.map((p) => ({ href: `/people/${p.slug}`, title: p.displayName, meta: p.roleLabel }))} onPick={onClose} />
-            <Group title="Insights" items={state.results.insights.map((i) => ({ href: `/insights/${i.slug}`, title: i.title, meta: i.categoryLabels.join(", ") }))} onPick={onClose} />
+        {state.status === "error" ? <EmptyState title="Search is unavailable" text={state.message} /> : null}
+        {r && total === 0 ? <EmptyState title={`No results for “${q.trim()}”`} text="Try a different word, such as a practice area or an attorney's name." /> : null}
+
+        {r && total > 0 ? (
+          <div className="space-y-12" onClick={(e) => (e.target as HTMLElement).closest("a") && close()}>
+            {r.practiceAreas.length > 0 ? (
+              <ResultGroup title="Practice Areas" count={r.practiceAreas.length}>
+                {r.practiceAreas.map((a) => (
+                  <li key={a.id}>
+                    <PracticeAreaCard area={a} />
+                  </li>
+                ))}
+              </ResultGroup>
+            ) : null}
+            {r.people.length > 0 ? (
+              <ResultGroup title="Attorneys" count={r.people.length}>
+                {r.people.map((p) => (
+                  <li key={p.id}>
+                    <PersonCard person={p} />
+                  </li>
+                ))}
+              </ResultGroup>
+            ) : null}
+            {r.insights.length > 0 ? (
+              <ResultGroup title="Insights & News" count={r.insights.length}>
+                {r.insights.map((i) => (
+                  <li key={i.id}>
+                    <InsightCard insight={i} />
+                  </li>
+                ))}
+              </ResultGroup>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -110,21 +153,25 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
   );
 }
 
-function Group({ title, items, onPick }: { title: string; items: { href: string; title: string; meta?: string }[]; onPick: () => void }) {
-  if (items.length === 0) return null;
+function EmptyState({ title, text }: { title: string; text: string }) {
   return (
-    <div>
-      <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-stone">{title}</p>
-      <ul>
-        {items.map((it) => (
-          <li key={it.href}>
-            <Link href={it.href} onClick={onPick} className="block rounded-lg px-3 py-2.5 hover:bg-mist">
-              <span className="block text-sm text-ink">{it.title}</span>
-              {it.meta ? <span className="block text-xs text-stone">{it.meta}</span> : null}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
+      <span className="grid size-16 place-items-center rounded-full bg-mist">
+        <Search className="size-6 text-stone" aria-hidden />
+      </span>
+      <p className="mt-4 font-serif text-2xl">{title}</p>
+      <p className="mt-1 max-w-sm text-sm text-stone">{text}</p>
     </div>
+  );
+}
+
+function ResultGroup({ title, count, children }: { title: string; count: number; children: React.ReactNode }) {
+  return (
+    <section>
+      <h2 className="flex items-baseline gap-2 font-serif text-2xl">
+        {title} <span className="font-sans text-sm text-stone">{count}</span>
+      </h2>
+      <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</ul>
+    </section>
   );
 }

@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getInsight } from "@/lib/api/endpoints";
+import { ArrowLeft } from "lucide-react";
+import { getInsight, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
-import { formatLongDate, initials } from "@/lib/utils";
-import { DetailHero } from "@/components/sections/page-hero";
+import { formatMonthYear, initials, navLabel } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
-import { InsightCard } from "@/components/sections/cards";
-import { Heading, Section } from "@/components/ui/primitives";
+import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { VideoEmbed } from "@/components/sections/video-embed";
 
@@ -40,100 +39,100 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/** Article page, following the "READ MORE" frame (white header, full-width cover, body, author). */
 export default async function InsightPage({ params }: Props) {
   const { slug } = await params;
-  const i = await load(slug);
+  const [i, site] = await Promise.all([load(slug), getSite()]);
   const body = cleanHtml(i.body);
-  const authorName = i.author.type === "person" ? i.author.person.displayName : i.author.name;
-  const authorLabel = i.author.type === "person" ? i.author.person.roleLabel : i.author.label;
+  const back = navLabel(site.nav, "/insights");
+  const date = formatMonthYear(i.publishedAt);
+  const author =
+    i.author.type === "person"
+      ? { name: i.author.person.displayName, label: i.author.person.roleLabel, href: `/people/${i.author.person.slug}`, photo: i.author.person.photo }
+      : { name: i.author.name, label: i.author.label, href: null, photo: null };
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: i.title,
     datePublished: i.publishedAt ?? undefined,
-    author: { "@type": i.author.type === "person" ? "Person" : "Organization", name: authorName },
-    publisher: { "@type": "Organization", name: "SPA Ajibade & Co.", url: SITE_URL },
+    author: { "@type": i.author.type === "person" ? "Person" : "Organization", name: author.name },
+    publisher: { "@type": "Organization", name: site.settings.firmName, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/insights/${i.slug}`,
   };
 
   return (
     <>
-      <DetailHero
-        eyebrow={
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href="/insights" className="hover:text-white">
-              ← Insights &amp; News
+      <article className="bg-white">
+        <div className="container-site py-10 md:py-12">
+          {back ? (
+            <Link href="/insights" className="inline-flex items-center gap-1.5 text-[13px] hover:underline">
+              <ArrowLeft className="size-3.5" aria-hidden /> Back to {back}
             </Link>
-            {i.categoryLabels.map((c, n) => (
-              <Link key={c} href={`/insights?category=${i.categories[n]}`} className="rounded-[4px] border border-white/20 px-2.5 py-1 text-xs hover:bg-white/10">
-                {c}
-              </Link>
-            ))}
+          ) : null}
+
+          <div className="mt-8 flex items-start justify-between gap-4">
+            <div className="flex flex-wrap gap-1.5">
+              {i.chips.map((c, n) => {
+                const cat = i.categories[n];
+                return cat ? (
+                  <Link key={c} href={`/insights?category=${cat}`}>
+                    <Chip className="underline underline-offset-2">{c}</Chip>
+                  </Link>
+                ) : (
+                  <Chip key={c} className="underline underline-offset-2">
+                    {c}
+                  </Chip>
+                );
+              })}
+            </div>
+            {date && i.publishedAt ? (
+              <time dateTime={i.publishedAt}>
+                <Chip>{date}</Chip>
+              </time>
+            ) : null}
           </div>
-        }
-        title={i.title}
-      >
-        <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-white/80">
-          <span className="flex items-center gap-2">
-            <span className="grid size-8 place-items-center rounded-full bg-[#56697a] text-[11px] text-white">{initials(authorName)}</span>
-            {i.author.type === "person" ? (
-              <Link href={`/people/${i.author.person.slug}`} className="hover:underline">
-                {authorName}
-              </Link>
-            ) : (
-              authorName
-            )}
-            <span className="text-white/50">· {authorLabel}</span>
-          </span>
-          {i.publishedAt ? <time dateTime={i.publishedAt}>{formatLongDate(i.publishedAt)}</time> : null}
-        </div>
-      </DetailHero>
 
-      <Section tone="white">
-        <div className="mx-auto max-w-3xl">
-          {i.format === "video" && i.videoUrl ? (
-            <VideoEmbed url={i.videoUrl} title={i.title} poster={i.coverImage} />
-          ) : i.coverImage ? (
-            <div className="aspect-[16/9] overflow-hidden rounded-xl">
-              <Media image={i.coverImage} priority sizes="(min-width:768px) 768px, 100vw" />
-            </div>
-          ) : null}
-          {i.excerpt ? <p className="mt-10 font-serif text-xl leading-9 text-ink">{i.excerpt}</p> : null}
-          {body ? <div className="prose-firm mt-8" dangerouslySetInnerHTML={{ __html: body }} /> : null}
-          {i.practiceAreas.length > 0 ? (
-            <div className="mt-12 border-t border-mist-200 pt-6">
-              <p className="text-xs uppercase tracking-wider text-stone">Practice areas</p>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {i.practiceAreas.map((a) => (
-                  <li key={a.slug}>
-                    <Link href={`/practice-areas/${a.slug}`} className="inline-block rounded-[4px] border border-mist-300 px-3 py-1.5 text-[13px] hover:border-ink">
-                      {a.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      </Section>
-
-      {i.related.length > 0 ? (
-        <Section tone="mist" labelledBy="related-heading">
-          <Heading>
-            <span id="related-heading">Related Insights</span>
+          <Heading as="h1" size="h2" className="mt-5 max-w-5xl">
+            {i.title}
           </Heading>
-          <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {i.related.map((r) => (
-              <li key={r.id}>
-                <InsightCard insight={r} />
-              </li>
-            ))}
-          </ul>
-        </Section>
-      ) : null}
 
-      <PageEnd faq={false} />
+          <div className="mt-8">
+            {i.format === "video" && i.videoUrl ? (
+              <VideoEmbed url={i.videoUrl} title={i.title} poster={i.coverImage} />
+            ) : (
+              <div className="aspect-[1352/540] overflow-hidden">
+                <Media image={i.coverImage} priority sizes="100vw" />
+              </div>
+            )}
+          </div>
+
+          {i.excerpt && !body ? <p className="mt-8 text-[15px] leading-8 text-ink-800">{i.excerpt}</p> : null}
+          {body ? <div className="prose-firm mt-8 text-[15px] leading-8" dangerouslySetInnerHTML={{ __html: body }} /> : null}
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="size-11 shrink-0 overflow-hidden rounded-full">
+              {author.photo ? (
+                <Media image={author.photo} alt="" />
+              ) : (
+                <span className="grid size-full place-items-center bg-[#56697a] text-xs text-white">{initials(author.name)}</span>
+              )}
+            </span>
+            <span className="leading-tight">
+              {author.href ? (
+                <Link href={author.href} className="block text-[13px] hover:underline">
+                  {author.name}
+                </Link>
+              ) : (
+                <span className="block text-[13px]">{author.name}</span>
+              )}
+              <span className="block text-[11px] text-stone">{author.label}</span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <PageEnd />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
     </>
   );

@@ -5,7 +5,7 @@ import { getJob } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
-import { formatLongDate } from "@/lib/utils";
+import { formatLongDate, navLabel } from "@/lib/utils";
 import { DetailHero } from "@/components/sections/page-hero";
 import { ContactCallout } from "@/components/sections/contact-callout";
 import { getSite } from "@/lib/api/endpoints";
@@ -26,8 +26,8 @@ async function load(id: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const job = await load(id);
-  return pageMetadata(undefined, { title: `${job.title} | Careers`, description: `${job.title}, ${job.office?.name ?? ""}. Apply to SPA Ajibade & Co.`, path: `/careers/${id}` });
+  const [job, site] = await Promise.all([load(id), getSite()]);
+  return pageMetadata(undefined, { title: job.title, description: [job.title, job.office?.name, site.settings.firmName].filter(Boolean).join(", "), path: `/careers/${id}` });
 }
 
 export default async function JobPage({ params }: Props) {
@@ -38,9 +38,11 @@ export default async function JobPage({ params }: Props) {
     <>
       <DetailHero
         eyebrow={
-          <Link href="/careers" className="hover:text-white">
-            ← Careers
-          </Link>
+          navLabel(site.nav, "/careers") ? (
+            <Link href="/careers" className="hover:text-white">
+              ← {navLabel(site.nav, "/careers")}
+            </Link>
+          ) : undefined
         }
         title={job.title}
       >

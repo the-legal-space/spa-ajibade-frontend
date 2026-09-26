@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, Search, X } from "lucide-react";
-import type { NavItem } from "@/lib/api/schemas";
+import { Bot, ChevronDown, Menu, Search, X } from "lucide-react";
+import type { ApiLink, NavItem } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { buttonClass } from "@/components/ui/button";
-import { ActionButton } from "@/components/ui/smart-link";
+import { SmartLink } from "@/components/ui/smart-link";
 import { SearchDialog } from "./search-dialog";
 
 function isActive(pathname: string, href: string) {
@@ -16,8 +16,14 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName: string; descriptor: string }) {
+/** Article and attorney pages use the white header from the Figma ("READ MORE", "ATTORNEY DETAILS"). */
+function usesLightHeader(pathname: string) {
+  return /^\/(people|insights)\/[^/]+\/?$/.test(pathname);
+}
+
+export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; firmName: string; descriptor: string; cta: ApiLink | null }) {
   const pathname = usePathname();
+  const light = usesLightHeader(pathname);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -42,42 +48,41 @@ export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const iconBtn = cn("grid size-10 place-items-center rounded-full", light ? "hover:bg-mist" : "hover:bg-white/10");
+
   return (
     <>
       <header
         className={cn(
-          "sticky top-0 z-40 border-b border-white/15 text-white transition-colors duration-300",
-          scrolled ? "bg-ink/80 backdrop-blur-md" : "bg-ink/40 backdrop-blur-[2px]",
+          "sticky top-0 z-40 border-b transition-colors duration-300",
+          light
+            ? "border-mist-200 bg-white text-ink"
+            : cn("border-white/15 text-white", scrolled ? "bg-ink/80 backdrop-blur-md" : "bg-ink/40 backdrop-blur-[2px]"),
         )}
       >
         <div className="container-site flex h-[70px] items-center justify-between gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
-            <Logo firmName={firmName} descriptor={descriptor} />
+            <Logo firmName={firmName} descriptor={descriptor} tone={light ? "dark" : "light"} />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
-            <ul className="flex items-center gap-1 xl:gap-2">
+            <ul className="flex items-center gap-0.5 xl:gap-1.5">
               {nav.map((item) => (
-                <DesktopNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
+                <DesktopNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} light={light} />
               ))}
             </ul>
           </nav>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="grid size-10 place-items-center rounded-full hover:bg-white/10"
-              aria-label="Search the site"
-            >
+            <button type="button" onClick={() => setSearchOpen(true)} className={iconBtn} aria-label="Search the site">
               <Search className="size-5" strokeWidth={1.5} />
             </button>
-            <ActionButton action="action:mandate" className={buttonClass("light", "hidden px-3 py-2 text-[13px] sm:inline-flex")}>
-              Discuss a Mandate
-            </ActionButton>
+            {cta ? (
+              <SmartLink link={cta} className={buttonClass(light ? "dark" : "light", "hidden px-3 py-2 text-[13px] sm:inline-flex")} />
+            ) : null}
             <button
               type="button"
-              className="grid size-10 place-items-center rounded-full hover:bg-white/10 lg:hidden"
+              className={cn(iconBtn, "lg:hidden")}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
@@ -89,26 +94,26 @@ export function Header({ nav, firmName, descriptor }: { nav: NavItem[]; firmName
         </div>
 
         {mobileOpen ? (
-          <nav id="mobile-nav" aria-label="Mobile" className="max-h-[calc(100dvh-70px)] overflow-y-auto border-t border-white/10 bg-ink lg:hidden">
+          <nav id="mobile-nav" aria-label="Mobile" className="max-h-[calc(100dvh-70px)] overflow-y-auto border-t border-white/10 bg-ink text-white lg:hidden">
             <ul className="container-site flex flex-col py-4">
               {nav.map((item) => (
                 <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
               ))}
-              <li className="pt-4 sm:hidden">
-                <ActionButton action="action:mandate" className={buttonClass("light", "w-full")}>
-                  Discuss a Mandate
-                </ActionButton>
-              </li>
+              {cta ? (
+                <li className="pt-4 sm:hidden">
+                  <SmartLink link={cta} className={buttonClass("light", "w-full")} />
+                </li>
+              ) : null}
             </ul>
           </nav>
         ) : null}
       </header>
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} firmName={firmName} descriptor={descriptor} />
     </>
   );
 }
 
-function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
+function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolean; light: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
   const hasChildren = item.children.length > 0;
@@ -127,10 +132,14 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
     };
   }, [open]);
 
-  const linkClass = cn(
-    "inline-flex items-center gap-1 rounded px-2 py-2 text-[13px] transition-colors",
-    active ? "text-white" : "text-white/65 hover:text-white",
-  );
+  const tone = light
+    ? active
+      ? "text-ink"
+      : "text-stone hover:text-ink"
+    : active
+      ? "text-white"
+      : "text-white/65 hover:text-white";
+  const linkClass = cn("inline-flex items-center gap-1 rounded px-2 py-2 text-[13px] transition-colors", tone);
 
   if (!hasChildren) {
     return (
@@ -150,7 +159,7 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
         </Link>
         <button
           type="button"
-          className="rounded p-1 text-white/65 hover:text-white"
+          className={cn("rounded p-1", tone)}
           aria-label={`${item.label} menu`}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
@@ -159,15 +168,12 @@ function DesktopNavItem({ item, active }: { item: NavItem; active: boolean }) {
         </button>
       </span>
       {open ? (
-        <div className="absolute left-0 top-full z-50 pt-2">
-          <ul className="min-w-72 animate-fade-in rounded-lg border border-white/10 bg-ink-900/95 p-2 shadow-2xl backdrop-blur-md">
+        // White rounded card with divided rows, as in the "NAV ACCORDIONS" frames.
+        <div className="absolute left-0 top-full z-50 pt-1.5">
+          <ul className="min-w-60 animate-fade-in divide-y divide-mist-200 rounded-xl bg-white px-3 py-1.5 text-ink shadow-2xl ring-1 ring-black/5">
             {item.children.map((child) => (
               <li key={child.href}>
-                <Link
-                  href={child.href}
-                  className="block rounded-md px-3 py-2.5 text-sm text-white/75 hover:bg-white/10 hover:text-white"
-                  onClick={() => setOpen(false)}
-                >
+                <Link href={child.href} className="block py-2.5 text-[13px] text-ink-700 hover:text-ink" onClick={() => setOpen(false)}>
                   {child.label}
                 </Link>
               </li>
@@ -211,5 +217,22 @@ function MobileNavItem({ item, active }: { item: NavItem; active: boolean }) {
         </ul>
       ) : null}
     </li>
+  );
+}
+
+/**
+ * Floating "Chat with us" pill from the designs. It only appears when the CMS provides
+ * a chat action (in /site: faqSection.stillHaveQuestions.actions) and uses its label.
+ */
+export function ChatButton({ link }: { link: ApiLink | undefined }) {
+  if (!link) return null;
+  return (
+    <SmartLink
+      link={link}
+      className="fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full border border-white/20 bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl transition hover:bg-ink-700 md:bottom-8 md:right-8"
+    >
+      <Bot className="size-4" strokeWidth={1.6} aria-hidden />
+      {link.label}
+    </SmartLink>
   );
 }
