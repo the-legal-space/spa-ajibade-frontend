@@ -3,10 +3,15 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 import type { PracticeAreaCard } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { MotionP } from "@/components/ui/motion-p";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { useAutoplay, useSwipe } from "./scroll-rail";
+
+const MotionLink = motion.create(Link);
 
 /**
  * Home "Focused Practice Areas": a tab bar of short labels driving a sliding track of cards.
@@ -42,7 +47,7 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
     <div {...autoplay}>
       <div ref={bar} role="tablist" aria-label="Practice areas" className="hide-scrollbar relative mx-auto flex w-max max-w-full overflow-x-auto rounded-full bg-ink-700 p-1">
         {areas.map((a, i) => (
-          <button
+          <motion.button
             key={a.slug}
             role="tab"
             type="button"
@@ -50,13 +55,16 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
             aria-selected={i === index}
             aria-controls={`pa-panel-${a.slug}`}
             onClick={() => go(i)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
+            transition={TRANSITIONS.hover}
             className={cn(
               "whitespace-nowrap rounded-full px-4 py-2 text-[13px] transition-colors duration-300",
-              i === index ? "bg-white/20 font-medium text-white" : "text-white/75 hover:text-white",
+              i === index ? "bg-white/20 font-medium text-white shadow-xs" : "text-white/75 hover:text-white",
             )}
           >
             {a.shortLabel}
-          </button>
+          </motion.button>
         ))}
       </div>
 
@@ -80,7 +88,7 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
                 onClick={active ? undefined : () => go(i)}
                 className={cn(
                   "grid w-(--cw) shrink-0 gap-6 rounded-[20px] bg-ink-800 p-2 transition-[opacity,transform] duration-700 md:grid-cols-[362px_1fr] md:p-1.5",
-                  active ? "opacity-100" : "scale-[0.96] cursor-pointer opacity-40 hover:opacity-60",
+                  active ? "opacity-100 shadow-xl" : "scale-[0.96] cursor-pointer opacity-40 hover:opacity-60",
                 )}
               >
                 <div className="aspect-[362/394] overflow-hidden rounded-2xl">
@@ -88,14 +96,17 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
                 </div>
                 <div className="flex flex-col px-3 pb-4 md:px-2 md:py-7 md:pr-8">
                   <h3 className="font-serif text-3xl leading-tight text-white md:text-[2.25rem]">{a.title}</h3>
-                  <p className="mt-5 flex-1 text-[13px] leading-6 text-white/85">{a.summary}</p>
-                  <Link
+                  <MotionP className="mt-5 flex-1 text-[13px] leading-6 text-white/85">{a.summary}</MotionP>
+                  <MotionLink
                     href={`/practice-areas/${a.slug}`}
                     tabIndex={active ? undefined : -1}
+                    whileHover={INTERACTION.button.whileHover}
+                    whileTap={INTERACTION.button.whileTap}
+                    transition={TRANSITIONS.hover}
                     className="mt-6 inline-flex w-max items-center gap-2 rounded-[4px] border border-white/25 px-4 py-2.5 text-[13px] text-white hover:bg-white/10"
                   >
                     Learn More <ArrowRight className="size-4" aria-hidden />
-                  </Link>
+                  </MotionLink>
                 </div>
               </article>
             );
@@ -104,12 +115,28 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
       </div>
 
       <div className="mt-8 flex justify-end gap-3">
-        <button type="button" onClick={() => go(index - 1)} className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition hover:bg-ink-800 active:scale-95" aria-label="Previous practice area">
+        <motion.button
+          type="button"
+          onClick={() => go(index - 1)}
+          whileHover={INTERACTION.iconButton.whileHover}
+          whileTap={INTERACTION.iconButton.whileTap}
+          transition={TRANSITIONS.hover}
+          className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition-colors hover:bg-ink-800"
+          aria-label="Previous practice area"
+        >
           <ArrowLeft className="size-4" />
-        </button>
-        <button type="button" onClick={() => go(index + 1)} className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition hover:bg-ink-800 active:scale-95" aria-label="Next practice area">
+        </motion.button>
+        <motion.button
+          type="button"
+          onClick={() => go(index + 1)}
+          whileHover={INTERACTION.iconButton.whileHover}
+          whileTap={INTERACTION.iconButton.whileTap}
+          transition={TRANSITIONS.hover}
+          className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition-colors hover:bg-ink-800"
+          aria-label="Next practice area"
+        >
           <ArrowRight className="size-4" />
-        </button>
+        </motion.button>
       </div>
     </div>
   );

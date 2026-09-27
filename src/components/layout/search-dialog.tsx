@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
+import { motion } from "motion/react";
 import { API_BASE_URL } from "@/lib/env";
 import { SearchResults, type SearchResults as Results } from "@/lib/api/schemas";
 import { Logo } from "@/components/ui/logo";
 import { InsightCard, PersonCard, PracticeAreaCard } from "@/components/sections/cards";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 
 type State = { status: "idle" } | { status: "loading" } | { status: "error"; message: string } | { status: "done"; results: Results };
 
@@ -104,9 +107,17 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
             />
             {state.status === "loading" ? <Loader2 className="size-4 animate-spin text-stone" aria-label="Searching" /> : null}
           </div>
-          <button type="button" onClick={close} className="grid size-10 place-items-center rounded-full bg-ink text-white hover:bg-ink-700" aria-label="Close search">
+          <motion.button
+            type="button"
+            onClick={close}
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={INTERACTION.iconButton.whileTap}
+            transition={TRANSITIONS.hover}
+            className="grid size-10 place-items-center rounded-full bg-ink text-white transition-colors hover:bg-ink-700"
+            aria-label="Close search"
+          >
             <X className="size-4" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -122,27 +133,27 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
             {r.practiceAreas.length > 0 ? (
               <ResultGroup title="Practice Areas" count={r.practiceAreas.length}>
                 {r.practiceAreas.map((a) => (
-                  <li key={a.id}>
+                  <MotionListItem key={a.id}>
                     <PracticeAreaCard area={a} />
-                  </li>
+                  </MotionListItem>
                 ))}
               </ResultGroup>
             ) : null}
             {r.people.length > 0 ? (
               <ResultGroup title="Attorneys" count={r.people.length}>
                 {r.people.map((p) => (
-                  <li key={p.id}>
+                  <MotionListItem key={p.id}>
                     <PersonCard person={p} />
-                  </li>
+                  </MotionListItem>
                 ))}
               </ResultGroup>
             ) : null}
             {r.insights.length > 0 ? (
               <ResultGroup title="Insights & News" count={r.insights.length}>
                 {r.insights.map((i) => (
-                  <li key={i.id}>
+                  <MotionListItem key={i.id}>
                     <InsightCard insight={i} />
-                  </li>
+                  </MotionListItem>
                 ))}
               </ResultGroup>
             ) : null}
@@ -155,13 +166,18 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
 
 function EmptyState({ title, text }: { title: string; text: string }) {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={TRANSITIONS.smooth}
+      className="flex min-h-[50vh] flex-col items-center justify-center text-center"
+    >
       <span className="grid size-16 place-items-center rounded-full bg-mist">
         <Search className="size-6 text-stone" aria-hidden />
       </span>
       <p className="mt-4 font-serif text-2xl">{title}</p>
       <p className="mt-1 max-w-sm text-sm text-stone">{text}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -171,7 +187,7 @@ function ResultGroup({ title, count, children }: { title: string; count: number;
       <h2 className="flex items-baseline gap-2 font-serif text-2xl">
         {title} <span className="font-sans text-sm text-stone">{count}</span>
       </h2>
-      <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</ul>
+      <MotionList className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</MotionList>
     </section>
   );
 }

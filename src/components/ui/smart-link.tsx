@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { motion } from "motion/react";
 import type { ApiLink } from "@/lib/api/schemas";
 import { useActions } from "@/components/forms/actions-context";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+
+const MotionNextLink = motion.create(Link);
 
 /**
  * Renders a CMS link correctly whatever its kind:
  * internal → next/link, external → new tab, action → button that runs the action.
+ * Enhanced with subtle scale hover and tap micro-interactions.
  */
 export function SmartLink({
   link,
@@ -22,27 +27,50 @@ export function SmartLink({
 }) {
   const { run } = useActions();
   const content = children ?? link.label;
+  const isPill = className?.includes("rounded-full");
+  const interaction = isPill ? INTERACTION.pill : INTERACTION.button;
 
   if (link.kind === "action" || link.href.startsWith("action:")) {
     return (
-      <button type="button" className={className} onClick={() => run(link.href, { practiceArea })}>
+      <motion.button
+        type="button"
+        className={className}
+        whileHover={interaction.whileHover}
+        whileTap={interaction.whileTap}
+        transition={TRANSITIONS.hover}
+        onClick={() => run(link.href, { practiceArea })}
+      >
         {content}
-      </button>
+      </motion.button>
     );
   }
 
   if (link.kind === "external" || /^https?:\/\//.test(link.href)) {
     return (
-      <a href={link.href} className={className} target="_blank" rel="noopener noreferrer">
+      <motion.a
+        href={link.href}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        whileHover={interaction.whileHover}
+        whileTap={interaction.whileTap}
+        transition={TRANSITIONS.hover}
+      >
         {content}
-      </a>
+      </motion.a>
     );
   }
 
   return (
-    <Link href={link.href} className={className}>
+    <MotionNextLink
+      href={link.href}
+      className={className}
+      whileHover={interaction.whileHover}
+      whileTap={interaction.whileTap}
+      transition={TRANSITIONS.hover}
+    >
       {content}
-    </Link>
+    </MotionNextLink>
   );
 }
 
@@ -58,9 +86,19 @@ export function ActionButton({
   practiceArea?: string;
 }) {
   const { run } = useActions();
+  const isPill = className?.includes("rounded-full");
+  const interaction = isPill ? INTERACTION.pill : INTERACTION.button;
+
   return (
-    <button type="button" className={className} onClick={() => run(action, { practiceArea })}>
+    <motion.button
+      type="button"
+      className={className}
+      whileHover={interaction.whileHover}
+      whileTap={interaction.whileTap}
+      transition={TRANSITIONS.hover}
+      onClick={() => run(action, { practiceArea })}
+    >
       {children}
-    </button>
+    </motion.button>
   );
 }

@@ -10,6 +10,7 @@ import { Media } from "@/components/ui/media";
 import { CmsIcon } from "@/components/ui/icon";
 import { buttonClass } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -117,15 +118,15 @@ export default async function AboutPage() {
           <Heading className="mt-2 max-w-3xl">
             <span id="principles-heading">{principles.title}</span>
           </Heading>
-          <ul className="mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
             {principles.items.map((p) => (
-              <li key={p.title} className="border-b border-r border-mist-200 p-8">
+              <MotionListItem key={p.title} className="border-b border-r border-mist-200 p-8 transition-colors duration-200 hover:bg-mist/40">
                 <CmsIcon name={p.icon} className="size-7" />
                 <h3 className="mt-8 font-serif text-2xl text-olive">{p.title}</h3>
                 {p.text ? <p className="mt-2 text-[15px] leading-7 text-ink-800">{p.text}</p> : null}
-              </li>
+              </MotionListItem>
             ))}
-          </ul>
+          </MotionList>
         </div>
       </Section>
 
@@ -138,18 +139,18 @@ export default async function AboutPage() {
               <Heading className="mt-3">
                 <span id="awards-heading">{awardsList.title}</span>
               </Heading>
-              <ul className="mt-6 border-t border-white/15">
+              <MotionList className="mt-6 border-t border-white/15">
                 {awardsList.items.map((a) => (
-                  <li key={a.name} className="flex items-center justify-between gap-4 border-b border-white/15 py-4">
+                  <MotionListItem key={a.name} className="flex items-center justify-between gap-4 border-b border-white/15 py-4">
                     <span className="text-xl">{a.name}</span>
                     {a.url ? (
                       <a href={a.url} target="_blank" rel="noopener noreferrer" className={buttonClass("light", "px-5")}>
                         View Awards <ArrowUpRight className="size-4" aria-hidden />
                       </a>
                     ) : null}
-                  </li>
+                  </MotionListItem>
                 ))}
-              </ul>
+              </MotionList>
             </div>
             <div className="hidden aspect-[524/560] overflow-hidden lg:block">
               <Media image={awardsList.image} placeholder="dark" />

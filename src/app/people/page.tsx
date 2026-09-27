@@ -10,6 +10,7 @@ import { PersonCard } from "@/components/sections/cards";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { SortMenu } from "@/components/ui/sort-menu";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -54,13 +55,13 @@ export default async function PeoplePage({ searchParams }: Props) {
         </div>
 
         {people.data.length > 0 ? (
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {people.data.map((p) => (
-              <li key={p.id}>
+              <MotionListItem key={p.id}>
                 <PersonCard person={p} />
-              </li>
+              </MotionListItem>
             ))}
-          </ul>
+          </MotionList>
         ) : (
           <p className="mt-10 rounded-xl bg-white p-10 text-center text-stone">No attorneys are listed in this group yet.</p>
         )}

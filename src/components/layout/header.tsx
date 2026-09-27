@@ -4,11 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Bot, ChevronDown, Menu, Search, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import type { ApiLink, NavItem } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { buttonClass } from "@/components/ui/button";
 import { SmartLink } from "@/components/ui/smart-link";
+import {
+  accordionPanelVariants,
+  dropdownMenuVariants,
+  INTERACTION,
+  TRANSITIONS,
+} from "@/lib/motion";
 import { SearchDialog } from "./search-dialog";
 
 function isActive(pathname: string, href: string) {
@@ -48,7 +55,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const iconBtn = cn("grid size-10 place-items-center rounded-full", light ? "hover:bg-mist" : "hover:bg-white/10");
+  const iconBtn = cn("grid size-10 place-items-center rounded-full transition-colors", light ? "hover:bg-mist" : "hover:bg-white/10");
 
   return (
     <>
@@ -74,39 +81,57 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
           </nav>
 
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setSearchOpen(true)} className={iconBtn} aria-label="Search the site">
+            <motion.button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              whileHover={INTERACTION.iconButton.whileHover}
+              whileTap={INTERACTION.iconButton.whileTap}
+              transition={TRANSITIONS.hover}
+              className={iconBtn}
+              aria-label="Search the site"
+            >
               <Search className="size-5" strokeWidth={1.5} />
-            </button>
+            </motion.button>
             {cta ? (
               <SmartLink link={cta} className={buttonClass(light ? "dark" : "light", "hidden px-3 py-2 text-[13px] sm:inline-flex")} />
             ) : null}
-            <button
+            <motion.button
               type="button"
               className={cn(iconBtn, "lg:hidden")}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
+              whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
               {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        {mobileOpen ? (
-          <nav id="mobile-nav" aria-label="Mobile" className="max-h-[calc(100dvh-70px)] overflow-y-auto border-t border-white/10 bg-ink text-white lg:hidden">
-            <ul className="container-site flex flex-col py-4">
-              {nav.map((item) => (
-                <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
-              ))}
-              {cta ? (
-                <li className="pt-4 sm:hidden">
-                  <SmartLink link={cta} className={buttonClass("light", "w-full")} />
-                </li>
-              ) : null}
-            </ul>
-          </nav>
-        ) : null}
+        <AnimatePresence>
+          {mobileOpen ? (
+            <motion.nav
+              id="mobile-nav"
+              aria-label="Mobile"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1, transition: { height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.2 } } }}
+              exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.2, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.15 } } }}
+              className="max-h-[calc(100dvh-70px)] overflow-hidden border-t border-white/10 bg-ink text-white lg:hidden"
+            >
+              <ul className="container-site flex flex-col py-4">
+                {nav.map((item) => (
+                  <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
+                ))}
+                {cta ? (
+                  <li className="pt-4 sm:hidden">
+                    <SmartLink link={cta} className={buttonClass("light", "w-full")} />
+                  </li>
+                ) : null}
+              </ul>
+            </motion.nav>
+          ) : null}
+        </AnimatePresence>
       </header>
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} firmName={firmName} descriptor={descriptor} />
     </>
@@ -164,23 +189,32 @@ function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolea
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
         >
-          <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} />
+          <ChevronDown className={cn("size-3.5 transition-transform duration-200", open && "rotate-180")} />
         </button>
       </span>
-      {open ? (
-        // White rounded card with divided rows, as in the "NAV ACCORDIONS" frames.
-        <div className="absolute left-0 top-full z-50 pt-1.5">
-          <ul className="min-w-60 animate-fade-in divide-y divide-mist-200 rounded-xl bg-white px-3 py-1.5 text-ink shadow-2xl ring-1 ring-black/5">
-            {item.children.map((child) => (
-              <li key={child.href}>
-                <Link href={child.href} className="block py-2.5 text-[13px] text-ink-700 hover:text-ink" onClick={() => setOpen(false)}>
-                  {child.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <AnimatePresence>
+        {open ? (
+          <motion.div
+            variants={dropdownMenuVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="absolute left-0 top-full z-50 pt-1.5"
+          >
+            <ul className="min-w-60 divide-y divide-mist-200 rounded-xl bg-white px-3 py-1.5 text-ink shadow-2xl ring-1 ring-black/5">
+              {item.children.map((child) => (
+                <li key={child.href}>
+                  <motion.div whileHover={{ x: 3 }} transition={TRANSITIONS.hover}>
+                    <Link href={child.href} className="block py-2.5 text-[13px] text-ink-700 hover:text-ink" onClick={() => setOpen(false)}>
+                      {child.label}
+                    </Link>
+                  </motion.div>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </li>
   );
 }
@@ -201,21 +235,29 @@ function MobileNavItem({ item, active }: { item: NavItem; active: boolean }) {
             aria-label={`${item.label} submenu`}
             onClick={() => setOpen((o) => !o)}
           >
-            <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
+            <ChevronDown className={cn("size-4 transition-transform duration-200", open && "rotate-180")} />
           </button>
         ) : null}
       </div>
-      {open ? (
-        <ul className="pb-3 pl-3">
-          {item.children.map((c) => (
-            <li key={c.href}>
-              <Link href={c.href} className="block py-2 text-sm text-white/65 hover:text-white">
-                {c.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.ul
+            variants={accordionPanelVariants}
+            initial="collapsed"
+            animate="expanded"
+            exit="collapsed"
+            className="overflow-hidden pb-3 pl-3"
+          >
+            {item.children.map((c) => (
+              <li key={c.href}>
+                <Link href={c.href} className="block py-2 text-sm text-white/65 hover:text-white">
+                  {c.label}
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        ) : null}
+      </AnimatePresence>
     </li>
   );
 }
@@ -227,12 +269,19 @@ function MobileNavItem({ item, active }: { item: NavItem; active: boolean }) {
 export function ChatButton({ link }: { link: ApiLink | undefined }) {
   if (!link) return null;
   return (
-    <SmartLink
-      link={link}
-      className="fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full border border-white/20 bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl transition hover:bg-ink-700 md:bottom-8 md:right-8"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay: 0.5, ...TRANSITIONS.entrance }}
+      className="fixed bottom-5 right-5 z-30 md:bottom-8 md:right-8"
     >
-      <Bot className="size-4" strokeWidth={1.6} aria-hidden />
-      {link.label}
-    </SmartLink>
+      <SmartLink
+        link={link}
+        className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl transition-colors hover:bg-ink-700"
+      >
+        <Bot className="size-4" strokeWidth={1.6} aria-hidden />
+        {link.label}
+      </SmartLink>
+    </motion.div>
   );
 }

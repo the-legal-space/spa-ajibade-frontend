@@ -1,5 +1,9 @@
+"use client";
+
+import { motion } from "motion/react";
 import type { Socials } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
+import { TRANSITIONS } from "@/lib/motion";
 
 const paths: Record<keyof Socials, { label: string; d: string }> = {
   instagram: {
@@ -40,9 +44,18 @@ export function SocialLinks({ socials, className, iconClassName }: { socials: So
     <ul className={cn("flex items-center gap-4", className)}>
       {entries.map((k) => (
         <li key={k}>
-          <a href={socials[k]!} target="_blank" rel="noopener noreferrer" aria-label={paths[k].label} className="opacity-90 transition hover:opacity-100">
+          <motion.a
+            href={socials[k]!}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={paths[k].label}
+            whileHover={{ scale: 1.15, opacity: 1 }}
+            whileTap={{ scale: 0.9 }}
+            transition={TRANSITIONS.hover}
+            className="block opacity-90 transition-opacity"
+          >
             <SocialIcon name={k} className={iconClassName} />
-          </a>
+          </motion.a>
         </li>
       ))}
     </ul>

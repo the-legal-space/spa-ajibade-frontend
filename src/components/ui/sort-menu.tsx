@@ -2,6 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import { motion } from "motion/react";
+import { TRANSITIONS } from "@/lib/motion";
 
 /** "Sort By" dropdown that writes ?sort= into the URL (and resets to page 1). */
 export function SortMenu({ options, defaultValue }: { options: { value: string; label: string }[]; defaultValue: string }) {
@@ -11,7 +13,12 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
   const current = params.get("sort") ?? defaultValue;
 
   return (
-    <label className="relative inline-flex items-center">
+    <motion.label
+      whileHover={{ scale: 1.015 }}
+      whileTap={{ scale: 0.985 }}
+      transition={TRANSITIONS.hover}
+      className="relative inline-flex items-center"
+    >
       <span className="sr-only">Sort by</span>
       <select
         value={current}
@@ -23,7 +30,7 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
           const qs = next.toString();
           router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
         }}
-        className="h-[42px] appearance-none rounded-[4px] border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none hover:border-ink"
+        className="h-[42px] cursor-pointer appearance-none rounded-[4px] border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none transition-colors hover:border-ink focus:border-ink shadow-xs"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -32,6 +39,6 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
         ))}
       </select>
       <ChevronDown className="pointer-events-none absolute right-3 size-4 text-stone" aria-hidden />
-    </label>
+    </motion.label>
   );
 }

@@ -7,6 +7,8 @@ import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { Heading, Section } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("offices");
@@ -27,12 +29,12 @@ export default async function OfficesPage() {
     <>
       <PageHero hero={page.hero} />
       <Section tone="mist">
-        <ul className="grid gap-5 lg:grid-cols-3">
+        <MotionList className="grid gap-5 lg:grid-cols-3">
           {page.offices.map((o) => {
             const tel = telHref(o.phone);
             return (
-              <li key={o.id}>
-                <article id={o.slug} className="flex h-full flex-col rounded-[var(--radius-card)] bg-white p-6 md:p-7" aria-labelledby={`office-${o.slug}`}>
+              <MotionListItem key={o.id}>
+                <article id={o.slug} className="flex h-full flex-col rounded-[var(--radius-card)] bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md md:p-7" aria-labelledby={`office-${o.slug}`}>
                   <Heading as="h2" size="h3">
                     <span id={`office-${o.slug}`}>{o.name}</span>
                   </Heading>
@@ -66,14 +68,19 @@ export default async function OfficesPage() {
                       </div>
                     ) : null}
                   </dl>
-                  <a href={directions(o)} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-6 w-full")}>
+                  <a
+                    href={directions(o)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={buttonClass("dark", "mt-6 w-full")}
+                  >
                     <Navigation className="size-4" aria-hidden /> Get directions
                   </a>
                 </article>
-              </li>
+              </MotionListItem>
             );
           })}
-        </ul>
+        </MotionList>
       </Section>
       <PageEnd />
     </>

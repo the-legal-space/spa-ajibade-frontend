@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { motion } from "motion/react";
 import type { ApiImage } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
@@ -51,16 +52,23 @@ export function HeroDots({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-1", className)} role="group" aria-label="Hero images">
       {Array.from({ length: count }, (_, i) => (
-        <button
+        <motion.button
           key={i}
           type="button"
           onClick={() => go(i)}
+          whileHover={{ scale: 1.3 }}
+          whileTap={{ scale: 0.85 }}
           aria-label={`Show image ${i + 1} of ${count}`}
           aria-current={i === index}
           className="grid size-5 place-items-center"
         >
-          <span className={cn("block size-2 rounded-full transition-colors duration-500", i === index ? "bg-white" : "bg-white/35 hover:bg-white/60")} />
-        </button>
+          <span
+            className={cn(
+              "block rounded-full transition-all duration-500",
+              i === index ? "size-2.5 bg-white shadow-xs" : "size-2 bg-white/35 hover:bg-white/60",
+            )}
+          />
+        </motion.button>
       ))}
     </div>
   );

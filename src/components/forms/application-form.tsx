@@ -5,6 +5,7 @@ import { Paperclip } from "lucide-react";
 import { CONSENT_TEXT_VERSION } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { buttonClass } from "@/components/ui/button";
+import { MotionButton } from "@/components/ui/motion-primitives";
 import { ConsentCheckbox, FormError, Honeypot, SuccessPanel, TextArea, TextField } from "./fields";
 import { useTurnstile } from "./turnstile";
 
@@ -127,9 +128,9 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
       <ConsentCheckbox checked={consent} onChange={setConsent} error={errors.consent} />
       {turnstile.widget}
       <FormError message={formError} />
-      <button type="submit" disabled={submitting} className={buttonClass("pillDark", "w-full")}>
-        {submitting ? "Uploading…" : "Submit application"}
-      </button>
+      <MotionButton type="submit" variant="pillDark" loading={submitting} loadingText="Uploading…" className="w-full">
+        Submit application
+      </MotionButton>
     </form>
   );
 }
