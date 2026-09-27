@@ -8,6 +8,7 @@ import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("practice-areas");
@@ -27,13 +28,13 @@ export default async function PracticeAreasPage() {
         <Heading className="mt-2 max-w-4xl">
           <span id="grid-heading">{page.gridSection.title}</span>
         </Heading>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <MotionList className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {page.practiceAreas.map((a) => (
-            <li key={a.id}>
+            <MotionListItem key={a.id}>
               <PracticeAreaCard area={a} />
-            </li>
+            </MotionListItem>
           ))}
-        </ul>
+        </MotionList>
       </Section>
 
       {csr ? (

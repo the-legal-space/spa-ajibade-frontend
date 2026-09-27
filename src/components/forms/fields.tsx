@@ -2,8 +2,11 @@
 
 import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { CONSENT_TEXT_VERSION } from "@/lib/env";
+import { MotionButton } from "@/components/ui/motion-primitives";
+import { TRANSITIONS } from "@/lib/motion";
 import { useActions } from "./actions-context";
 
 const control =
@@ -104,8 +107,19 @@ export function Honeypot({ value, onChange }: { value: string; onChange: (v: str
 
 export function SuccessPanel({ reference, title, children, onDone }: { reference: string; title: string; children?: ReactNode; onDone?: () => void }) {
   return (
-    <div className="flex flex-col items-start gap-4 py-2">
-      <CheckCircle2 className="size-10 text-success" aria-hidden />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={TRANSITIONS.smooth}
+      className="flex flex-col items-start gap-4 py-2"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 450, damping: 20, delay: 0.1 }}
+      >
+        <CheckCircle2 className="size-10 text-success" aria-hidden />
+      </motion.div>
       <div>
         <p className="font-serif text-2xl">{title}</p>
         {children ? <div className="mt-2 text-sm leading-6 text-ink-700">{children}</div> : null}
@@ -118,19 +132,25 @@ export function SuccessPanel({ reference, title, children, onDone }: { reference
         </div>
       ) : null}
       {onDone ? (
-        <button type="button" onClick={onDone} className="rounded-[4px] bg-ink px-4 py-3 text-sm text-white hover:bg-ink-700">
+        <MotionButton type="button" onClick={onDone} variant="dark" className="px-5 py-2.5">
           Close
-        </button>
+        </MotionButton>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
 
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (
-    <p role="alert" className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
+    <motion.p
+      role="alert"
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={TRANSITIONS.hover}
+      className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger"
+    >
       {message}
-    </p>
+    </motion.p>
   );
 }

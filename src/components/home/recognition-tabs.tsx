@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import type { Recognition } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { MotionP } from "@/components/ui/motion-p";
+import { INTERACTION, tabContentVariants, TRANSITIONS } from "@/lib/motion";
 
 export function RecognitionTabs({
   labels,
@@ -25,30 +28,55 @@ export function RecognitionTabs({
   return (
     <div>
       {tabs.length > 1 ? (
-        <div role="tablist" aria-label="Recognition" className="flex gap-6 border-b border-mist-300">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              role="tab"
-              type="button"
-              aria-selected={t.key === current.key}
-              onClick={() => setActive(t.key)}
-              className={cn("-mb-px border-b-2 pb-3 text-sm", t.key === current.key ? "border-ink text-ink" : "border-transparent text-stone hover:text-ink")}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div role="tablist" aria-label="Recognition" className="relative flex gap-6 border-b border-mist-300">
+          {tabs.map((t) => {
+            const isSelected = t.key === current.key;
+            return (
+              <motion.button
+                key={t.key}
+                role="tab"
+                type="button"
+                aria-selected={isSelected}
+                whileTap={INTERACTION.button.whileTap}
+                onClick={() => setActive(t.key)}
+                className={cn(
+                  "relative pb-3 text-sm transition-colors",
+                  isSelected ? "font-medium text-ink" : "text-stone hover:text-ink",
+                )}
+              >
+                {t.label}
+                {isSelected ? (
+                  <motion.span
+                    layoutId="recognition-tab-underline"
+                    className="absolute -bottom-px left-0 right-0 h-0.5 bg-ink"
+                    transition={TRANSITIONS.smooth}
+                  />
+                ) : null}
+              </motion.button>
+            );
+          })}
         </div>
       ) : (
-        <p className="font-serif text-[2rem] leading-tight md:text-[2.75rem]">{current.label}</p>
+        <MotionP className="font-serif text-[2rem] leading-tight md:text-[2.75rem]">{current.label}</MotionP>
       )}
-      <ul role={tabs.length > 1 ? "tabpanel" : undefined} className="mt-6 flex flex-wrap gap-4">
-        {current.items.map((b) => (
-          <li key={b.id}>
-            <Badge item={b} />
-          </li>
-        ))}
-      </ul>
+
+      <AnimatePresence mode="wait">
+        <motion.ul
+          key={current.key}
+          variants={tabContentVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          role={tabs.length > 1 ? "tabpanel" : undefined}
+          className="mt-6 flex flex-wrap gap-4"
+        >
+          {current.items.map((b) => (
+            <li key={b.id}>
+              <Badge item={b} />
+            </li>
+          ))}
+        </motion.ul>
+      </AnimatePresence>
     </div>
   );
 }
@@ -66,11 +94,21 @@ function Badge({ item }: { item: Recognition }) {
       {item.year ? <span className="mt-1 text-[11px] font-semibold">{item.year}</span> : null}
     </span>
   );
-  return item.url ? (
-    <a href={item.url} target="_blank" rel="noopener noreferrer" className="block transition hover:opacity-80">
-      {inner}
-    </a>
-  ) : (
-    inner
+
+  return (
+    <motion.div
+      whileHover={INTERACTION.card.whileHover}
+      whileTap={INTERACTION.card.whileTap}
+      transition={TRANSITIONS.hover}
+      className="shadow-xs transition-shadow duration-300 hover:shadow-sm"
+    >
+      {item.url ? (
+        <a href={item.url} target="_blank" rel="noopener noreferrer" className="block transition hover:opacity-85">
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
+    </motion.div>
   );
 }

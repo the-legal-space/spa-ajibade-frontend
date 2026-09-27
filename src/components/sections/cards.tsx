@@ -1,40 +1,72 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Play, Plus } from "lucide-react";
+import { motion } from "motion/react";
 import type { InsightCard as Insight, PersonSummary, PracticeAreaCard as PracticeArea } from "@/lib/api/schemas";
 import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { Chip } from "@/components/ui/primitives";
 import { SocialIcon } from "@/components/ui/social-icons";
 import { buttonClass } from "@/components/ui/button";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+
+const MotionLink = motion.create(Link);
 
 export function PracticeAreaCard({ area, headingLevel = "h3" }: { area: PracticeArea; headingLevel?: "h2" | "h3" }) {
   const H = headingLevel;
   return (
-    <article className="flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5">
+    <motion.article
+      whileHover={INTERACTION.card.whileHover}
+      whileTap={INTERACTION.card.whileTap}
+      transition={TRANSITIONS.hover}
+      className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 shadow-sm transition-shadow duration-300 hover:shadow-md"
+    >
       <div className="aspect-[331/240] overflow-hidden rounded-xl">
-        <Media image={area.image} alt="" />
+        <Media image={area.image} alt="" className="transition duration-500 group-hover:scale-[1.03]" />
       </div>
       <H className="mt-4 font-serif text-xl">{area.title}</H>
       <p className="mt-2 line-clamp-4 flex-1 text-[13px] leading-6 text-ink-700">{area.summary}</p>
-      <Link href={`/practice-areas/${area.slug}`} className={buttonClass("dark", "mt-4 w-full py-2.5")} aria-label={`Learn more about ${area.title}`}>
+      <MotionLink
+        href={`/practice-areas/${area.slug}`}
+        whileHover={INTERACTION.button.whileHover}
+        whileTap={INTERACTION.button.whileTap}
+        transition={TRANSITIONS.hover}
+        className={buttonClass("dark", "mt-4 w-full py-2.5")}
+        aria-label={`Learn more about ${area.title}`}
+      >
         Learn More <ArrowRight className="size-4" aria-hidden />
-      </Link>
-    </article>
+      </MotionLink>
+    </motion.article>
   );
 }
 
 export function PersonCard({ person }: { person: PersonSummary }) {
   return (
-    <article className="group relative rounded-[var(--radius-card)] bg-white p-1.5">
+    <motion.article
+      whileHover={INTERACTION.card.whileHover}
+      whileTap={INTERACTION.card.whileTap}
+      transition={TRANSITIONS.hover}
+      className="group relative rounded-[var(--radius-card)] bg-white p-1.5 shadow-sm transition-shadow duration-300 hover:shadow-md"
+    >
       <div className="relative aspect-square overflow-hidden rounded-xl">
-        <Media image={person.photo} alt={`Portrait of ${person.displayName}`} placeholder="portrait" name={person.displayName} className="transition duration-500 group-hover:scale-[1.03]" />
-        <Link
+        <Media
+          image={person.photo}
+          alt={`Portrait of ${person.displayName}`}
+          placeholder="portrait"
+          name={person.displayName}
+          className="transition duration-500 group-hover:scale-[1.03]"
+        />
+        <MotionLink
           href={`/people/${person.slug}`}
-          className="absolute right-3 top-3 z-10 grid size-8 place-items-center rounded-[4px] bg-white text-ink transition hover:bg-mist"
+          whileHover={INTERACTION.iconButton.whileHover}
+          whileTap={INTERACTION.iconButton.whileTap}
+          transition={TRANSITIONS.hover}
+          className="absolute right-3 top-3 z-10 grid size-8 place-items-center rounded-[4px] bg-white text-ink transition-colors hover:bg-mist shadow-sm"
           aria-label={`View ${person.displayName}'s profile`}
         >
           <Plus className="size-4" aria-hidden />
-        </Link>
+        </MotionLink>
       </div>
       <div className="mt-1.5 flex items-center justify-between gap-3 rounded-xl bg-ink px-3.5 py-3 text-white">
         <div className="min-w-0">
@@ -46,18 +78,21 @@ export function PersonCard({ person }: { person: PersonSummary }) {
           <p className="text-sm text-white/85">{person.roleLabel}</p>
         </div>
         {person.linkedinUrl ? (
-          <a
+          <motion.a
             href={person.linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            transition={TRANSITIONS.hover}
             className="relative z-10 shrink-0"
             aria-label={`${person.displayName} on LinkedIn`}
           >
             <SocialIcon name="linkedin" className="size-6" />
-          </a>
+          </motion.a>
         ) : null}
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -65,7 +100,7 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   if (author.type === "person") {
     const p = author.person;
     return (
-      <Link href={`/people/${p.slug}`} className="flex min-w-0 items-center gap-2 hover:underline">
+      <Link href={`/people/${p.slug}`} className="group/author flex min-w-0 items-center gap-2">
         <span className="size-7 shrink-0 overflow-hidden rounded-full">
           {p.photo ? (
             <Media image={p.photo} alt="" />
@@ -74,7 +109,7 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
           )}
         </span>
         <span className="min-w-0 leading-tight">
-          <span className="block truncate text-xs text-ink">{p.displayName}</span>
+          <span className="block truncate text-xs text-ink group-hover/author:underline">{p.displayName}</span>
           <span className="block text-[10px] text-stone">{p.roleLabel}</span>
         </span>
       </Link>
@@ -100,14 +135,23 @@ export function InsightCard({ insight, className }: { insight: Insight; classNam
   const date = formatMonthYear(insight.publishedAt);
   const isVideo = insight.format === "video";
   return (
-    <article className={cn("flex h-full flex-col", className)}>
-      <Link href={href} className="relative block aspect-[357/221] overflow-hidden" tabIndex={-1} aria-hidden>
-        <Media image={insight.coverImage} alt="" />
+    <motion.article
+      whileHover={INTERACTION.card.whileHover}
+      whileTap={INTERACTION.card.whileTap}
+      transition={TRANSITIONS.hover}
+      className={cn("group flex h-full flex-col", className)}
+    >
+      <Link href={href} className="relative block aspect-[357/221] overflow-hidden rounded-md" tabIndex={-1} aria-hidden>
+        <Media image={insight.coverImage} alt="" className="transition duration-500 group-hover:scale-[1.03]" />
         {isVideo ? (
           <span className="absolute inset-0 grid place-items-center">
-            <span className="grid size-14 place-items-center rounded-full bg-white/30 backdrop-blur">
+            <motion.span
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="grid size-14 place-items-center rounded-full bg-white/30 backdrop-blur"
+            >
               <Play className="size-6 fill-white text-white" />
-            </span>
+            </motion.span>
           </span>
         ) : null}
       </Link>
@@ -128,10 +172,16 @@ export function InsightCard({ insight, className }: { insight: Insight; classNam
       </h3>
       <div className="mt-4 flex items-center justify-between gap-3">
         <AuthorLine author={insight.author} />
-        <Link href={href} className={buttonClass("outline", "px-2.5 py-1.5 text-xs")}>
+        <MotionLink
+          href={href}
+          whileHover={INTERACTION.button.whileHover}
+          whileTap={INTERACTION.button.whileTap}
+          transition={TRANSITIONS.hover}
+          className={buttonClass("outline", "px-2.5 py-1.5 text-xs")}
+        >
           {isVideo ? "Watch Video" : insight.cta.label || "Read More"} <ArrowUpRight className="size-3.5" aria-hidden />
-        </Link>
+        </MotionLink>
       </div>
-    </article>
+    </motion.article>
   );
 }

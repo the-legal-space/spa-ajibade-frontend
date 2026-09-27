@@ -9,6 +9,7 @@ import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { Heading, Section } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
+import { MotionLink, MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("careers");
@@ -28,10 +29,10 @@ export default async function CareersPage() {
         </Heading>
 
         {page.jobs.length > 0 ? (
-          <ul className="mt-10 space-y-8">
+          <MotionList className="mt-10 space-y-8">
             {page.jobs.map((job) => (
-              <li key={job.id}>
-                <article className="rounded-[var(--radius-card)] bg-white p-5 md:p-6" aria-labelledby={`job-${job.id}`}>
+              <MotionListItem key={job.id}>
+                <article className="rounded-[var(--radius-card)] bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md md:p-6" aria-labelledby={`job-${job.id}`}>
                   {job.practiceArea ? <p className="text-sm font-semibold">{job.practiceArea.title}</p> : null}
                   <div className="prose-firm mt-4 text-base leading-8 md:text-[1.05rem]" dangerouslySetInnerHTML={{ __html: cleanHtml(job.description) }} />
                   <ul className="mt-2 flex flex-wrap gap-2">
@@ -46,14 +47,14 @@ export default async function CareersPage() {
                     <h3 id={`job-${job.id}`} className="font-serif text-2xl md:text-[1.75rem]">
                       {job.title}
                     </h3>
-                    <Link href={`/careers/${job.id}`} className={buttonClass("pillDark")}>
+                    <MotionLink href={`/careers/${job.id}`} variant="pillDark">
                       Send your CV
-                    </Link>
+                    </MotionLink>
                   </div>
                 </article>
-              </li>
+              </MotionListItem>
             ))}
-          </ul>
+          </MotionList>
         ) : (
           <div className="mt-10 flex flex-col items-center rounded-[var(--radius-card)] bg-white px-6 py-16 text-center">
             <Briefcase className="size-10 text-stone" strokeWidth={1.2} aria-hidden />

@@ -14,6 +14,8 @@ import { PracticeCarousel } from "@/components/home/practice-carousel";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionTabs } from "@/components/home/recognition-tabs";
+import { MotionP } from "@/components/ui/motion-p";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("home");
@@ -38,7 +40,9 @@ export default async function HomePage() {
           </Heading>
           <div className="mt-5 space-y-6 text-base leading-8 text-ink-800 md:text-[1.05rem]">
             {aboutFirm.paragraphs.map((p, i) => (
-              <p key={i}>{p}</p>
+              <MotionP key={i} transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}>
+                {p}
+              </MotionP>
             ))}
           </div>
           {aboutFirm.cta ? <SmartLink link={aboutFirm.cta} className={buttonClass("outline", "mt-6 bg-transparent")} /> : null}
@@ -92,13 +96,13 @@ export default async function HomePage() {
             </div>
             {page.leadershipSection.cta ? <SmartLink link={page.leadershipSection.cta} className={buttonClass("outline")} /> : null}
           </div>
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {page.leadership.map((p) => (
-              <li key={p.id}>
+              <MotionListItem key={p.id}>
                 <PersonCard person={p} />
-              </li>
+              </MotionListItem>
             ))}
-          </ul>
+          </MotionList>
         </Section>
       ) : null}
 
@@ -106,18 +110,18 @@ export default async function HomePage() {
       <Section tone="black" labelledBy="why-heading">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
-            {whyChooseUs.eyebrow ? <p className="text-xs text-white/70">{whyChooseUs.eyebrow}</p> : null}
+            {whyChooseUs.eyebrow ? <MotionP className="text-xs text-white/70">{whyChooseUs.eyebrow}</MotionP> : null}
             <Heading className="mt-3 max-w-lg">
               <span id="why-heading">{whyChooseUs.title}</span>
             </Heading>
-            <p className="mt-4 max-w-xl text-lg leading-8 text-white/85">{whyChooseUs.text}</p>
+            <MotionP className="mt-4 max-w-xl text-lg leading-8 text-white/85">{whyChooseUs.text}</MotionP>
             <ul className="mt-8 space-y-7">
               {whyChooseUs.points.map((pt) => (
                 <li key={pt.title} className="flex gap-3">
                   <CmsIcon name={pt.icon} className="mt-0.5 size-5 shrink-0" />
                   <div>
-                    <p className="text-[15px]">{pt.title}</p>
-                    {pt.text ? <p className="mt-1 text-sm text-white/70">{pt.text}</p> : null}
+                    <MotionP className="text-[15px]">{pt.title}</MotionP>
+                    {pt.text ? <MotionP className="mt-1 text-sm text-white/70">{pt.text}</MotionP> : null}
                   </div>
                 </li>
               ))}

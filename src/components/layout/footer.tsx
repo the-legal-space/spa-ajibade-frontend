@@ -46,7 +46,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
           <FooterColumn title="Quick Links">
             {footer.links.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="text-[13px] text-white/90 hover:text-white">
+                <Link href={l.href} className="text-[13px] text-white/80 transition-colors duration-200 hover:text-white">
                   {l.label}
                 </Link>
               </li>
@@ -56,7 +56,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
           <FooterColumn title="Practice Areas">
             {footer.practiceAreas.map((p) => (
               <li key={p.slug}>
-                <Link href={`/practice-areas/${p.slug}`} className="text-[13px] text-white/90 underline underline-offset-2 hover:text-white">
+                <Link href={`/practice-areas/${p.slug}`} className="text-[13px] text-white/80 underline underline-offset-2 transition-colors duration-200 hover:text-white">
                   {p.title}
                 </Link>
               </li>
@@ -68,18 +68,18 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
               <li key={o.id} className="text-[12px]">
                 <p className="font-semibold text-white">{o.name}:</p>
                 {o.address ? (
-                  <Link href="/offices" className="text-white/90 underline underline-offset-2 hover:text-white">
+                  <Link href="/offices" className="text-white/80 underline underline-offset-2 transition-colors duration-200 hover:text-white">
                     {o.address}
                   </Link>
                 ) : null}
                 <div className="mt-1.5 flex gap-2 text-white/90">
                   {o.email ? (
-                    <a href={`mailto:${o.email}`} aria-label={`Email the ${o.name} office`} className="hover:text-white">
+                    <a href={`mailto:${o.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110 hover:text-white">
                       <Mail className="size-4" strokeWidth={1.5} />
                     </a>
                   ) : null}
                   {telHref(o.phone) ? (
-                    <a href={telHref(o.phone)!} aria-label={`Call the ${o.name} office`} className="hover:text-white">
+                    <a href={telHref(o.phone)!} aria-label={`Call the ${o.name} office`} className="transition-transform duration-200 hover:scale-110 hover:text-white">
                       <PhoneCall className="size-4" strokeWidth={1.5} />
                     </a>
                   ) : null}

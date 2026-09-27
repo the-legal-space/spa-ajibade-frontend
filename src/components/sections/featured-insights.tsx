@@ -3,10 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 import type { InsightCard } from "@/lib/api/schemas";
 import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { useAutoplay, useSwipe } from "@/components/home/scroll-rail";
+import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+
+const MotionLink = motion.create(Link);
 
 /** Dark featured carousel at the top of Insights & News. */
 export function FeaturedInsights({ items }: { items: InsightCard[] }) {
@@ -65,9 +69,16 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                           <span className="block text-[10px] text-white/60">{item.author.type === "person" ? item.author.person.roleLabel : item.author.label}</span>
                         </span>
                       </span>
-                      <Link href={`/insights/${item.slug}`} tabIndex={n === i ? undefined : -1} className="inline-flex items-center gap-1 rounded-[4px] border border-white/20 px-3 py-2 text-xs hover:bg-white/10">
+                      <MotionLink
+                        href={`/insights/${item.slug}`}
+                        tabIndex={n === i ? undefined : -1}
+                        whileHover={INTERACTION.button.whileHover}
+                        whileTap={INTERACTION.button.whileTap}
+                        transition={TRANSITIONS.hover}
+                        className="inline-flex items-center gap-1 rounded-[4px] border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
+                      >
                         {item.format === "video" ? "Watch Video" : "Read More"} <ArrowUpRight className="size-3.5" aria-hidden />
-                      </Link>
+                      </MotionLink>
                     </div>
                   </div>
                   <div className="aspect-[513/306] overflow-hidden">
@@ -83,25 +94,44 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
           <div className="mt-8 flex items-center justify-between">
             <div className="flex gap-2">
               {items.map((it, n) => (
-                <button
+                <motion.button
                   key={it.id}
                   type="button"
                   onClick={() => go(n)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={TRANSITIONS.hover}
                   aria-label={`Show featured item ${n + 1}`}
                   aria-current={n === i}
                   className={cn("grid size-8 place-items-center rounded-full text-sm", n === i ? "ring-2 ring-gold" : "bg-white/10 hover:bg-white/20")}
                 >
                   {n + 1}
-                </button>
+                </motion.button>
               ))}
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={() => go(i - 1)} className="grid size-8 place-items-center rounded-full bg-white/10 hover:bg-white/20" aria-label="Previous">
+              <motion.button
+                type="button"
+                onClick={() => go(i - 1)}
+                whileHover={INTERACTION.iconButton.whileHover}
+                whileTap={INTERACTION.iconButton.whileTap}
+                transition={TRANSITIONS.hover}
+                className="grid size-8 place-items-center rounded-full bg-white/10 hover:bg-white/20"
+                aria-label="Previous"
+              >
                 <ChevronLeft className="size-4" />
-              </button>
-              <button type="button" onClick={() => go(i + 1)} className="grid size-8 place-items-center rounded-full bg-white/10 hover:bg-white/20" aria-label="Next">
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={() => go(i + 1)}
+                whileHover={INTERACTION.iconButton.whileHover}
+                whileTap={INTERACTION.iconButton.whileTap}
+                transition={TRANSITIONS.hover}
+                className="grid size-8 place-items-center rounded-full bg-white/10 hover:bg-white/20"
+                aria-label="Next"
+              >
                 <ChevronRight className="size-4" />
-              </button>
+              </motion.button>
             </div>
           </div>
         ) : null}

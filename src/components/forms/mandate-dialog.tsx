@@ -6,6 +6,7 @@ import { CONSENT_TEXT_VERSION } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Dialog } from "@/components/ui/dialog";
 import { buttonClass } from "@/components/ui/button";
+import { MotionButton } from "@/components/ui/motion-primitives";
 import { ConsentCheckbox, FormError, Honeypot, Select, SuccessPanel, TextArea, TextField } from "./fields";
 import { useTurnstile } from "./turnstile";
 
@@ -149,9 +150,9 @@ export function MandateDialog({
             <FormError message={formError} />
           </div>
           <div className="flex justify-end md:col-span-2">
-            <button type="submit" disabled={submitting} className={buttonClass("dark", "min-w-40")}>
-              {submitting ? "Sending…" : "Send enquiry"}
-            </button>
+            <MotionButton type="submit" variant="dark" loading={submitting} loadingText="Sending…" className="min-w-40">
+              Send enquiry
+            </MotionButton>
           </div>
         </form>
       )}

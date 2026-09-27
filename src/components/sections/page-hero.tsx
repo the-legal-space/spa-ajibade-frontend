@@ -4,6 +4,7 @@ import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { Heading } from "@/components/ui/primitives";
+import { MotionP } from "@/components/ui/motion-p";
 import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
 
 /**
@@ -39,7 +40,9 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
           <Heading as="h1" size="display">
             {hero.title}
           </Heading>
-          {hero.subtitle ? <p className="mt-4 max-w-[620px] text-lg leading-8 text-white/85 md:text-xl md:leading-9">{hero.subtitle}</p> : null}
+          {hero.subtitle ? (
+            <MotionP className="mt-4 max-w-[620px] text-lg leading-8 text-white/85 md:text-xl md:leading-9">{hero.subtitle}</MotionP>
+          ) : null}
           <HeroDots className="-ml-1.5 mt-4" />
           {children}
           {hero.primaryCta || hero.secondaryCta ? (

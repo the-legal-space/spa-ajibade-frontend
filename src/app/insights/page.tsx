@@ -11,6 +11,7 @@ import { FeaturedInsights } from "@/components/sections/featured-insights";
 import { Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { SortMenu } from "@/components/ui/sort-menu";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -57,13 +58,13 @@ export default async function InsightsPage({ searchParams }: Props) {
         </div>
 
         {list.data.length > 0 ? (
-          <ul className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {list.data.map((i) => (
-              <li key={i.id}>
+              <MotionListItem key={i.id}>
                 <InsightCard insight={i} />
-              </li>
+              </MotionListItem>
             ))}
-          </ul>
+          </MotionList>
         ) : (
           <p className="mt-10 rounded-xl bg-white p-10 text-center text-stone">Nothing has been published in this category yet.</p>
         )}

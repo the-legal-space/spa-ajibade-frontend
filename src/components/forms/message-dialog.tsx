@@ -5,6 +5,7 @@ import { CONSENT_TEXT_VERSION } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Dialog } from "@/components/ui/dialog";
 import { buttonClass } from "@/components/ui/button";
+import { MotionButton } from "@/components/ui/motion-primitives";
 import { ConsentCheckbox, FormError, Honeypot, SuccessPanel, TextArea, TextField } from "./fields";
 import { useTurnstile } from "./turnstile";
 
@@ -99,9 +100,9 @@ export function MessageDialog({ open, onClose }: { open: boolean; onClose: () =>
           {turnstile.widget}
           <FormError message={formError} />
           <div className="flex justify-end">
-            <button type="submit" disabled={submitting} className={buttonClass("dark", "min-w-40")}>
-              {submitting ? "Sending…" : "Send message"}
-            </button>
+            <MotionButton type="submit" variant="dark" loading={submitting} loadingText="Sending…" className="min-w-40">
+              Send message
+            </MotionButton>
           </div>
         </form>
       )}

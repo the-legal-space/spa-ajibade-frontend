@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { MotionP } from "@/components/ui/motion-p";
 
 export function Eyebrow({ children, tone = "dark", className }: { children: ReactNode; tone?: "dark" | "light"; className?: string }) {
   return (
-    <p className={cn("flex items-center gap-1.5 text-xs", tone === "dark" ? "text-ink" : "text-white/80", className)}>
+    <MotionP className={cn("flex items-center gap-1.5 text-xs", tone === "dark" ? "text-ink" : "text-white/80", className)}>
       <span aria-hidden className={cn("inline-block size-2 rounded-[1px]", tone === "dark" ? "bg-ink" : "bg-white")} />
       {children}
-    </p>
+    </MotionP>
   );
 }
 

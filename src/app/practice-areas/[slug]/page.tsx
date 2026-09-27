@@ -17,6 +17,7 @@ import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { ScrollRail } from "@/components/home/scroll-rail";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -109,14 +110,14 @@ export default async function PracticeAreaPage({ params }: Props) {
             {area.keyServices.length > 0 ? (
               <div className="mt-8">
                 <h2 className="font-serif text-xl">Core Services</h2>
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <MotionList className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {area.keyServices.map((s) => (
-                    <li key={s} className="flex min-h-[140px] flex-col justify-between rounded-xl bg-mist p-4">
+                    <MotionListItem key={s} className="flex min-h-[140px] flex-col justify-between rounded-xl bg-mist p-4 transition-shadow duration-200 hover:shadow-xs">
                       {mark}
                       <p className="mt-6 font-serif text-lg leading-snug">{s}</p>
-                    </li>
+                    </MotionListItem>
                   ))}
-                </ul>
+                </MotionList>
               </div>
             ) : null}
           </div>
@@ -155,9 +156,9 @@ export default async function PracticeAreaPage({ params }: Props) {
 
 function ContactCard({ person }: { person: PersonSummary }) {
   return (
-    <div>
-      <Link href={`/people/${person.slug}`} className="block aspect-[264/280] overflow-hidden">
-        <Media image={person.photo} placeholder="portrait" name={person.displayName} alt={`Portrait of ${person.displayName}`} sizes="264px" />
+    <div className="group">
+      <Link href={`/people/${person.slug}`} className="block aspect-[264/280] overflow-hidden rounded-md">
+        <Media image={person.photo} placeholder="portrait" name={person.displayName} alt={`Portrait of ${person.displayName}`} sizes="264px" className="transition duration-500 group-hover:scale-[1.03]" />
       </Link>
       <Link href={`/people/${person.slug}`} className="mt-2 block text-[13px] font-medium hover:underline">
         {person.displayName}
@@ -165,11 +166,11 @@ function ContactCard({ person }: { person: PersonSummary }) {
       <p className="text-[11px] text-stone">{person.roleLabel}</p>
       <div className="mt-2 flex gap-2">
         {person.linkedinUrl ? (
-          <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`${person.displayName} on LinkedIn`} className="grid size-8 place-items-center rounded-md bg-mist hover:bg-mist-200">
+          <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`${person.displayName} on LinkedIn`} className="grid size-8 place-items-center rounded-md bg-mist transition-colors hover:bg-mist-200">
             <SocialIcon name="linkedin" className="size-4" />
           </a>
         ) : null}
-        <Link href={`/people/${person.slug}`} aria-label={`Contact ${person.displayName}`} className="grid size-8 place-items-center rounded-md bg-mist hover:bg-mist-200">
+        <Link href={`/people/${person.slug}`} aria-label={`Contact ${person.displayName}`} className="grid size-8 place-items-center rounded-md bg-mist transition-colors hover:bg-mist-200">
           <Mail className="size-4" aria-hidden />
         </Link>
       </div>
