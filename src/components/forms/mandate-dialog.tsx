@@ -5,12 +5,27 @@ import type { OfficeRef, PracticeAreaRef } from "@/lib/api/schemas";
 import { CONSENT_TEXT_VERSION } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Dialog } from "@/components/ui/dialog";
-import { buttonClass } from "@/components/ui/button";
 import { MotionButton } from "@/components/ui/motion-primitives";
-import { ConsentCheckbox, FormError, Honeypot, Select, SuccessPanel, TextArea, TextField } from "./fields";
+import {
+  ConsentCheckbox,
+  FormError,
+  Honeypot,
+  Select,
+  SuccessPanel,
+  TextArea,
+  TextField,
+} from "./fields";
 import { useTurnstile } from "./turnstile";
 
-const empty = { fullName: "", email: "", phone: "", organization: "", practiceArea: "", preferredOffice: "", summary: "" };
+const empty = {
+  fullName: "",
+  email: "",
+  phone: "",
+  organization: "",
+  practiceArea: "",
+  preferredOffice: "",
+  summary: "",
+};
 
 /** "Discuss a Mandate" → POST /enquiries */
 export function MandateDialog({
@@ -36,10 +51,15 @@ export function MandateDialog({
   const turnstile = useTurnstile();
 
   useEffect(() => {
-    if (open) setValues((v) => ({ ...v, practiceArea: defaultPracticeArea ?? v.practiceArea }));
+    if (open)
+      setValues((v) => ({
+        ...v,
+        practiceArea: defaultPracticeArea ?? v.practiceArea,
+      }));
   }, [open, defaultPracticeArea]);
 
-  const set = (k: keyof typeof empty) => (e: { target: { value: string } }) => setValues((v) => ({ ...v, [k]: e.target.value }));
+  const set = (k: keyof typeof empty) => (e: { target: { value: string } }) =>
+    setValues((v) => ({ ...v, [k]: e.target.value }));
 
   function close() {
     onClose();
@@ -55,11 +75,18 @@ export function MandateDialog({
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const local: Record<string, string> = {};
-    if (values.fullName.trim().length < 2) local.fullName = "Please enter your full name.";
-    if (!/^\S+@\S+\.\S+$/.test(values.email.trim())) local.email = "Please enter a valid email address.";
-    if (values.phone && !/^[\d\s+()-]{7,20}$/.test(values.phone.trim())) local.phone = "Use digits, spaces, + ( ) or -, between 7 and 20 characters.";
-    if (values.summary.trim().length < 20) local.summary = "Please give us at least 20 characters so the right lawyer can respond.";
-    if (!consent) local.consent = "Please tick the box so we can respond to you.";
+    if (values.fullName.trim().length < 2)
+      local.fullName = "Please enter your full name.";
+    if (!/^\S+@\S+\.\S+$/.test(values.email.trim()))
+      local.email = "Please enter a valid email address.";
+    if (values.phone && !/^[\d\s+()-]{7,20}$/.test(values.phone.trim()))
+      local.phone =
+        "Use digits, spaces, + ( ) or -, between 7 and 20 characters.";
+    if (values.summary.trim().length < 20)
+      local.summary =
+        "Please give us at least 20 characters so the right lawyer can respond.";
+    if (!consent)
+      local.consent = "Please tick the box so we can respond to you.";
     setErrors(local);
     if (Object.keys(local).length) return;
     if (!turnstile.ready) {
@@ -79,7 +106,8 @@ export function MandateDialog({
       website,
     };
     if (values.phone.trim()) body.phone = values.phone.trim();
-    if (values.organization.trim()) body.organization = values.organization.trim();
+    if (values.organization.trim())
+      body.organization = values.organization.trim();
     if (values.practiceArea) body.practiceArea = values.practiceArea;
     if (values.preferredOffice) body.preferredOffice = values.preferredOffice;
 
@@ -99,21 +127,77 @@ export function MandateDialog({
       open={open}
       onClose={close}
       title={reference !== null ? "Thank you" : "Discuss a Mandate"}
-      description={reference !== null ? undefined : "Tell us briefly what you need. A member of the firm will respond, usually within one working day. Please don't include confidential details yet."}
+      description={
+        reference !== null
+          ? undefined
+          : "Tell us briefly what you need. A member of the firm will respond, usually within one working day. Please don't include confidential details yet."
+      }
       size="lg"
     >
       {reference !== null ? (
-        <SuccessPanel reference={reference} title="Your enquiry has been received." onDone={close}>
-          The appropriate partner's team will be in touch using the details you provided.
+        <SuccessPanel
+          reference={reference}
+          title="Your enquiry has been received."
+          onDone={close}
+        >
+          {
+            "The appropriate partner's team will be in touch using the details you provided."
+          }
         </SuccessPanel>
       ) : (
-        <form onSubmit={onSubmit} noValidate className="relative grid gap-4 md:grid-cols-2">
+        <form
+          onSubmit={onSubmit}
+          noValidate
+          className="relative grid gap-4 md:grid-cols-2"
+        >
           <Honeypot value={website} onChange={setWebsite} />
-          <TextField label="Full name" name="fullName" autoComplete="name" required maxLength={120} value={values.fullName} onChange={set("fullName")} error={errors.fullName} />
-          <TextField label="Email" name="email" type="email" autoComplete="email" required maxLength={254} value={values.email} onChange={set("email")} error={errors.email} />
-          <TextField label="Phone" name="phone" type="tel" autoComplete="tel" maxLength={20} value={values.phone} onChange={set("phone")} error={errors.phone} />
-          <TextField label="Organisation" name="organization" autoComplete="organization" maxLength={160} value={values.organization} onChange={set("organization")} error={errors.organization} />
-          <Select label="Practice area" name="practiceArea" value={values.practiceArea} onChange={set("practiceArea")} error={errors.practiceArea}>
+          <TextField
+            label="Full name"
+            name="fullName"
+            autoComplete="name"
+            required
+            maxLength={120}
+            value={values.fullName}
+            onChange={set("fullName")}
+            error={errors.fullName}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            maxLength={254}
+            value={values.email}
+            onChange={set("email")}
+            error={errors.email}
+          />
+          <TextField
+            label="Phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            maxLength={20}
+            value={values.phone}
+            onChange={set("phone")}
+            error={errors.phone}
+          />
+          <TextField
+            label="Organisation"
+            name="organization"
+            autoComplete="organization"
+            maxLength={160}
+            value={values.organization}
+            onChange={set("organization")}
+            error={errors.organization}
+          />
+          <Select
+            label="Practice area"
+            name="practiceArea"
+            value={values.practiceArea}
+            onChange={set("practiceArea")}
+            error={errors.practiceArea}
+          >
             <option value="">Not sure yet</option>
             {practiceAreas.map((p) => (
               <option key={p.slug} value={p.slug}>
@@ -121,7 +205,13 @@ export function MandateDialog({
               </option>
             ))}
           </Select>
-          <Select label="Preferred office" name="preferredOffice" value={values.preferredOffice} onChange={set("preferredOffice")} error={errors.preferredOffice}>
+          <Select
+            label="Preferred office"
+            name="preferredOffice"
+            value={values.preferredOffice}
+            onChange={set("preferredOffice")}
+            error={errors.preferredOffice}
+          >
             <option value="">No preference</option>
             {offices.map((o) => (
               <option key={o.id} value={o.id}>
@@ -143,14 +233,26 @@ export function MandateDialog({
             />
           </div>
           <div className="md:col-span-2">
-            <ConsentCheckbox checked={consent} onChange={setConsent} error={errors.consent} />
+            <ConsentCheckbox
+              checked={consent}
+              onChange={setConsent}
+              error={errors.consent}
+            />
           </div>
-          {turnstile.widget ? <div className="md:col-span-2">{turnstile.widget}</div> : null}
+          {turnstile.widget ? (
+            <div className="md:col-span-2">{turnstile.widget}</div>
+          ) : null}
           <div className="md:col-span-2">
             <FormError message={formError} />
           </div>
           <div className="flex justify-end md:col-span-2">
-            <MotionButton type="submit" variant="dark" loading={submitting} loadingText="Sending…" className="min-w-40">
+            <MotionButton
+              type="submit"
+              variant="dark"
+              loading={submitting}
+              loadingText="Sending…"
+              className="min-w-40"
+            >
               Send enquiry
             </MotionButton>
           </div>

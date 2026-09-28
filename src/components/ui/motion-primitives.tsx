@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef, type ButtonHTMLAttributes, type ComponentProps, type ReactNode } from "react";
+import {
+  forwardRef,
+  type ButtonHTMLAttributes,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
 import { cn } from "@/lib/utils";
 import { buttonClass, type ButtonVariant } from "./button";
-import {
-  INTERACTION,
-  TRANSITIONS,
-  staggerContainerVariants,
-  staggerItemVariants,
-} from "@/lib/motion";
+import { INTERACTION, TRANSITIONS, staggerItemVariants } from "@/lib/motion";
 
 /**
  * Animated 3-dot loading indicator for buttons and inline actions.
@@ -61,7 +61,16 @@ export type MotionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
   function MotionButton(
-    { variant = "dark", loading = false, loadingText, className, children, disabled, type = "button", ...props },
+    {
+      variant = "dark",
+      loading = false,
+      loadingText,
+      className,
+      children,
+      disabled,
+      type = "button",
+      ...props
+    },
     ref,
   ) {
     const isPill = variant === "pill" || variant === "pillDark";

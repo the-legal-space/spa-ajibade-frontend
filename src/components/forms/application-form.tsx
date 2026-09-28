@@ -4,9 +4,15 @@ import { useRef, useState, type FormEvent } from "react";
 import { Paperclip } from "lucide-react";
 import { CONSENT_TEXT_VERSION } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
-import { buttonClass } from "@/components/ui/button";
 import { MotionButton } from "@/components/ui/motion-primitives";
-import { ConsentCheckbox, FormError, Honeypot, SuccessPanel, TextArea, TextField } from "./fields";
+import {
+  ConsentCheckbox,
+  FormError,
+  Honeypot,
+  SuccessPanel,
+  TextArea,
+  TextField,
+} from "./fields";
 import { useTurnstile } from "./turnstile";
 
 /**
@@ -16,12 +22,19 @@ import { useTurnstile } from "./turnstile";
  */
 const CV_FIELD = "cv";
 const MAX_BYTES = 5 * 1024 * 1024;
-const ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const ACCEPT =
+  ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 const empty = { fullName: "", email: "", phone: "", coverNote: "" };
 
 /** "Send your CV" → POST /jobs/{id}/applications (multipart). */
-export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: string }) {
+export function ApplicationForm({
+  jobId,
+  jobTitle,
+}: {
+  jobId: string;
+  jobTitle: string;
+}) {
   const [values, setValues] = useState(empty);
   const [file, setFile] = useState<File | null>(null);
   const [consent, setConsent] = useState(false);
@@ -33,18 +46,25 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
   const fileRef = useRef<HTMLInputElement>(null);
   const turnstile = useTurnstile();
 
-  const set = (k: keyof typeof empty) => (e: { target: { value: string } }) => setValues((v) => ({ ...v, [k]: e.target.value }));
+  const set = (k: keyof typeof empty) => (e: { target: { value: string } }) =>
+    setValues((v) => ({ ...v, [k]: e.target.value }));
 
   function pickFile(f: File | null) {
     setErrors((e) => ({ ...e, [CV_FIELD]: "" }));
     if (!f) return setFile(null);
     const okType = /\.(pdf|docx)$/i.test(f.name);
     if (!okType) {
-      setErrors((e) => ({ ...e, [CV_FIELD]: "Please attach a PDF or Word (.docx) document." }));
+      setErrors((e) => ({
+        ...e,
+        [CV_FIELD]: "Please attach a PDF or Word (.docx) document.",
+      }));
       return setFile(null);
     }
     if (f.size > MAX_BYTES) {
-      setErrors((e) => ({ ...e, [CV_FIELD]: "That file is larger than 5 MB." }));
+      setErrors((e) => ({
+        ...e,
+        [CV_FIELD]: "That file is larger than 5 MB.",
+      }));
       return setFile(null);
     }
     setFile(f);
@@ -53,11 +73,16 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const local: Record<string, string> = {};
-    if (values.fullName.trim().length < 2) local.fullName = "Please enter your full name.";
-    if (!/^\S+@\S+\.\S+$/.test(values.email.trim())) local.email = "Please enter a valid email address.";
-    if (!/^[\d\s+()-]{7,20}$/.test(values.phone.trim())) local.phone = "Please enter a phone number (7 to 20 digits).";
+    if (values.fullName.trim().length < 2)
+      local.fullName = "Please enter your full name.";
+    if (!/^\S+@\S+\.\S+$/.test(values.email.trim()))
+      local.email = "Please enter a valid email address.";
+    if (!/^[\d\s+()-]{7,20}$/.test(values.phone.trim()))
+      local.phone = "Please enter a phone number (7 to 20 digits).";
     if (!file) local[CV_FIELD] = "Please attach your CV.";
-    if (!consent) local.consent = "Please tick the box so we can consider your application.";
+    if (!consent)
+      local.consent =
+        "Please tick the box so we can consider your application.";
     setErrors(local);
     if (Object.keys(local).length) return;
     if (!turnstile.ready) {
@@ -86,14 +111,16 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
     }
     turnstile.reset();
     if (result.kind === "validation") setErrors(result.fieldErrors);
-    if (result.kind === "file") setErrors((e) => ({ ...e, [CV_FIELD]: result.message }));
+    if (result.kind === "file")
+      setErrors((e) => ({ ...e, [CV_FIELD]: result.message }));
     setFormError(result.message);
   }
 
   if (reference !== null) {
     return (
       <SuccessPanel reference={reference} title="Application received.">
-        Thank you for applying for {jobTitle}. The firm will contact you if your application is taken forward.
+        Thank you for applying for {jobTitle}. The firm will contact you if your
+        application is taken forward.
       </SuccessPanel>
     );
   }
@@ -101,9 +128,38 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
   return (
     <form onSubmit={onSubmit} noValidate className="relative grid gap-4">
       <Honeypot value={website} onChange={setWebsite} />
-      <TextField label="Full name" name="fullName" autoComplete="name" required maxLength={120} value={values.fullName} onChange={set("fullName")} error={errors.fullName} />
-      <TextField label="Email" name="email" type="email" autoComplete="email" required maxLength={254} value={values.email} onChange={set("email")} error={errors.email} />
-      <TextField label="Phone" name="phone" type="tel" autoComplete="tel" required maxLength={20} value={values.phone} onChange={set("phone")} error={errors.phone} />
+      <TextField
+        label="Full name"
+        name="fullName"
+        autoComplete="name"
+        required
+        maxLength={120}
+        value={values.fullName}
+        onChange={set("fullName")}
+        error={errors.fullName}
+      />
+      <TextField
+        label="Email"
+        name="email"
+        type="email"
+        autoComplete="email"
+        required
+        maxLength={254}
+        value={values.email}
+        onChange={set("email")}
+        error={errors.email}
+      />
+      <TextField
+        label="Phone"
+        name="phone"
+        type="tel"
+        autoComplete="tel"
+        required
+        maxLength={20}
+        value={values.phone}
+        onChange={set("phone")}
+        error={errors.phone}
+      />
 
       <div>
         <p className="mb-1.5 text-sm font-medium">
@@ -114,8 +170,17 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
           aria-invalid={!!errors[CV_FIELD]}
         >
           <Paperclip className="size-4 shrink-0 text-stone" aria-hidden />
-          <span className="truncate">{file ? file.name : "Choose a PDF or DOCX file"}</span>
-          <input ref={fileRef} type="file" name={CV_FIELD} accept={ACCEPT} className="sr-only" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
+          <span className="truncate">
+            {file ? file.name : "Choose a PDF or DOCX file"}
+          </span>
+          <input
+            ref={fileRef}
+            type="file"
+            name={CV_FIELD}
+            accept={ACCEPT}
+            className="sr-only"
+            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+          />
         </label>
         {errors[CV_FIELD] ? (
           <p className="mt-1 text-xs text-danger" role="alert">
@@ -124,11 +189,29 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
         ) : null}
       </div>
 
-      <TextArea label="Cover note" name="coverNote" maxLength={2000} value={values.coverNote} onChange={set("coverNote")} error={errors.coverNote} hint={`${values.coverNote.length}/2000`} />
-      <ConsentCheckbox checked={consent} onChange={setConsent} error={errors.consent} />
+      <TextArea
+        label="Cover note"
+        name="coverNote"
+        maxLength={2000}
+        value={values.coverNote}
+        onChange={set("coverNote")}
+        error={errors.coverNote}
+        hint={`${values.coverNote.length}/2000`}
+      />
+      <ConsentCheckbox
+        checked={consent}
+        onChange={setConsent}
+        error={errors.consent}
+      />
       {turnstile.widget}
       <FormError message={formError} />
-      <MotionButton type="submit" variant="pillDark" loading={submitting} loadingText="Uploading…" className="w-full">
+      <MotionButton
+        type="submit"
+        variant="pillDark"
+        loading={submitting}
+        loadingText="Uploading…"
+        className="w-full"
+      >
         Submit application
       </MotionButton>
     </form>
