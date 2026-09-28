@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Play, Plus } from "lucide-react";
 import { motion } from "motion/react";
@@ -117,11 +118,8 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   }
   return (
     <span className="flex min-w-0 items-center gap-2">
-      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-ink text-white" aria-hidden>
-        <svg viewBox="0 0 32 32" className="size-4">
-          <path d="M5 6 L16 16 L5 26 M27 6 L16 16 L27 26" fill="none" stroke="currentColor" strokeWidth="4" />
-        </svg>
-      </span>
+      {/* Firm mark from Figma ("Favicon.png" in the insight card author avatar). */}
+      <Image src="/brand/mark.png" alt="" width={28} height={28} className="size-7 shrink-0 rounded-full" aria-hidden />
       <span className="min-w-0 leading-tight">
         <span className="block truncate text-xs text-ink">{author.name}</span>
         <span className="block text-[10px] text-stone">{author.label}</span>
