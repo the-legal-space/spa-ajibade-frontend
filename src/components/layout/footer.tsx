@@ -10,7 +10,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
   const officeDetails = footer.offices.map((ref) => offices.find((o) => o.id === ref.id) ?? { ...ref, address: "", phone: null, email: null });
 
   return (
-    <footer className="relative overflow-hidden bg-ink text-white">
+    <footer data-header-theme="dark" className="site-dark-surface relative text-white">
       <svg className="pointer-events-none absolute inset-0 size-full text-white/[0.05]" aria-hidden preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 520">
         <path d="M260 -40 L720 340 L1180 -40 M260 620 L720 340 L1180 620" fill="none" stroke="currentColor" strokeWidth="150" />
       </svg>

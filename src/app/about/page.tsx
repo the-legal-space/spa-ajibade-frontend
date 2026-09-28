@@ -132,7 +132,7 @@ export default async function AboutPage() {
 
       {/* Awards */}
       {awardsList.items.length > 0 ? (
-        <section id="recognition" className="bg-ink py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
+        <section id="recognition" data-header-theme="dark" className="site-dark-surface py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
           <div className="container-site grid items-center gap-10 lg:grid-cols-2">
             <div>
               {awardsList.eyebrow ? <p className="text-xs text-white/70">{awardsList.eyebrow}</p> : null}
