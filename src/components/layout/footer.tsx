@@ -13,9 +13,8 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
 
   return (
     <footer data-header-theme="dark" className="site-dark-surface relative text-white">
-      <svg className="pointer-events-none absolute inset-0 size-full text-white/[0.05]" aria-hidden preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 520">
-        <path d="M260 -40 L720 340 L1180 -40 M260 620 L720 340 L1180 620" fill="none" stroke="currentColor" strokeWidth="150" />
-      </svg>
+      {/* Figma "Footer Background Mark": white crossed mark with the 10% opacity baked into the PNG. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/footer-mark.png')] bg-cover bg-center bg-no-repeat" />
 
       <div className="container-site relative pb-8 pt-14">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_0.6fr_1fr_1.1fr] lg:gap-8">
