@@ -22,7 +22,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
 
   return (
     <HeroSlideshow count={images.length}>
-    <section className={cn("relative -mt-[70px] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
+    <section data-header-theme="dark" className={cn("relative -mt-[70px] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
       <div className="absolute inset-0">
         {images.length > 1 ? (
           <HeroSlides images={images} />
@@ -31,7 +31,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
         ) : (
           <div className="size-full bg-[radial-gradient(ellipse_at_70%_30%,#3a3a3a_0%,#141414_45%,#000_80%)]" aria-hidden />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" aria-hidden />
+        <div className="absolute inset-0 bg-black/50" aria-hidden />
       </div>
 
       <div className={cn("container-site relative flex flex-col justify-center pt-[70px]", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
@@ -61,7 +61,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
 /** Compact dark header for detail pages (attorney, practice area, article). */
 export function DetailHero({ eyebrow, title, children }: { eyebrow?: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
-    <section className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white">
+    <section data-header-theme="dark" className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,#2a2a2a_0%,#000_60%)]" aria-hidden />
       <div className="container-site relative py-16 md:py-20">
         {eyebrow ? <div className="mb-4 text-sm text-white/70">{eyebrow}</div> : null}

@@ -64,7 +64,7 @@ export default async function HomePage() {
 
       {/* Focused Practice Areas */}
       {page.practiceAreas.length > 0 ? (
-        <section className="overflow-hidden bg-ink py-16 text-white md:py-[68px]" aria-labelledby="practice-heading">
+        <section data-header-theme="dark" className="site-dark-surface overflow-hidden py-16 text-white md:py-[68px]" aria-labelledby="practice-heading">
           <div className="container-site">
             <div className="text-center">
               {page.practiceSection.eyebrow ? <Eyebrow tone="light" className="justify-center">{page.practiceSection.eyebrow}</Eyebrow> : null}

@@ -28,19 +28,85 @@ function usesLightHeader(pathname: string) {
   return /^\/(people|insights)\/[^/]+\/?$/.test(pathname);
 }
 
+/**
+ * Samples what page section sits directly below the header using
+ * `document.elementsFromPoint`. Sections opt-in by setting
+ * `data-header-theme="dark"` (white navbar text) or `"light"` (dark text).
+ * Elements that are part of the header itself are skipped via `data-header-self`.
+ */
+function parseRgb(color: string): [number, number, number] | null {
+  const rgb = color.match(/rgba?\(([^)]+)\)/i);
+  if (rgb?.[1]) {
+    const channels = rgb[1].split(",").map((n) => Number.parseFloat(n.trim()));
+    if (channels.length >= 3 && channels.every((v) => Number.isFinite(v))) {
+      const [r, g, b] = channels as [number, number, number];
+      return [r, g, b];
+    }
+  }
+
+  const hex = color.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex?.[1]) {
+    const value = hex[1];
+    const full = value.length === 3 ? value.split("").map((c) => c + c).join("") : value;
+    const r = Number.parseInt(full.slice(0, 2), 16);
+    const g = Number.parseInt(full.slice(2, 4), 16);
+    const b = Number.parseInt(full.slice(4, 6), 16);
+    return [r, g, b];
+  }
+
+  return null;
+}
+
+function isDarkBackground(color: string): boolean {
+  const parsed = parseRgb(color);
+  if (!parsed) return false;
+  const [r, g, b] = parsed;
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 160;
+}
+
+function useIsOverDark(): boolean {
+  const [overDark, setOverDark] = useState(true); // hero is first, default white text
+  useEffect(() => {
+    const check = () => {
+      const els = document.elementsFromPoint(window.innerWidth / 2, 71);
+      for (const el of els) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (el.closest("[data-header-self]")) continue; // skip the header & its children
+
+        const themedParent = el.closest("[data-header-theme]") as HTMLElement | null;
+        const theme = themedParent?.dataset.headerTheme ?? el.dataset.headerTheme;
+        if (theme === "dark") { setOverDark(true); return; }
+        if (theme === "light") { setOverDark(false); return; }
+
+        const bg = window.getComputedStyle(el).backgroundColor;
+        if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+          if (isDarkBackground(bg)) { setOverDark(true); return; }
+          if (!isDarkBackground(bg)) {
+            setOverDark(false);
+            return;
+          }
+        }
+      }
+      setOverDark(false); // default: light page body
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, []);
+  return overDark;
+}
+
 export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; firmName: string; descriptor: string; cta: ApiLink | null }) {
   const pathname = usePathname();
   const light = usesLightHeader(pathname);
-  const [scrolled, setScrolled] = useState(false);
+  const overDark = useIsOverDark();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
@@ -55,27 +121,35 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const iconBtn = cn("grid size-10 place-items-center rounded-full transition-colors", light ? "hover:bg-mist" : "hover:bg-white/10");
+  // Detail pages (people / insights) always use white bg + dark text.
+  // Other pages: white text over dark sections (hero, dark bands), dark text over light content.
+  const wantsWhiteText = !light && overDark;
+
+  const iconBtn = cn(
+    "grid size-10 place-items-center rounded-full transition-colors",
+    wantsWhiteText ? "hover:bg-white/10" : "hover:bg-mist",
+  );
 
   return (
     <>
       <header
+        data-header-self
         className={cn(
-          "sticky top-0 z-40 border-b transition-colors duration-300",
-          light
-            ? "border-mist-200 bg-white text-ink"
-            : cn("border-white/15 text-white", scrolled ? "bg-ink/80 backdrop-blur-md" : "bg-ink/40 backdrop-blur-[2px]"),
+          "sticky top-0 z-40 border-b backdrop-blur-md transition-[color,border-color] duration-300",
+          wantsWhiteText
+            ? "border-white/10 bg-transparent text-white"
+            : "border-ink/10 bg-transparent text-ink",
         )}
       >
         <div className="container-site flex h-[70px] items-center justify-between gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
-            <Logo firmName={firmName} descriptor={descriptor} tone={light ? "dark" : "light"} />
+            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
             <ul className="flex items-center gap-0.5 xl:gap-1.5">
               {nav.map((item) => (
-                <DesktopNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} light={light} />
+                <DesktopNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} light={!wantsWhiteText} />
               ))}
             </ul>
           </nav>
@@ -93,7 +167,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               <Search className="size-5" strokeWidth={1.5} />
             </motion.button>
             {cta ? (
-              <SmartLink link={cta} className={buttonClass(light ? "dark" : "light", "hidden px-3 py-2 text-[13px] sm:inline-flex")} />
+              <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "hidden px-3 py-2 text-[13px] sm:inline-flex")} />
             ) : null}
             <motion.button
               type="button"

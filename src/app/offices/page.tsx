@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Clock, Mail, MapPin, Navigation, PhoneCall } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
@@ -23,6 +24,8 @@ function directions(o: { directionsUrl: string | null; coordinates: { lat: numbe
 
 // The offices page is not in the Figma yet; it uses the same card language as Careers.
 export default async function OfficesPage() {
+  notFound();
+
   const page = await getPage("offices");
 
   return (

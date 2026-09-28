@@ -43,9 +43,10 @@ export function Section({
   id?: string;
   labelledBy?: string;
 }) {
-  const tones = { mist: "bg-mist text-ink", white: "bg-white text-ink", black: "bg-ink text-white" };
+  const tones = { mist: "bg-mist text-ink", white: "bg-white text-ink", black: "site-dark-surface text-white" };
+  const attrs = tone === "black" ? { "data-header-theme": "dark" } : {};
   return (
-    <section id={id} aria-labelledby={labelledBy} className={cn(tones[tone], "py-16 md:py-[68px]", className)}>
+    <section id={id} aria-labelledby={labelledBy} {...attrs} className={cn(tones[tone], "py-16 md:py-[68px]", className)}>
       <div className="container-site">{children}</div>
     </section>
   );
