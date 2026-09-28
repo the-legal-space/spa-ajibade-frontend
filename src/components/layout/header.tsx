@@ -36,13 +36,16 @@ function usesLightHeader(pathname: string) {
  */
 function parseRgb(color: string): [number, number, number] | null {
   const rgb = color.match(/rgba?\(([^)]+)\)/i);
-  if (rgb) {
-    const [r, g, b] = rgb[1].split(",").map((n) => Number.parseFloat(n.trim()));
-    if ([r, g, b].every((v) => Number.isFinite(v))) return [r, g, b];
+  if (rgb?.[1]) {
+    const channels = rgb[1].split(",").map((n) => Number.parseFloat(n.trim()));
+    if (channels.length >= 3 && channels.every((v) => Number.isFinite(v))) {
+      const [r, g, b] = channels as [number, number, number];
+      return [r, g, b];
+    }
   }
 
   const hex = color.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
-  if (hex) {
+  if (hex?.[1]) {
     const value = hex[1];
     const full = value.length === 3 ? value.split("").map((c) => c + c).join("") : value;
     const r = Number.parseInt(full.slice(0, 2), 16);

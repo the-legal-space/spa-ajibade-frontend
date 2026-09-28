@@ -30,7 +30,9 @@ function cloudinaryResize(url: string, width: number): string {
   const transformSegmentRe = /^([a-z]{1,3}_[^/,]+|[a-z_]+,[a-z_]+)/;
   const segments = rest.split("/");
   let i = 0;
-  while (i < segments.length - 1 && transformSegmentRe.test(segments[i])) {
+  while (i < segments.length - 1) {
+    const segment = segments[i];
+    if (!segment || !transformSegmentRe.test(segment)) break;
     i++;
   }
   const publicId = segments.slice(i).join("/");
