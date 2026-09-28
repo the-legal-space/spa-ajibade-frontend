@@ -13,7 +13,7 @@ async function allPages<T>(fetchPage: (page: number) => Promise<{ data: T[]; met
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const statics = ["", "/about", "/practice-areas", "/people", "/insights", "/careers", "/faq", "/offices"].map((p) => ({
+  const statics = ["", "/about", "/practice-areas", "/people", "/insights", "/careers"].map((p) => ({
     url: `${SITE_URL}${p}`,
     changeFrequency: "weekly" as const,
     priority: p === "" ? 1 : 0.8,

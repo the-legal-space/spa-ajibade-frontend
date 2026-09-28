@@ -34,6 +34,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Render per request; the API responses themselves are cached (see lib/api/client.ts).
   await connection();
   const [site, offices, practiceAreas] = await Promise.all([getSite(), getOffices(), getPracticeAreas()]);
+  const hiddenPaths = new Set(["/faq", "/offices"]);
+  const filteredNav = site.nav
+    .filter((item) => !hiddenPaths.has(item.href))
+    .map((item) => ({
+      ...item,
+      children: item.children.filter((child) => !hiddenPaths.has(child.href)),
+    }));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -62,7 +69,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <ActionsProvider firmName={site.settings.firmName} phone={site.settings.phone} practiceAreas={practiceAreas} offices={offices}>
           <TopBar settings={site.settings} />
-          <Header nav={site.nav} firmName={site.settings.firmName} descriptor={site.settings.legalDescriptor} cta={site.contactCallout.primaryCta} />
+          <Header nav={filteredNav} firmName={site.settings.firmName} descriptor={site.settings.legalDescriptor} cta={site.contactCallout.primaryCta} />
           <main id="main" className="bg-white">
             {children}
           </main>

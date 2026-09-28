@@ -7,6 +7,8 @@ import { Logo } from "@/components/ui/logo";
 
 export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
   const { footer, settings } = site;
+  const hiddenPaths = new Set(["/faq", "/offices"]);
+  const visibleLinks = footer.links.filter((link) => !hiddenPaths.has(link.href));
   const officeDetails = footer.offices.map((ref) => offices.find((o) => o.id === ref.id) ?? { ...ref, address: "", phone: null, email: null });
 
   return (
@@ -44,7 +46,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
           </div>
 
           <FooterColumn title="Quick Links">
-            {footer.links.map((l) => (
+            {visibleLinks.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="text-[13px] text-white/80 transition-colors duration-200 hover:text-white">
                   {l.label}
@@ -67,11 +69,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
             {officeDetails.map((o) => (
               <li key={o.id} className="text-[12px]">
                 <p className="font-semibold text-white">{o.name}:</p>
-                {o.address ? (
-                  <Link href="/offices" className="text-white/80 underline underline-offset-2 transition-colors duration-200 hover:text-white">
-                    {o.address}
-                  </Link>
-                ) : null}
+                {o.address ? <p className="text-white/80">{o.address}</p> : null}
                 <div className="mt-1.5 flex gap-2 text-white/90">
                   {o.email ? (
                     <a href={`mailto:${o.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110 hover:text-white">
