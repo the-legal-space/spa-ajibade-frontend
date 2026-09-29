@@ -47,11 +47,7 @@ export type Seo = z.infer<typeof SeoSchema>;
 export const HeroSchema = z.object({
   title: z.string(),
   subtitle: nullableString.optional(),
-  image: NullableImage,
-  /**
-   * Extra slides for the auto-advancing home hero. Not in the API yet (backend request:
-   * `hero.images: Image[]`); optional so the site works before and after it ships.
-   */
+  image: NullableImage.optional(),
   images: z.array(ImageSchema).optional(),
   primaryCta: NullableLink.optional(),
   secondaryCta: NullableLink.optional(),
@@ -67,7 +63,7 @@ export const PersonRole = z.enum([
   "associate_partner",
   "senior_associate",
   "associate",
-  "nysc_associate",
+  "trainee_associate",
 ]);
 export type PersonRole = z.infer<typeof PersonRole>;
 
@@ -77,8 +73,8 @@ export const InsightCategory = z.enum([
   "insights",
   "regulatory_updates",
   "news_updates",
-  "media_coverage",
-  "webinar_resources",
+  "events",
+  "pro_bono",
 ]);
 export type InsightCategory = z.infer<typeof InsightCategory>;
 
@@ -141,12 +137,31 @@ export const InsightDetail = InsightCard.extend({
 });
 export type InsightDetail = z.infer<typeof InsightDetail>;
 
+export const PracticeAreaLead = z.object({
+  id: z.string(),
+  slug: z.string(),
+  displayName: z.string(),
+  role: PersonRole,
+  roleLabel: z.string(),
+  photo: NullableImage,
+  linkedinUrl: nullableString,
+  cardBio: nullableString,
+  practiceAreas: z.array(z.object({ slug: z.string(), title: z.string() })),
+  email: nullableString,
+});
+
 export const PracticeAreaDetail = PracticeAreaCard.extend({
-  body: nullableString,
-  keyServices: z.array(z.string()),
-  contacts: z.array(PersonSummary),
-  relatedInsights: z.array(InsightCard),
-  seo: SeoSchema.optional(),
+  homeSummary: z.string(),
+  heroIntro: z.string(),
+  heroImages: z.array(ImageSchema),
+  overview: nullableString,
+  coreServices: z.array(z.object({ title: z.string(), description: z.string() })),
+  approach: z.object({ text: z.string(), points: z.array(z.string()) }).nullable(),
+  industries: z.array(z.object({ name: z.string(), slug: z.string() })),
+  lead: PracticeAreaLead.nullable(),
+  siblings: z.array(z.object({ slug: z.string(), title: z.string() })),
+  recentPublications: z.array(InsightCard),
+  seo: SeoSchema,
 });
 export type PracticeAreaDetail = z.infer<typeof PracticeAreaDetail>;
 
@@ -186,6 +201,15 @@ export const Recognition = z.object({
   tab: z.string(),
 });
 export type Recognition = z.infer<typeof Recognition>;
+
+export const Award = z.object({
+  id: z.string(),
+  title: z.string(),
+  year: z.number(),
+  badge: NullableImage,
+  directory: z.object({ name: z.string(), slug: z.string() }),
+});
+export type Award = z.infer<typeof Award>;
 
 export const FaqSchema = z.object({ id: z.string(), question: z.string(), answer: z.string() });
 export type Faq = z.infer<typeof FaqSchema>;
@@ -271,15 +295,13 @@ export const HomePage = z.object({
     poster: NullableImage,
     caption: nullableString.optional(),
   }),
-  recognitionTabs: z.object({
-    achievementsLabel: z.string(),
-    recognizedByLabel: z.string(),
-    eyebrow: nullableString.optional(),
-    title: nullableString.optional(),
-    cta: NullableLink.optional(),
-    image: NullableImage.optional(),
+  recognitionSection: z.object({
+    eyebrow: nullableString,
+    title: z.string(),
+    cta: z.object({ label: z.string(), href: nullableString, kind: z.string().nullable() }),
+    image: NullableImage,
+    badges: z.array(Award),
   }),
-  recognitions: z.object({ achievements: z.array(Recognition), recognizedBy: z.array(Recognition) }),
   practiceSection: SectionHeader,
   practiceAreas: z.array(PracticeAreaCard),
   leadershipSection: SectionHeader,
@@ -327,7 +349,7 @@ export const AboutPage = z.object({
     eyebrow: nullableString,
     title: z.string(),
     image: NullableImage,
-    items: z.array(z.object({ name: z.string(), url: nullableString })),
+    items: z.array(z.object({ name: z.string(), slug: z.string() })),
   }),
   ...seo,
 });
@@ -339,7 +361,7 @@ export const PracticeAreasPage = z.object({
   gridSection: SectionHeader,
   practiceAreas: z.array(PracticeAreaCard),
   csrBanner: z
-    .object({ title: z.string(), text: z.string(), image: NullableImage, cta: NullableLink })
+    .object({ title: z.string(), text: z.string(), images: z.array(ImageSchema), cta: NullableLink })
     .nullable(),
   ...seo,
 });
@@ -350,6 +372,7 @@ export const PeoplePage = z.object({
   hero: HeroSchema,
   directorySection: SectionHeader,
   roleFilters: z.array(FilterOption),
+  practiceAreaFilters: z.array(FilterOption),
   ...seo,
 });
 export type PeoplePage = z.infer<typeof PeoplePage>;

@@ -55,7 +55,7 @@ export default async function HomePage() {
 
       <VideoShowcase showcase={page.videoShowcase} />
 
-      <RecognitionFeature tabs={page.recognitionTabs} recognitions={[...page.recognitions.achievements, ...page.recognitions.recognizedBy]} />
+      <RecognitionFeature section={page.recognitionSection} />
 
       {/* Focused Practice Areas */}
       {page.practiceAreas.length > 0 ? (
