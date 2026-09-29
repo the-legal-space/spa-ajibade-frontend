@@ -5,6 +5,7 @@ import type { OfficeRef, PracticeAreaRef } from "@/lib/api/schemas";
 import { telHref } from "@/lib/utils";
 import { MandateDialog } from "./mandate-dialog";
 import { MessageDialog } from "./message-dialog";
+import { ChatPanel, type ChatFaq } from "./chat-panel";
 
 /**
  * The CMS expresses some links as actions ("action:mandate", "action:message",
@@ -12,7 +13,7 @@ import { MessageDialog } from "./message-dialog";
  * so any button anywhere can trigger the right form without prop drilling.
  */
 
-type DialogKind = "mandate" | "message" | null;
+type DialogKind = "mandate" | "message" | "chat" | null;
 
 type ActionsValue = {
   run: (action: string, context?: { practiceArea?: string }) => void;
@@ -34,12 +35,14 @@ export function ActionsProvider({
   phone,
   practiceAreas,
   offices,
+  faqs = [],
 }: {
   children: ReactNode;
   firmName: string;
   phone: string | null;
   practiceAreas: PracticeAreaRef[];
   offices: OfficeRef[];
+  faqs?: ChatFaq[];
 }) {
   const [open, setOpen] = useState<DialogKind>(null);
   const [presetArea, setPresetArea] = useState<string | undefined>();
@@ -57,9 +60,10 @@ export function ActionsProvider({
           if (phoneHref) window.location.href = phoneHref;
           else setOpen("message");
           break;
-        // There is no chat assistant behind the API yet, so "Chat with us" opens the
-        // message form. Swap this for the chatbot once one exists.
+        // "Chat with us" opens the SPAACO AI panel (answers from the published FAQ for now).
         case "chat":
+          setOpen("chat");
+          break;
         case "message":
         default:
           setOpen("message");
@@ -68,6 +72,7 @@ export function ActionsProvider({
     [phoneHref],
   );
 
+  const closeChat = useCallback(() => setOpen((o) => (o === "chat" ? null : o)), []);
   const value = useMemo(() => ({ run, phoneHref, firmName }), [run, phoneHref, firmName]);
 
   return (
@@ -81,6 +86,17 @@ export function ActionsProvider({
         defaultPracticeArea={presetArea}
       />
       <MessageDialog open={open === "message"} onClose={() => setOpen(null)} />
+      <ChatPanel
+        open={open === "chat"}
+        onClose={closeChat}
+        faqs={faqs}
+        firmName={firmName}
+        onMessage={() => setOpen("message")}
+        onCall={() => {
+          if (phoneHref) window.location.href = phoneHref;
+          else setOpen("message");
+        }}
+      />
     </ActionsContext.Provider>
   );
 }

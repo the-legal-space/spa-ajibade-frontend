@@ -4,8 +4,8 @@ import { MotionP } from "@/components/ui/motion-p";
 
 export function Eyebrow({ children, tone = "dark", className }: { children: ReactNode; tone?: "dark" | "light"; className?: string }) {
   return (
-    <MotionP className={cn("flex items-center gap-1.5 text-xs", tone === "dark" ? "text-ink" : "text-white/80", className)}>
-      <span aria-hidden className={cn("inline-block size-2 rounded-[1px]", tone === "dark" ? "bg-ink" : "bg-white")} />
+    <MotionP className={cn("flex items-center gap-1 text-xs leading-none", tone === "dark" ? "text-ink" : "text-white", className)}>
+      <span aria-hidden className={cn("inline-block size-2.5 rounded-[2px]", tone === "dark" ? "bg-ink" : "bg-white")} />
       {children}
     </MotionP>
   );
@@ -23,11 +23,11 @@ export function Heading({
   size?: "display" | "h2" | "h3";
 }) {
   const sizes = {
-    display: "text-[2.5rem] leading-[1.15] md:text-[3.25rem] md:leading-[1.19]",
-    h2: "text-[2rem] leading-[1.2] md:text-[2.75rem]",
+    display: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
+    h2: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
     h3: "text-2xl leading-tight md:text-[1.75rem]",
   };
-  return <Tag className={cn("font-serif font-normal tracking-[-0.01em] text-balance", sizes[size], className)}>{children}</Tag>;
+  return <Tag className={cn("font-serif font-normal text-balance", sizes[size], className)}>{children}</Tag>;
 }
 
 export function Section({
@@ -52,9 +52,27 @@ export function Section({
   );
 }
 
-export function Chip({ children, className }: { children: ReactNode; className?: string }) {
+/** Figma "Sub Container" tag: white, 0.5px grey border, 10px text. Stays on one line and truncates. */
+export function Chip({
+  children,
+  className,
+  title,
+  compact = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  title?: string;
+  compact?: boolean;
+}) {
   return (
-    <span className={cn("inline-flex items-center rounded-[4px] border border-mist-300 bg-white px-2.5 py-1 text-[11px] leading-none text-ink", className)}>
+    <span
+      title={title}
+      className={cn(
+        "inline-block min-w-0 truncate whitespace-nowrap rounded-[4px] border-[0.5px] border-gray bg-white py-2 text-[10px] leading-none text-ink",
+        compact ? "px-3" : "px-4",
+        className,
+      )}
+    >
       {children}
     </span>
   );

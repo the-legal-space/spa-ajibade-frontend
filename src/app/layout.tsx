@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Inter, Source_Serif_4 } from "next/font/google";
 import { connection } from "next/server";
 import { getOffices, getPracticeAreas, getSite } from "@/lib/api/endpoints";
 import { SITE_URL } from "@/lib/env";
@@ -7,9 +7,12 @@ import { TopBar } from "@/components/layout/top-bar";
 import { ChatButton, Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ActionsProvider } from "@/components/forms/actions-context";
+import { designNav } from "@/lib/nav";
+import { cleanHtml } from "@/lib/sanitize";
 import "./globals.css";
 
-const fraunces = Fraunces({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-fraunces", display: "swap" });
+const fraunces = Fraunces({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-fraunces", display: "swap" });
+const sourceSerif = Source_Serif_4({ subsets: ["latin"], weight: ["400"], variable: "--font-source-serif", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,13 +37,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Render per request; the API responses themselves are cached (see lib/api/client.ts).
   await connection();
   const [site, offices, practiceAreas] = await Promise.all([getSite(), getOffices(), getPracticeAreas()]);
-  const hiddenPaths = new Set(["/faq", "/offices"]);
-  const filteredNav = site.nav
-    .filter((item) => !hiddenPaths.has(item.href))
-    .map((item) => ({
-      ...item,
-      children: item.children.filter((child) => !hiddenPaths.has(child.href)),
-    }));
+  const filteredNav = designNav(site.nav);
+  // Plain-text FAQ for the chat panel (rendered as text, never as HTML).
+  const chatFaqs = site.faqSection.items.map((f) => ({
+    question: f.question,
+    answer: cleanHtml(f.answer)
+      .replace(/<\/(p|li|h[2-4])>/g, "\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\n{2,}/g, "\n")
+      .trim(),
+  }));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -62,12 +74,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang="en-NG" className={`${fraunces.variable} ${inter.variable}`}>
+    <html lang="en-NG" className={`${fraunces.variable} ${inter.variable} ${sourceSerif.variable}`}>
       <body>
         <a href="#main" className="sr-only z-[100] rounded bg-white px-4 py-2 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
           Skip to content
         </a>
-        <ActionsProvider firmName={site.settings.firmName} phone={site.settings.phone} practiceAreas={practiceAreas} offices={offices}>
+        <ActionsProvider firmName={site.settings.firmName} phone={site.settings.phone} practiceAreas={practiceAreas} offices={offices} faqs={chatFaqs}>
           <TopBar settings={site.settings} />
           <Header nav={filteredNav} firmName={site.settings.firmName} descriptor={site.settings.legalDescriptor} cta={site.contactCallout.primaryCta} />
           <main id="main" className="bg-white">

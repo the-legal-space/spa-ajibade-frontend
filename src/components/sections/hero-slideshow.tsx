@@ -50,7 +50,7 @@ export function HeroDots({ className }: { className?: string }) {
   const { index, count, go } = useContext(SlideCtx);
   if (count < 2) return null;
   return (
-    <div className={cn("flex items-center gap-1", className)} role="group" aria-label="Hero images">
+    <div className={cn("flex h-2 items-center gap-2", className)} role="group" aria-label="Hero images">
       {Array.from({ length: count }, (_, i) => (
         <motion.button
           key={i}
@@ -60,12 +60,12 @@ export function HeroDots({ className }: { className?: string }) {
           whileTap={{ scale: 0.85 }}
           aria-label={`Show image ${i + 1} of ${count}`}
           aria-current={i === index}
-          className="grid size-5 place-items-center"
+          className="relative grid size-2 place-items-center before:absolute before:-inset-2 before:content-['']"
         >
           <span
             className={cn(
-              "block rounded-full transition-all duration-500",
-              i === index ? "size-2.5 bg-white shadow-xs" : "size-2 bg-white/35 hover:bg-white/60",
+              "block size-2 rounded-full transition-colors duration-500",
+              i === index ? "bg-white" : "bg-white/40 hover:bg-white/70",
             )}
           />
         </motion.button>

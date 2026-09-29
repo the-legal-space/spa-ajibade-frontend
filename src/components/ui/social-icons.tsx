@@ -36,26 +36,46 @@ export function SocialIcon({ name, className }: { name: keyof Socials; className
   );
 }
 
-/** Only renders networks the firm has actually filled in. */
-export function SocialLinks({ socials, className, iconClassName }: { socials: Socials; className?: string; iconClassName?: string }) {
-  const entries = (Object.keys(paths) as (keyof Socials)[]).filter((k) => !!socials[k]);
+/**
+ * The five networks from the Figma, in its order. A network the firm has filled in
+ * links out; with `always`, the others still show as plain icons so the bar matches
+ * the design until the CMS has every URL.
+ */
+export function SocialLinks({
+  socials,
+  className,
+  iconClassName,
+  always = false,
+}: {
+  socials: Socials;
+  className?: string;
+  iconClassName?: string;
+  always?: boolean;
+}) {
+  const entries = (Object.keys(paths) as (keyof Socials)[]).filter((k) => always || !!socials[k]);
   if (entries.length === 0) return null;
   return (
     <ul className={cn("flex items-center gap-4", className)}>
       {entries.map((k) => (
         <li key={k}>
-          <motion.a
-            href={socials[k]!}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={paths[k].label}
-            whileHover={{ scale: 1.15, opacity: 1 }}
-            whileTap={{ scale: 0.9 }}
-            transition={TRANSITIONS.hover}
-            className="block opacity-90 transition-opacity"
-          >
-            <SocialIcon name={k} className={iconClassName} />
-          </motion.a>
+          {socials[k] ? (
+            <motion.a
+              href={socials[k]!}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={paths[k].label}
+              whileHover={{ scale: 1.15, opacity: 1 }}
+              whileTap={{ scale: 0.9 }}
+              transition={TRANSITIONS.hover}
+              className="block opacity-90 transition-opacity"
+            >
+              <SocialIcon name={k} className={iconClassName} />
+            </motion.a>
+          ) : (
+            <span className="block" title={paths[k].label}>
+              <SocialIcon name={k} className={iconClassName} />
+            </span>
+          )}
         </li>
       ))}
     </ul>
