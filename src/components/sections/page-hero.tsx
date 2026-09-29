@@ -22,7 +22,7 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
 
   return (
     <HeroSlideshow count={images.length}>
-    <section data-header-theme="dark" className={cn("relative -mt-[70px] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
+    <section data-header-theme="dark" className={cn("relative -mt-[var(--header-h)] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
       <div className="absolute inset-0">
         {images.length > 1 ? (
           <HeroSlides images={images} />
@@ -31,22 +31,24 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
         ) : (
           <div className="size-full bg-[radial-gradient(ellipse_at_70%_30%,#3a3a3a_0%,#141414_45%,#000_80%)]" aria-hidden />
         )}
+        {/* Figma overlay: 50% black plus a left-to-right fade from 80% black behind the copy. */}
         <div className="absolute inset-0 bg-black/50" aria-hidden />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.8)_0.66%,rgba(0,0,0,0)_100%)]" aria-hidden />
       </div>
 
-      <div className={cn("container-site relative flex flex-col justify-center pt-[70px]", size === "lg" ? "min-h-[600px] md:min-h-[680px]" : "min-h-[500px] md:min-h-[580px]")}>
-        <div className="max-w-[720px] py-16">
+      <div className={cn("container-site relative flex flex-col justify-center pt-[var(--header-h)]", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
+        <div className="max-w-[776px] py-16">
           {top ? <div className="mb-3 text-[13px] text-white/85">{top}</div> : null}
           <Heading as="h1" size="display">
             {hero.title}
           </Heading>
           {hero.subtitle ? (
-            <MotionP className="mt-4 max-w-[620px] text-lg leading-8 text-white/85 md:text-xl md:leading-9">{hero.subtitle}</MotionP>
+            <MotionP className="mt-5 text-lg leading-8 text-mist md:text-xl md:leading-9">{hero.subtitle}</MotionP>
           ) : null}
-          <HeroDots className="-ml-1.5 mt-4" />
+          <HeroDots className="mt-5" />
           {children}
           {hero.primaryCta || hero.secondaryCta ? (
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               {hero.primaryCta ? <SmartLink link={hero.primaryCta} className={buttonClass("light")} /> : null}
               {hero.secondaryCta ? <SmartLink link={hero.secondaryCta} className={buttonClass("ghostDark")} /> : null}
             </div>
@@ -61,11 +63,11 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
 /** Compact dark header for detail pages (attorney, practice area, article). */
 export function DetailHero({ eyebrow, title, children }: { eyebrow?: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
-    <section data-header-theme="dark" className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white">
+    <section data-header-theme="dark" className="relative -mt-[var(--header-h)] overflow-hidden bg-ink pt-[var(--header-h)] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,#2a2a2a_0%,#000_60%)]" aria-hidden />
       <div className="container-site relative py-16 md:py-20">
         {eyebrow ? <div className="mb-4 text-sm text-white/70">{eyebrow}</div> : null}
-        <Heading as="h1" size="display" className="max-w-4xl">
+        <Heading as="h1" size="display" className="max-w-4xl normal-case">
           {title}
         </Heading>
         {children}

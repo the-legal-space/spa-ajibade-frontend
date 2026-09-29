@@ -18,6 +18,7 @@ import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { personPhoto } from "@/lib/figma-assets";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -158,7 +159,7 @@ function ContactCard({ person }: { person: PersonSummary }) {
   return (
     <div className="group">
       <Link href={`/people/${person.slug}`} className="block aspect-[264/280] overflow-hidden rounded-md">
-        <Media image={person.photo} placeholder="portrait" name={person.displayName} alt={`Portrait of ${person.displayName}`} sizes="264px" className="transition duration-500 group-hover:scale-[1.03]" />
+        <Media image={personPhoto(person.slug, person.photo)} placeholder="portrait" name={person.displayName} alt={`Portrait of ${person.displayName}`} sizes="264px" className="transition duration-500 group-hover:scale-[1.03]" />
       </Link>
       <Link href={`/people/${person.slug}`} className="mt-2 block text-[13px] font-medium hover:underline">
         {person.displayName}

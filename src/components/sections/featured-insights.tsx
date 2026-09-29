@@ -9,6 +9,7 @@ import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { useAutoplay, useSwipe } from "@/components/home/scroll-rail";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+import { insightCover } from "@/lib/figma-assets";
 
 const MotionLink = motion.create(Link);
 
@@ -24,7 +25,7 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section {...autoplay} className="relative -mt-[70px] overflow-hidden bg-ink pt-[70px] text-white" aria-roledescription="carousel" aria-label="Featured insights">
+    <section {...autoplay} className="relative -mt-[var(--header-h)] overflow-hidden bg-ink pt-[var(--header-h)] text-white" aria-roledescription="carousel" aria-label="Featured insights">
       <svg className="pointer-events-none absolute inset-0 size-full text-white/[0.06]" aria-hidden preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 600">
         <path d="M200 -60 L720 330 L1240 -60 M200 720 L720 330 L1240 720" fill="none" stroke="currentColor" strokeWidth="170" />
       </svg>
@@ -82,7 +83,7 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                     </div>
                   </div>
                   <div className="aspect-[513/306] overflow-hidden">
-                    <Media image={item.coverImage} placeholder="dark" priority={n === 0} sizes="(min-width:768px) 50vw, 100vw" />
+                    <Media image={insightCover(item.slug, item.coverImage)} placeholder="dark" priority={n === 0} sizes="(min-width:768px) 50vw, 100vw" />
                   </div>
                 </article>
               );

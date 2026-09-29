@@ -2,24 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
-import type { PracticeAreaCard } from "@/lib/api/schemas";
+import type { ApiLink, PracticeAreaCard } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
+import { practiceImage } from "@/lib/figma-assets";
 import { Media } from "@/components/ui/media";
-import { MotionP } from "@/components/ui/motion-p";
+import { SmartLink } from "@/components/ui/smart-link";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { useAutoplay, useSwipe } from "./scroll-rail";
+import { CarouselArrow } from "./carousel-arrow";
 
 const MotionLink = motion.create(Link);
 
 /**
- * Home "Focused Practice Areas": a tab bar of short labels driving a sliding track of cards.
- * The active card sits in the centre and the neighbouring cards peek in, dimmed, at the sides.
+ * Home "Focused Practice Areas" (Figma component "Practice Areas"): a pill tab bar driving a
+ * sliding track of 910px cards. The active card is centred, its neighbours peek in at 30%.
  * Pills, arrows, clicking a side card, swiping and autoplay all move the same track.
  */
-export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
-  const [index, setIndex] = useState(Math.min(2, Math.max(0, areas.length - 1)));
+export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; cta?: ApiLink | null }) {
+  const [index, setIndex] = useState(Math.min(3, Math.max(0, areas.length - 1)));
   const count = Math.max(1, areas.length);
   const go = (i: number) => setIndex(((i % count) + count) % count);
   const autoplay = useAutoplay(() => setIndex((i) => (i + 1) % count), { enabled: areas.length > 1 });
@@ -45,7 +47,12 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
 
   return (
     <div {...autoplay}>
-      <div ref={bar} role="tablist" aria-label="Practice areas" className="hide-scrollbar relative mx-auto flex w-max max-w-full overflow-x-auto rounded-full bg-ink-700 p-1">
+      <div
+        ref={bar}
+        role="tablist"
+        aria-label="Practice areas"
+        className="hide-scrollbar relative mx-auto flex h-12 w-max max-w-full items-center gap-2.5 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5"
+      >
         {areas.map((a, i) => (
           <motion.button
             key={a.slug}
@@ -55,12 +62,11 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
             aria-selected={i === index}
             aria-controls={`pa-panel-${a.slug}`}
             onClick={() => go(i)}
-            whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             transition={TRANSITIONS.hover}
             className={cn(
-              "whitespace-nowrap rounded-full px-4 py-2 text-[13px] transition-colors duration-300",
-              i === index ? "bg-white/20 font-medium text-white shadow-xs" : "text-white/75 hover:text-white",
+              "flex h-11 shrink-0 items-center whitespace-nowrap rounded-[32px] px-5 text-sm leading-7 text-cream transition-colors duration-300",
+              i === index ? "bg-cream/16 font-semibold" : "hover:bg-cream/8",
             )}
           >
             {a.shortLabel}
@@ -70,7 +76,7 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
 
       <div
         {...swipe}
-        className="relative mt-12 overflow-hidden [--cw:calc(100vw_-_40px)] [--gap:16px] md:[--cw:min(744px,calc(100vw_-_64px))] lg:[--gap:56px]"
+        className="relative mt-11 overflow-hidden [--cw:calc(100vw_-_40px)] [--gap:16px] md:[--cw:min(910px,calc(100vw_-_64px))] lg:[--gap:68px]"
       >
         <div
           className="relative left-1/2 flex w-max gap-(--gap) transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
@@ -87,25 +93,27 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
                 aria-hidden={!active}
                 onClick={active ? undefined : () => go(i)}
                 className={cn(
-                  "grid w-(--cw) shrink-0 gap-6 rounded-[20px] bg-ink-800 p-2 transition-[opacity,transform] duration-700 md:grid-cols-[362px_1fr] md:p-1.5",
-                  active ? "opacity-100 shadow-xl" : "scale-[0.96] cursor-pointer opacity-40 hover:opacity-60",
+                  "flex w-(--cw) shrink-0 flex-col gap-2 rounded-[32px] bg-cream/8 p-2 transition-opacity duration-700 md:h-[500px] md:flex-row",
+                  active ? "opacity-100" : "cursor-pointer opacity-30 hover:opacity-50",
                 )}
               >
-                <div className="aspect-[362/394] overflow-hidden rounded-2xl">
-                  <Media image={a.image} alt="" placeholder="dark" />
+                <div className="aspect-[443/484] w-full shrink-0 overflow-hidden rounded-[24px] md:aspect-auto md:h-full md:w-[443px] md:max-w-[49%]">
+                  <Media image={practiceImage(a.slug, a.image)} alt="" placeholder="dark" sizes="(min-width:768px) 443px, 100vw" />
                 </div>
-                <div className="flex flex-col px-3 pb-4 md:px-2 md:py-7 md:pr-8">
-                  <h3 className="font-serif text-3xl leading-tight text-white md:text-[2.25rem]">{a.title}</h3>
-                  <MotionP className="mt-5 flex-1 text-[13px] leading-6 text-white/85">{a.summary}</MotionP>
+                <div className="flex min-w-0 flex-1 flex-col justify-between gap-8 p-5 md:p-8">
+                  <div className="flex flex-col gap-3.5">
+                    <h3 className="font-card text-[2rem] capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
+                    <p className="line-clamp-2 text-sm leading-7 text-cream/88">{a.summary}</p>
+                  </div>
                   <MotionLink
                     href={`/practice-areas/${a.slug}`}
                     tabIndex={active ? undefined : -1}
                     whileHover={INTERACTION.button.whileHover}
                     whileTap={INTERACTION.button.whileTap}
                     transition={TRANSITIONS.hover}
-                    className="mt-6 inline-flex w-max items-center gap-2 rounded-[4px] border border-white/25 px-4 py-2.5 text-[13px] text-white hover:bg-white/10"
+                    className="inline-flex w-max items-center gap-2.5 rounded-[4px] border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium leading-none text-white backdrop-blur-[15px] hover:bg-white/15"
                   >
-                    Learn More <ArrowRight className="size-4" aria-hidden />
+                    Learn More <ArrowRight className="size-5" strokeWidth={1.5} aria-hidden />
                   </MotionLink>
                 </div>
               </article>
@@ -114,29 +122,21 @@ export function PracticeCarousel({ areas }: { areas: PracticeAreaCard[] }) {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-end gap-3">
-        <motion.button
-          type="button"
-          onClick={() => go(index - 1)}
-          whileHover={INTERACTION.iconButton.whileHover}
-          whileTap={INTERACTION.iconButton.whileTap}
-          transition={TRANSITIONS.hover}
-          className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition-colors hover:bg-ink-800"
-          aria-label="Previous practice area"
-        >
-          <ArrowLeft className="size-4" />
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => go(index + 1)}
-          whileHover={INTERACTION.iconButton.whileHover}
-          whileTap={INTERACTION.iconButton.whileTap}
-          transition={TRANSITIONS.hover}
-          className="grid size-10 place-items-center rounded-full bg-ink-700 text-white transition-colors hover:bg-ink-800"
-          aria-label="Next practice area"
-        >
-          <ArrowRight className="size-4" />
-        </motion.button>
+      <div className="mt-11 flex flex-wrap items-center justify-between gap-4">
+        {cta ? (
+          <SmartLink
+            link={cta}
+            className="inline-flex items-center gap-2.5 rounded-[4px] border-2 border-ink bg-mist p-4 text-sm font-medium leading-none text-ink backdrop-blur-[15px] hover:bg-white"
+          >
+            {cta.label} <ArrowUpRight className="size-5" strokeWidth={1.5} aria-hidden />
+          </SmartLink>
+        ) : (
+          <span />
+        )}
+        <div className="flex gap-4">
+          <CarouselArrow dir="prev" onClick={() => go(index - 1)} label="Previous practice area" />
+          <CarouselArrow dir="next" onClick={() => go(index + 1)} label="Next practice area" />
+        </div>
       </div>
     </div>
   );

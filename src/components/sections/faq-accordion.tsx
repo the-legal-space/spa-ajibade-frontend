@@ -8,10 +8,13 @@ import { accordionPanelVariants, INTERACTION, TRANSITIONS } from "@/lib/motion";
 
 export type AccordionItem = { id: string; question: string; answerHtml: string };
 
-/** Single-open accordion with smooth height expand/collapse and icon morph. */
+/**
+ * Figma FAQ accordion: one item is always open (the first by default). Opening another closes
+ * the current one; clicking the open item keeps it open, so the panel never collapses to nothing.
+ */
 export function FaqAccordion({
   items,
-  defaultOpen = 1,
+  defaultOpen = 0,
   tone = "mist",
 }: {
   items: AccordionItem[];
@@ -21,7 +24,7 @@ export function FaqAccordion({
   const [open, setOpen] = useState<string | null>(items[defaultOpen]?.id ?? items[0]?.id ?? null);
 
   return (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-4 lg:gap-5">
       {items.map((item) => {
         const isOpen = open === item.id;
         const panelId = `faq-panel-${item.id}`;
@@ -29,9 +32,8 @@ export function FaqAccordion({
           <li
             key={item.id}
             className={cn(
-              "overflow-hidden rounded-xl transition-shadow duration-300",
+              "overflow-hidden rounded-[12px]",
               tone === "mist" ? "bg-mist" : "bg-white",
-              isOpen ? "shadow-sm" : "",
             )}
           >
             <h3>
@@ -41,19 +43,22 @@ export function FaqAccordion({
                 aria-controls={panelId}
                 whileTap={INTERACTION.button.whileTap}
                 transition={TRANSITIONS.tap}
-                onClick={() => setOpen(isOpen ? null : item.id)}
-                className="group flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors"
+                onClick={() => setOpen(item.id)}
+                className="group flex w-full items-center justify-between gap-5 p-5 text-left transition-colors md:p-6"
               >
-                <span className="font-serif text-lg transition-colors group-hover:text-ink-700 md:text-[1.35rem]">
+                <span className="font-serif text-xl leading-7 text-[#0a0a0b] transition-colors group-hover:text-ink-700 md:text-2xl md:leading-[28px]">
                   {item.question}
                 </span>
                 <motion.span
-                  className="grid size-8 shrink-0 place-items-center rounded-full bg-mist-200/80 text-ink transition-colors group-hover:bg-mist-300"
+                  className={cn(
+                    "grid size-10 shrink-0 place-items-center rounded-full text-ink transition-colors",
+                    isOpen ? "bg-[#e9e9e9]" : "bg-[rgba(10,10,11,0.04)] group-hover:bg-[#e9e9e9]",
+                  )}
                   animate={{ rotate: isOpen ? 180 : 0 }}
                   transition={TRANSITIONS.smooth}
                   aria-hidden
                 >
-                  {isOpen ? <Minus className="size-4" /> : <Plus className="size-4" />}
+                  {isOpen ? <Minus className="size-5" strokeWidth={1.5} /> : <Plus className="size-5" strokeWidth={1.5} />}
                 </motion.span>
               </motion.button>
             </h3>
@@ -68,8 +73,8 @@ export function FaqAccordion({
                   exit="collapsed"
                   className="overflow-hidden"
                 >
-                  <div className="px-5 pb-5">
-                    <div className="prose-firm text-[13px] leading-6" dangerouslySetInnerHTML={{ __html: item.answerHtml }} />
+                  <div className="-mt-3 px-5 pb-5 md:px-6 md:pb-6">
+                    <div className="prose-firm text-sm leading-7 text-ink [&_p:last-child]:mb-0" dangerouslySetInnerHTML={{ __html: item.answerHtml }} />
                   </div>
                 </motion.div>
               ) : null}

@@ -9,6 +9,7 @@ import { Media } from "@/components/ui/media";
 import { CmsIcon } from "@/components/ui/icon";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { personPhoto } from "@/lib/figma-assets";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -24,7 +25,7 @@ export default async function AboutPage() {
       <PageHero hero={page.hero} />
 
       {/* Our story */}
-      <Section tone="white" labelledBy="story-heading">
+      <Section tone="white" id="our-story" labelledBy="story-heading">
         <div className="grid gap-12 lg:grid-cols-[1fr_551px]">
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
@@ -36,7 +37,7 @@ export default async function AboutPage() {
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
                     <div className="aspect-[278/337] w-full max-w-[278px] overflow-hidden">
-                      <Media image={story.quotePerson.photo} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
+                      <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
                       {story.quotePerson.displayName}
@@ -83,7 +84,7 @@ export default async function AboutPage() {
       ) : null}
 
       {/* Mission, vision & values */}
-      <Section tone="mist" labelledBy="mission-heading">
+      <Section tone="mist" id="mission" labelledBy="mission-heading">
         {missionSection.eyebrow ? <Eyebrow>{missionSection.eyebrow}</Eyebrow> : null}
         <Heading className="mt-2 max-w-3xl">
           <span id="mission-heading">{missionSection.title}</span>
@@ -105,7 +106,7 @@ export default async function AboutPage() {
       </Section>
 
       {/* Principles */}
-      <Section tone="white" className="relative overflow-hidden" labelledBy="principles-heading">
+      <Section tone="white" id="principles" className="relative overflow-hidden" labelledBy="principles-heading">
         {principles.image ? (
           <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[340px] lg:block" aria-hidden>
             <Media image={principles.image} className="object-contain" />
