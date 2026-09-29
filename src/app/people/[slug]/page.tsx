@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
-import { getPage, getPerson, getSite } from "@/lib/api/endpoints";
+import { getInsights, getPage, getPerson, getSite } from "@/lib/api/endpoints";
+import { personPhoto } from "@/lib/figma-assets";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
@@ -37,7 +38,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Attorney profile, following the "ATTORNEY DETAILS" frame (white header, two columns). */
 export default async function PersonPage({ params }: Props) {
   const { slug } = await params;
-  const [p, site, home] = await Promise.all([load(slug), getSite(), getPage("home")]);
+  const [p, site, home, all] = await Promise.all([
+    load(slug),
+    getSite(),
+    getPage("home"),
+    getInsights({ pageSize: 50 }).catch(() => null),
+  ]);
+  // The person endpoint's `insights` list is empty today even for authors, so articles are
+  // also matched on the author of each published insight. Duplicates are dropped.
+  const authored = (all?.data ?? []).filter((i) => i.author.type === "person" && i.author.person.slug === p.slug);
+  const insights = [...p.insights, ...authored].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
   const bio = cleanHtml(p.bio);
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
@@ -68,8 +78,8 @@ export default async function PersonPage({ params }: Props) {
             <Heading as="h1" className="mt-2">
               {p.displayName}
             </Heading>
-            <div className="mt-8 aspect-[395/390] w-full max-w-[395px] overflow-hidden">
-              <Media image={p.photo} placeholder="portrait" name={p.displayName} alt={`Portrait of ${p.displayName}`} priority sizes="395px" />
+            <div className="mt-8 aspect-[395/390] w-full max-w-[395px] overflow-hidden bg-card-blue">
+              <Media image={personPhoto(p.slug, p.photo)} placeholder="portrait" name={p.displayName} alt={`Portrait of ${p.displayName}`} priority sizes="395px" />
             </div>
             {p.practiceAreas.length > 0 ? (
               <p className="mt-6 text-lg">
@@ -109,21 +119,21 @@ export default async function PersonPage({ params }: Props) {
         </div>
       </section>
 
-      {p.insights.length > 0 ? (
+      {insights.length > 0 ? (
         <Section tone="mist" labelledBy="person-insights">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               {home.insightsSection.eyebrow ? <Eyebrow>{home.insightsSection.eyebrow}</Eyebrow> : null}
               <Heading className="mt-2">
-                <span id="person-insights">{home.insightsSection.title}</span>
+                <span id="person-insights">Publications by {p.displayName}</span>
               </Heading>
             </div>
             {home.insightsSection.cta ? <SmartLink link={home.insightsSection.cta} className={buttonClass("outline")} /> : null}
           </div>
           <div className="mt-10">
-            <ScrollRail label={home.insightsSection.title}>
-              {p.insights.map((i) => (
-                <div key={i.id} className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]">
+            <ScrollRail label={`Publications by ${p.displayName}`}>
+              {insights.map((i) => (
+                <div key={i.id} className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]">
                   <InsightCard insight={i} />
                 </div>
               ))}

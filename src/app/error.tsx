@@ -9,7 +9,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error]);
 
   return (
-    <section className="relative -mt-[70px] bg-ink pt-[70px] text-white">
+    <section className="relative -mt-[var(--header-h)] bg-ink pt-[var(--header-h)] text-white">
       <div className="container-site flex min-h-[60vh] flex-col items-start justify-center py-24">
         <h1 className="font-serif text-4xl md:text-[3.25rem]">This page didn&apos;t load.</h1>
         <p className="mt-4 max-w-xl text-lg leading-8 text-white/80">

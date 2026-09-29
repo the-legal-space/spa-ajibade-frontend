@@ -44,7 +44,7 @@ export default async function InsightsPage({ searchParams }: Props) {
     <>
       {content.hero ? <PageHero hero={content.hero} /> : null}
       {!content.hero && content.featured.length > 0 ? <FeaturedInsights items={content.featured} /> : null}
-      {!content.hero && content.featured.length === 0 ? <div className="-mt-[70px] h-[70px] bg-ink" aria-hidden /> : null}
+      {!content.hero && content.featured.length === 0 ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
 
       <Section tone="mist" labelledBy="listing-heading" id="listing">
         <Heading as="h1">
