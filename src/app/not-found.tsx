@@ -3,7 +3,7 @@ import { buttonClass } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <section className="relative -mt-[70px] bg-ink pt-[70px] text-white">
+    <section className="relative -mt-[var(--header-h)] bg-ink pt-[var(--header-h)] text-white">
       <div className="container-site flex min-h-[60vh] flex-col items-start justify-center py-24">
         <p className="text-sm text-white/60">404</p>
         <h1 className="mt-3 font-serif text-4xl md:text-[3.25rem]">We couldn&apos;t find that page.</h1>

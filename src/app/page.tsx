@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
-import type { Recognition } from "@/lib/api/schemas";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard, PersonCard } from "@/components/sections/cards";
@@ -13,7 +12,8 @@ import { CmsIcon } from "@/components/ui/icon";
 import { PracticeCarousel } from "@/components/home/practice-carousel";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { VideoShowcase } from "@/components/home/video-showcase";
-import { RecognitionTabs } from "@/components/home/recognition-tabs";
+import { RecognitionFeature } from "@/components/home/recognition-feature";
+import { FIGMA } from "@/lib/figma-assets";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
@@ -25,61 +25,55 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
-  const badges: Recognition[] = [...page.recognitions.achievements, ...page.recognitions.recognizedBy];
+  // The Figma hero photograph leads; any extra CMS slides follow it in the slideshow.
+  const hero = { ...page.hero, image: FIGMA.heroHome };
 
   return (
     <>
-      <PageHero hero={page.hero} size="lg" />
+      <PageHero hero={hero} size="lg" />
 
       {/* A Firm Built On Integrity */}
-      <Section tone="mist" className="relative overflow-hidden" labelledBy="about-firm">
-        <WorldMap />
-        <div className="relative">
-          <Heading className="max-w-2xl" >
-            <span id="about-firm">{aboutFirm.title}</span>
-          </Heading>
-          <div className="mt-5 space-y-6 text-base leading-8 text-ink-800 md:text-[1.05rem]">
-            {aboutFirm.paragraphs.map((p, i) => (
-              <MotionP key={i} transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}>
-                {p}
-              </MotionP>
-            ))}
+      <section className="relative overflow-hidden bg-mist py-16 text-ink md:py-[68px]" aria-labelledby="about-firm">
+        {/* Figma "About Image": world map at 8% behind the copy. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.08]" style={{ backgroundImage: `url(${FIGMA.aboutMap})` }} />
+        <div className="container-site relative flex flex-col items-start gap-6">
+          <div className="flex flex-col gap-2.5">
+            <Heading className="max-w-[666px]">
+              <span id="about-firm">{aboutFirm.title}</span>
+            </Heading>
+            <div className="space-y-9 text-base leading-8 text-ink md:text-xl md:leading-9">
+              {aboutFirm.paragraphs.map((p, i) => (
+                <MotionP key={i} transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}>
+                  {p}
+                </MotionP>
+              ))}
+            </div>
           </div>
-          {aboutFirm.cta ? <SmartLink link={aboutFirm.cta} className={buttonClass("outline", "mt-6 bg-transparent")} /> : null}
+          {aboutFirm.cta ? <SmartLink link={aboutFirm.cta} className={buttonClass("outline")} /> : null}
         </div>
-      </Section>
+      </section>
 
       <VideoShowcase showcase={page.videoShowcase} />
 
-      {/* Recognition */}
-      {badges.length > 0 ? (
-        <Section tone="mist">
-          <RecognitionTabs
-            labels={page.recognitionTabs}
-            achievements={page.recognitions.achievements}
-            recognizedBy={page.recognitions.recognizedBy}
-          />
-        </Section>
-      ) : null}
+      <RecognitionFeature tabs={page.recognitionTabs} />
 
       {/* Focused Practice Areas */}
       {page.practiceAreas.length > 0 ? (
-        <section data-header-theme="dark" className="site-dark-surface overflow-hidden py-16 text-white md:py-[68px]" aria-labelledby="practice-heading">
+        <section data-header-theme="dark" className="overflow-hidden bg-[#0a0a0b] py-16 text-white md:py-[68px]" aria-labelledby="practice-heading">
           <div className="container-site">
-            <div className="text-center">
-              {page.practiceSection.eyebrow ? <Eyebrow tone="light" className="justify-center">{page.practiceSection.eyebrow}</Eyebrow> : null}
-              <Heading className="mt-3">
+            <div className="flex flex-col items-center gap-1 text-center">
+              {page.practiceSection.eyebrow ? (
+                <Eyebrow tone="light" className="justify-center font-medium">
+                  {page.practiceSection.eyebrow}
+                </Eyebrow>
+              ) : null}
+              <Heading>
                 <span id="practice-heading">{page.practiceSection.title}</span>
               </Heading>
             </div>
-            <div className="mt-6">
-              <PracticeCarousel areas={page.practiceAreas} />
+            <div className="mt-1">
+              <PracticeCarousel areas={page.practiceAreas} cta={page.practiceSection.cta} />
             </div>
-            {page.practiceSection.cta ? (
-              <div className="-mt-[50px]">
-                <SmartLink link={page.practiceSection.cta} className={buttonClass("light")} />
-              </div>
-            ) : null}
           </div>
         </section>
       ) : null}
@@ -90,13 +84,13 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               {page.leadershipSection.eyebrow ? <Eyebrow>{page.leadershipSection.eyebrow}</Eyebrow> : null}
-              <Heading className="mt-2 max-w-3xl">
+              <Heading className="mt-2 max-w-[895px]">
                 <span id="leadership-heading">{page.leadershipSection.title}</span>
               </Heading>
             </div>
             {page.leadershipSection.cta ? <SmartLink link={page.leadershipSection.cta} className={buttonClass("outline")} /> : null}
           </div>
-          <MotionList className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {page.leadership.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} />
@@ -108,27 +102,29 @@ export default async function HomePage() {
 
       {/* Why clients choose us */}
       <Section tone="black" labelledBy="why-heading">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div>
-            {whyChooseUs.eyebrow ? <MotionP className="text-xs text-white/70">{whyChooseUs.eyebrow}</MotionP> : null}
-            <Heading className="mt-3 max-w-lg">
-              <span id="why-heading">{whyChooseUs.title}</span>
-            </Heading>
-            <MotionP className="mt-4 max-w-xl text-lg leading-8 text-white/85">{whyChooseUs.text}</MotionP>
-            <ul className="mt-8 space-y-7">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 lg:py-[60px]">
+          <div className="flex flex-col justify-center gap-5">
+            <div className="flex flex-col gap-4">
+              {whyChooseUs.eyebrow ? <MotionP className="text-sm font-medium text-gray">{whyChooseUs.eyebrow}</MotionP> : null}
+              <Heading className="text-[#f2f1f0]">
+                <span id="why-heading">{whyChooseUs.title}</span>
+              </Heading>
+              <MotionP className="text-lg leading-8 text-mist md:text-xl md:leading-9">{whyChooseUs.text}</MotionP>
+            </div>
+            <ul className="flex max-w-[328px] flex-col gap-3">
               {whyChooseUs.points.map((pt) => (
-                <li key={pt.title} className="flex gap-3">
-                  <CmsIcon name={pt.icon} className="mt-0.5 size-5 shrink-0" />
+                <li key={pt.title} className="flex min-h-16 items-center gap-3 py-5">
+                  <CmsIcon name={pt.icon} className="size-5 shrink-0" />
                   <div>
-                    <MotionP className="text-[15px]">{pt.title}</MotionP>
+                    <MotionP className="text-base font-medium leading-7">{pt.title}</MotionP>
                     {pt.text ? <MotionP className="mt-1 text-sm text-white/70">{pt.text}</MotionP> : null}
                   </div>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="aspect-[645/557] overflow-hidden rounded-sm">
-            <Media image={whyChooseUs.image} placeholder="dark" sizes="(min-width:1024px) 50vw, 100vw" />
+          <div className="relative min-h-[360px] overflow-hidden rounded-[5px]">
+            <Media image={FIGMA.whyClients} alt={whyChooseUs.image?.alt ?? FIGMA.whyClients.alt} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
           </div>
         </div>
       </Section>
@@ -145,10 +141,10 @@ export default async function HomePage() {
             </div>
             {page.insightsSection.cta ? <SmartLink link={page.insightsSection.cta} className={buttonClass("outline")} /> : null}
           </div>
-          <div className="mt-10">
+          <div className="mt-11">
             <ScrollRail label="Recent publications">
               {page.latestInsights.map((i) => (
-                <div key={i.id} className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]">
+                <div key={i.id} className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]">
                   <InsightCard insight={i} />
                 </div>
               ))}
@@ -159,15 +155,5 @@ export default async function HomePage() {
 
       <PageEnd />
     </>
-  );
-}
-
-function WorldMap() {
-  // Subtle dotted backdrop standing in for the world-map texture in the design.
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 opacity-60 [background-image:radial-gradient(#dcdcdc_1px,transparent_1px)] [background-size:14px_14px] [mask-image:radial-gradient(ellipse_at_70%_40%,black,transparent_70%)]"
-    />
   );
 }

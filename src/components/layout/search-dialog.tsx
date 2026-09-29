@@ -89,7 +89,7 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
       className="m-0 h-dvh max-h-none w-screen max-w-none bg-white p-0 text-ink backdrop:bg-transparent"
     >
       <div className="sticky top-0 z-10 border-b border-mist-200 bg-white">
-        <div className="container-site flex h-[70px] items-center gap-4">
+        <div className="container-site flex h-[var(--header-h)] items-center gap-4">
           <Link href="/" onClick={close} className="hidden shrink-0 md:block" aria-label={`${firmName} home`}>
             <Logo firmName={firmName} descriptor={descriptor} tone="dark" />
           </Link>

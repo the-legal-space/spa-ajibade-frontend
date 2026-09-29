@@ -12,6 +12,7 @@ import { PageEnd } from "@/components/sections/page-end";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { VideoEmbed } from "@/components/sections/video-embed";
+import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -48,8 +49,13 @@ export default async function InsightPage({ params }: Props) {
   const date = formatMonthYear(i.publishedAt);
   const author =
     i.author.type === "person"
-      ? { name: i.author.person.displayName, label: i.author.person.roleLabel, href: `/people/${i.author.person.slug}`, photo: i.author.person.photo }
-      : { name: i.author.name, label: i.author.label, href: null, photo: null };
+      ? {
+          name: i.author.person.displayName,
+          label: i.author.person.roleLabel,
+          href: `/people/${i.author.person.slug}`,
+          photo: personAvatar(i.author.person.slug, i.author.person.photo),
+        }
+      : { name: i.author.name, label: i.author.label, href: null, photo: { url: FIGMA.firmAvatar, alt: "", width: 60, height: 60 } };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -102,7 +108,7 @@ export default async function InsightPage({ params }: Props) {
               <VideoEmbed url={i.videoUrl} title={i.title} poster={i.coverImage} />
             ) : (
               <div className="aspect-[1352/540] overflow-hidden">
-                <Media image={i.coverImage} priority sizes="100vw" />
+                <Media image={insightCover(i.slug, i.coverImage)} priority sizes="100vw" />
               </div>
             )}
           </div>
@@ -113,7 +119,7 @@ export default async function InsightPage({ params }: Props) {
           <div className="mt-6 flex items-center gap-3">
             <span className="size-11 shrink-0 overflow-hidden rounded-full">
               {author.photo ? (
-                <Media image={author.photo} alt="" />
+                <Media image={author.photo} alt="" sizes="44px" />
               ) : (
                 <span className="grid size-full place-items-center bg-[#56697a] text-xs text-white">{initials(author.name)}</span>
               )}
