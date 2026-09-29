@@ -38,7 +38,7 @@ export const getPracticeArea = cache((slug: string) =>
 );
 
 export const getPeople = cache(
-  (params: { role?: PersonRole; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) =>
+  (params: { role?: PersonRole; practiceArea?: string; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) =>
     apiList("/people", PersonSummary, { query: params, tags: ["people"] }),
 );
 

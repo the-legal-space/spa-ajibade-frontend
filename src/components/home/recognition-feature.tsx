@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { HomePage, Recognition } from "@/lib/api/schemas";
+import type { HomePage } from "@/lib/api/schemas";
 import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { Media } from "@/components/ui/media";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
@@ -11,11 +11,10 @@ import { buttonClass } from "@/components/ui/button";
  */
 type Badge = { src: string; alt: string; overlay?: string; href?: string | null };
 
-export function RecognitionFeature({ tabs, recognitions }: { tabs: HomePage["recognitionTabs"]; recognitions: Recognition[] }) {
-  // Badges come from the CMS recognition records; the Figma set is only used when none has an image.
-  const fromCms: Badge[] = recognitions
-    .filter((r) => r.badge?.url)
-    .map((r) => ({ src: r.badge!.url, alt: r.badge!.alt || `${r.organization}: ${r.title}${r.year ? ` ${r.year}` : ""}`, href: r.url }));
+export function RecognitionFeature({ section }: { section: HomePage["recognitionSection"] }) {
+  const fromCms: Badge[] = section.badges
+    .filter((award) => award.badge?.url)
+    .map((award) => ({ src: award.badge!.url, alt: award.badge!.alt || `${award.directory.name}: ${award.title} ${award.year}` }));
   const base: Badge[] = fromCms.length > 0 ? fromCms : FIGMA.badges.map((b) => ({ ...b }));
   // Repeat the set so the strip is always wider than its window, then double it for a seamless loop.
   const set: Badge[] = [];
@@ -24,9 +23,9 @@ export function RecognitionFeature({ tabs, recognitions }: { tabs: HomePage["rec
     <section className="bg-mist py-16 text-ink md:py-[68px]" aria-labelledby="recognition-heading">
       <div className="container-site grid items-center gap-10 lg:grid-cols-[811fr_497fr] lg:gap-11">
         <div className="flex min-w-0 flex-col items-start gap-6">
-          <Eyebrow>{tabs.eyebrow || "Recognition"}</Eyebrow>
+          <Eyebrow>{section.eyebrow || "Recognition"}</Eyebrow>
           <Heading>
-            <span id="recognition-heading">{tabs.title || "Ranked Among Nigeria's Top Firms By Key Global Legal Institutions."}</span>
+            <span id="recognition-heading">{section.title}</span>
           </Heading>
           <div className="pause-on-hover relative h-[124px] w-full max-w-[601px] overflow-hidden" aria-label="Awards and rankings" role="region">
             <ul className="animate-marquee flex w-max">
@@ -42,11 +41,11 @@ export function RecognitionFeature({ tabs, recognitions }: { tabs: HomePage["rec
             </ul>
           </div>
           <Link href="/about#recognition" className={buttonClass("dark")}>
-            {tabs.cta?.label || "View Our Recognitions"}
+            {section.cta.label}
           </Link>
         </div>
         <div className="h-[320px] overflow-hidden rounded-[24px] md:h-[488px]">
-          <Media image={cmsOr(tabs.image, FIGMA.recognition)} sizes="(min-width:1024px) 35vw, 100vw" />
+          <Media image={cmsOr(section.image, FIGMA.recognition)} sizes="(min-width:1024px) 35vw, 100vw" />
         </div>
       </div>
     </section>
