@@ -74,7 +74,7 @@ export function Pagination({
   base: string;
   current: Record<string, string | undefined>;
 }) {
-  if (totalPages <= 1) return null;
+  if (totalPages < 1) return null;
   const prev = page > 1 ? withParams(base, current, { page: page - 1 }) : null;
   const next = page < totalPages ? withParams(base, current, { page: page + 1 }) : null;
   const btn = "inline-flex h-9 items-center rounded-[4px] border border-mist-300 bg-white px-3 text-[13px] transition-colors";

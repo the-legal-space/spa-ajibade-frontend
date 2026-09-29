@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { CarouselArrow } from "./carousel-arrow";
 
 /**
  * Advances a carousel on a timer. Pauses while the visitor hovers or focuses inside it,
@@ -71,16 +71,20 @@ export function ScrollRail({ children, label }: { children: ReactNode; label: st
 
   return (
     <div {...autoplay}>
-      <div ref={ref} role="region" aria-label={label} tabIndex={0} className="hide-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 md:mx-0 md:px-0">
+      {/* Proximity snapping and contained overscroll: a trackpad or wheel gesture scrolls the row
+          smoothly instead of fighting the snap points or bouncing the page sideways. */}
+      <div
+        ref={ref}
+        role="region"
+        aria-label={label}
+        tabIndex={0}
+        className="hide-scrollbar -mx-5 flex snap-x snap-proximity gap-5 overflow-x-auto overscroll-x-contain scroll-smooth px-5 md:mx-0 md:px-0"
+      >
         {children}
       </div>
-      <div className="mt-10 flex justify-end gap-3">
-        <button type="button" onClick={() => scroll(-1)} className="grid size-10 place-items-center rounded-full border border-mist-300 bg-white hover:border-ink" aria-label="Scroll back">
-          <ArrowLeft className="size-4" />
-        </button>
-        <button type="button" onClick={() => scroll(1)} className="grid size-10 place-items-center rounded-full border border-mist-300 bg-white hover:border-ink" aria-label="Scroll forward">
-          <ArrowRight className="size-4" />
-        </button>
+      <div className="mt-11 flex justify-end gap-4">
+        <CarouselArrow dir="prev" tone="light" onClick={() => scroll(-1)} label="Scroll back" />
+        <CarouselArrow dir="next" tone="light" onClick={() => scroll(1)} label="Scroll forward" />
       </div>
     </div>
   );

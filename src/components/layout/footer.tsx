@@ -3,104 +3,128 @@ import { Mail, PhoneCall } from "lucide-react";
 import type { Office, Site } from "@/lib/api/schemas";
 import { telHref } from "@/lib/utils";
 import { SocialLinks } from "@/components/ui/social-icons";
-import { Logo } from "@/components/ui/logo";
+import { NewsletterForm } from "./newsletter-form";
 
+/** Office order from the Figma footer. Offices the design doesn't name follow in CMS order. */
+const OFFICE_ORDER = ["lagos", "ibadan", "abuja"];
+
+const QUICK_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about" },
+  { label: "Practice Areas", href: "/practice-areas" },
+  { label: "Our People", href: "/people" },
+  { label: "Insights & News", href: "/insights" },
+  { label: "Careers", href: "/careers" },
+  { label: "FAQ’s", href: "/#faq" },
+];
+
+/** Figma "Site Footer": newsletter and socials, Quick Links, Practice Areas, Offices, legal row. */
 export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
   const { footer, settings } = site;
-  const hiddenPaths = new Set(["/faq", "/offices"]);
-  const visibleLinks = footer.links.filter((link) => !hiddenPaths.has(link.href));
-  const officeDetails = footer.offices.map((ref) => offices.find((o) => o.id === ref.id) ?? { ...ref, address: "", phone: null, email: null });
+  const cmsHrefs = new Set(footer.links.map((l) => l.href));
+  // Keep the design's labels and order, but only for pages the CMS lists (plus FAQ's, which the design adds).
+  const links = QUICK_LINKS.filter((l) => l.href === "/#faq" || cmsHrefs.has(l.href));
+  const officeDetails = footer.offices
+    .map((ref) => offices.find((o) => o.id === ref.id) ?? { ...ref, address: "", phone: null, email: null })
+    .sort((a, b) => rank(a.name) - rank(b.name));
 
   return (
-    <footer data-header-theme="dark" className="site-dark-surface relative text-white">
-      <svg className="pointer-events-none absolute inset-0 size-full text-white/[0.05]" aria-hidden preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 520">
-        <path d="M260 -40 L720 340 L1180 -40 M260 620 L720 340 L1180 620" fill="none" stroke="currentColor" strokeWidth="150" />
-      </svg>
+    <footer data-header-theme="dark" className="relative overflow-hidden border-t-2 border-white/20 bg-ink text-white">
+      {/* Figma "Footer Background Mark": white crossed mark with the 10% opacity baked into the PNG. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/footer-mark.png')] bg-cover bg-center bg-no-repeat" />
 
-      <div className="container-site relative pb-8 pt-14">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_0.6fr_1fr_1.1fr] lg:gap-8">
-          <div className="max-w-sm">
-            <Link href="/" aria-label={`${settings.firmName} home`}>
-              <Logo firmName={settings.firmName} descriptor={settings.legalDescriptor} />
-            </Link>
-            <p className="mt-5 font-serif text-xl leading-snug text-white/90">{footer.tagline}</p>
-            {settings.email || settings.phone ? (
-              <ul className="mt-5 space-y-1.5 text-[13px] text-white/75">
-                {settings.phone ? (
-                  <li>
-                    <a href={telHref(settings.phone) ?? undefined} className="hover:text-white">
-                      {settings.phone}
-                    </a>
-                  </li>
-                ) : null}
-                {settings.email ? (
-                  <li>
-                    <a href={`mailto:${settings.email}`} className="hover:text-white">
-                      {settings.email}
-                    </a>
-                  </li>
-                ) : null}
-              </ul>
-            ) : null}
-            <SocialLinks socials={footer.socials} className="mt-6" iconClassName="size-4" />
+      <div className="container-site relative flex flex-col gap-11 py-14 md:py-[68px]">
+        <div className="grid gap-12 md:grid-cols-2 xl:flex xl:items-start xl:justify-between">
+          <div className="flex w-full max-w-[437px] flex-col gap-10">
+            <div className="flex max-w-[414px] flex-col gap-6">
+              <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">Subscribe for legal insights</h2>
+              <NewsletterForm firmEmail={settings.email} />
+              <p className="text-sm leading-7 text-[#e2e2e2]">Your information is kept confidential</p>
+            </div>
+            <SocialLinks socials={footer.socials} always className="gap-5" iconClassName="size-5" />
           </div>
 
-          <FooterColumn title="Quick Links">
-            {visibleLinks.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="text-[13px] text-white/80 transition-colors duration-200 hover:text-white">
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </FooterColumn>
+          <div className="grid gap-12 sm:grid-cols-2 md:col-span-2 lg:grid-cols-[auto_auto_auto] xl:flex xl:gap-[68px]">
+            <FooterColumn title="Quick Links">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-sm leading-7 text-white transition-opacity duration-200 hover:opacity-75">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </FooterColumn>
 
-          <FooterColumn title="Practice Areas">
-            {footer.practiceAreas.map((p) => (
-              <li key={p.slug}>
-                <Link href={`/practice-areas/${p.slug}`} className="text-[13px] text-white/80 underline underline-offset-2 transition-colors duration-200 hover:text-white">
-                  {p.title}
-                </Link>
-              </li>
-            ))}
-          </FooterColumn>
+            <FooterColumn title="Practice Areas">
+              {footer.practiceAreas.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/practice-areas/${p.slug}`}
+                    className="text-sm leading-7 text-mist underline underline-offset-2 transition-opacity duration-200 hover:opacity-75"
+                  >
+                    {p.title.replace(/ & /g, " and ")}
+                  </Link>
+                </li>
+              ))}
+            </FooterColumn>
 
-          <FooterColumn title="Offices">
-            {officeDetails.map((o) => (
-              <li key={o.id} className="text-[12px]">
-                <p className="font-semibold text-white">{o.name}:</p>
-                {o.address ? <p className="text-white/80">{o.address}</p> : null}
-                <div className="mt-1.5 flex gap-2 text-white/90">
-                  {o.email ? (
-                    <a href={`mailto:${o.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110 hover:text-white">
-                      <Mail className="size-4" strokeWidth={1.5} />
-                    </a>
-                  ) : null}
-                  {telHref(o.phone) ? (
-                    <a href={telHref(o.phone)!} aria-label={`Call the ${o.name} office`} className="transition-transform duration-200 hover:scale-110 hover:text-white">
-                      <PhoneCall className="size-4" strokeWidth={1.5} />
-                    </a>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </FooterColumn>
+            <FooterColumn title="Offices" gap="gap-4">
+              {officeDetails.map((o) => (
+                <li key={o.id} className="flex flex-col gap-2 text-xs leading-5">
+                  <p>
+                    <span className="font-bold text-white">{o.name}:</span>
+                    {o.address ? (
+                      <>
+                        <br />
+                        <span className="text-mist underline underline-offset-2">{o.address}</span>
+                      </>
+                    ) : null}
+                  </p>
+                  <div className="flex gap-1 text-white">
+                    {o.email || settings.email ? (
+                      <a href={`mailto:${o.email || settings.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
+                        <Mail className="size-5" strokeWidth={1.4} />
+                      </a>
+                    ) : null}
+                    {telHref(o.phone || settings.phone) ? (
+                      <a href={telHref(o.phone || settings.phone)!} aria-label={`Call the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
+                        <PhoneCall className="size-5" strokeWidth={1.4} />
+                      </a>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </FooterColumn>
+          </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 border-t border-white/15 pt-6 text-[13px] text-white/80 md:flex-row md:items-center md:justify-between">
-          <p>{footer.copyright}</p>
-          <p className="text-white/60">{settings.legalDescriptor}</p>
+        <div className="flex flex-col gap-3 border-t border-white/15 pt-6 text-sm leading-7 text-white md:flex-row md:items-center md:justify-between">
+          <p>{footer.copyright || settings.copyright}</p>
+          <p className="flex items-center gap-6">
+            <Link href="/terms" className="hover:opacity-75">
+              Terms of Service
+            </Link>
+            <span aria-hidden className="size-1.5 rounded-full bg-white" />
+            <Link href="/privacy" className="hover:opacity-75">
+              Privacy Policy
+            </Link>
+          </p>
         </div>
       </div>
     </footer>
   );
 }
 
-function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
+function rank(name: string) {
+  const i = OFFICE_ORDER.indexOf(name.trim().toLowerCase());
+  return i === -1 ? OFFICE_ORDER.length : i;
+}
+
+function FooterColumn({ title, children, gap = "gap-2" }: { title: string; children: React.ReactNode; gap?: string }) {
   return (
-    <div>
-      <h2 className="font-serif text-xl text-white/90">{title}</h2>
-      <ul className="mt-4 space-y-3">{children}</ul>
+    <div className="flex flex-col gap-4">
+      <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{title}</h2>
+      <ul className={`flex flex-col ${gap}`}>{children}</ul>
     </div>
   );
 }

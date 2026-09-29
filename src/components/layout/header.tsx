@@ -69,7 +69,9 @@ function useIsOverDark(): boolean {
   const [overDark, setOverDark] = useState(true); // hero is first, default white text
   useEffect(() => {
     const check = () => {
-      const els = document.elementsFromPoint(window.innerWidth / 2, 71);
+      const header = document.querySelector<HTMLElement>("[data-header-self]");
+      const y = (header?.getBoundingClientRect().bottom ?? 86) + 1;
+      const els = document.elementsFromPoint(window.innerWidth / 2, y);
       for (const el of els) {
         if (!(el instanceof HTMLElement)) continue;
         if (el.closest("[data-header-self]")) continue; // skip the header & its children
@@ -135,26 +137,28 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
       <header
         data-header-self
         className={cn(
-          "sticky top-0 z-40 border-b backdrop-blur-md transition-[color,border-color] duration-300",
-          wantsWhiteText
-            ? "border-white/10 bg-transparent text-white"
-            : "border-ink/10 bg-transparent text-ink",
+          "sticky top-0 z-40 border-b transition-[color,background-color,border-color] duration-300",
+          light
+            ? "border-ink/10 bg-white text-ink"
+            : wantsWhiteText
+              ? "border-[rgba(242,242,242,0.2)] bg-white/5 text-white backdrop-blur-[2px]"
+              : "border-ink/10 bg-white/85 text-ink backdrop-blur-md",
         )}
       >
-        <div className="container-site flex h-[70px] items-center justify-between gap-6">
+        <div className="container-site flex h-[var(--header-h)] items-center justify-between gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
             <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
-            <ul className="flex items-center gap-0.5 xl:gap-1.5">
+            <ul className="flex items-center gap-2 xl:gap-4">
               {nav.map((item) => (
                 <DesktopNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} light={!wantsWhiteText} />
               ))}
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 xl:gap-6">
             <motion.button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -164,10 +168,10 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               className={iconBtn}
               aria-label="Search the site"
             >
-              <Search className="size-5" strokeWidth={1.5} />
+              <Search className="size-6" strokeWidth={1.5} />
             </motion.button>
             {cta ? (
-              <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "hidden px-3 py-2 text-[13px] sm:inline-flex")} />
+              <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "hidden px-3 py-2.5 sm:inline-flex")} />
             ) : null}
             <motion.button
               type="button"
@@ -191,7 +195,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1, transition: { height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.2 } } }}
               exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.2, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.15 } } }}
-              className="max-h-[calc(100dvh-70px)] overflow-hidden border-t border-white/10 bg-ink text-white lg:hidden"
+              className="max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-white/10 bg-ink text-white lg:hidden"
             >
               <ul className="container-site flex flex-col py-4">
                 {nav.map((item) => (
@@ -231,14 +235,15 @@ function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolea
     };
   }, [open]);
 
+  // Figma: Inter Display Medium 14, mediumgray (#9c9b9b) links, the current page in full colour.
   const tone = light
     ? active
       ? "text-ink"
-      : "text-stone hover:text-ink"
+      : "text-gray hover:text-ink"
     : active
       ? "text-white"
-      : "text-white/65 hover:text-white";
-  const linkClass = cn("inline-flex items-center gap-1 rounded px-2 py-2 text-[13px] transition-colors", tone);
+      : "text-gray hover:text-white";
+  const linkClass = cn("inline-flex items-center gap-1 rounded py-2 text-sm font-medium transition-colors", tone);
 
   if (!hasChildren) {
     return (
@@ -253,17 +258,17 @@ function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolea
   return (
     <li ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <span className="inline-flex items-center">
-        <Link href={item.href} className={cn(linkClass, "pr-0.5")} aria-current={active ? "page" : undefined}>
+        <Link href={item.href} className={linkClass} aria-current={active ? "page" : undefined}>
           {item.label}
         </Link>
         <button
           type="button"
-          className={cn("rounded p-1", tone)}
+          className={cn("rounded py-1 pl-1", tone)}
           aria-label={`${item.label} menu`}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
         >
-          <ChevronDown className={cn("size-3.5 transition-transform duration-200", open && "rotate-180")} />
+          <ChevronDown className={cn("size-4 transition-transform duration-200", open && "rotate-180")} />
         </button>
       </span>
       <AnimatePresence>
@@ -275,11 +280,11 @@ function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolea
             exit="exit"
             className="absolute left-0 top-full z-50 pt-1.5"
           >
-            <ul className="min-w-60 divide-y divide-mist-200 rounded-xl bg-white px-3 py-1.5 text-ink shadow-2xl ring-1 ring-black/5">
+            <ul className="min-w-64 divide-y divide-mist-200 rounded-xl bg-white px-4 py-1.5 text-ink shadow-2xl ring-1 ring-black/5">
               {item.children.map((child) => (
                 <li key={child.href}>
                   <motion.div whileHover={{ x: 3 }} transition={TRANSITIONS.hover}>
-                    <Link href={child.href} className="block py-2.5 text-[13px] text-ink-700 hover:text-ink" onClick={() => setOpen(false)}>
+                    <Link href={child.href} className="block py-3 text-sm font-medium text-ink-700 hover:text-ink" onClick={() => setOpen(false)}>
                       {child.label}
                     </Link>
                   </motion.div>
@@ -351,9 +356,9 @@ export function ChatButton({ link }: { link: ApiLink | undefined }) {
     >
       <SmartLink
         link={link}
-        className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-xl transition-colors hover:bg-ink-700"
+        className="inline-flex items-center gap-2 rounded-[100px] border border-white/30 bg-ink px-5 py-3 text-base font-semibold leading-none text-white shadow-xl backdrop-blur-[5px] transition-colors hover:bg-ink-700"
       >
-        <Bot className="size-4" strokeWidth={1.6} aria-hidden />
+        <Bot className="size-5" strokeWidth={1.6} aria-hidden />
         {link.label}
       </SmartLink>
     </motion.div>
