@@ -63,7 +63,7 @@ export function ChatPanel({
   const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([
-    { from: "bot", text: `Hello, I'm SPAACO AI. I can answer common questions about ${firmName}. What would you like to know?` },
+    { from: "bot", text: `Hello, I'm SPAACO AI. I can answer common questions about ${firmName.replace(/\.+$/, "")}. What would you like to know?` },
   ]);
   const list = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
