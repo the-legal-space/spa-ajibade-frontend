@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
@@ -8,7 +7,6 @@ import { PageEnd } from "@/components/sections/page-end";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { CmsIcon } from "@/components/ui/icon";
-import { buttonClass } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
@@ -132,7 +130,7 @@ export default async function AboutPage() {
 
       {/* Awards */}
       {awardsList.items.length > 0 ? (
-        <section id="recognition" data-header-theme="dark" className="site-dark-surface py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
+        <section id="recognition" className="bg-ink py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
           <div className="container-site grid items-center gap-10 lg:grid-cols-2">
             <div>
               {awardsList.eyebrow ? <p className="text-xs text-white/70">{awardsList.eyebrow}</p> : null}
@@ -141,13 +139,8 @@ export default async function AboutPage() {
               </Heading>
               <MotionList className="mt-6 border-t border-white/15">
                 {awardsList.items.map((a) => (
-                  <MotionListItem key={a.name} className="flex items-center justify-between gap-4 border-b border-white/15 py-4">
+                  <MotionListItem key={a.name} className="border-b border-white/15 py-4">
                     <span className="text-xl">{a.name}</span>
-                    {a.url ? (
-                      <a href={a.url} target="_blank" rel="noopener noreferrer" className={buttonClass("light", "px-5")}>
-                        View Awards <ArrowUpRight className="size-4" aria-hidden />
-                      </a>
-                    ) : null}
                   </MotionListItem>
                 ))}
               </MotionList>
