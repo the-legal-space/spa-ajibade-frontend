@@ -81,13 +81,13 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
                     ) : null}
                   </p>
                   <div className="flex gap-1 text-white">
-                    {o.email ? (
-                      <a href={`mailto:${o.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
+                    {o.email || settings.email ? (
+                      <a href={`mailto:${o.email || settings.email}`} aria-label={`Email the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
                         <Mail className="size-5" strokeWidth={1.4} />
                       </a>
                     ) : null}
-                    {telHref(o.phone) ? (
-                      <a href={telHref(o.phone)!} aria-label={`Call the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
+                    {telHref(o.phone || settings.phone) ? (
+                      <a href={telHref(o.phone || settings.phone)!} aria-label={`Call the ${o.name} office`} className="transition-transform duration-200 hover:scale-110">
                         <PhoneCall className="size-5" strokeWidth={1.4} />
                       </a>
                     ) : null}

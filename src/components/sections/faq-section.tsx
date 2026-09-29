@@ -1,6 +1,7 @@
 import { Bot, Mail, PhoneCall } from "lucide-react";
 import type { Site } from "@/lib/api/schemas";
 import { cleanHtml } from "@/lib/sanitize";
+import { isPending } from "@/lib/utils";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { SmartLink } from "@/components/ui/smart-link";
 import { FaqAccordion } from "./faq-accordion";
@@ -14,7 +15,17 @@ const actionIcon: Record<string, typeof Bot> = {
 
 export function FaqSection({ section, headingLevel = "h2" }: { section: Site["faqSection"]; headingLevel?: "h1" | "h2" }) {
   if (section.items.length === 0) return null;
-  const items = section.items.map((f) => ({ id: f.id, question: f.question, answerHtml: cleanHtml(f.answer) }));
+  // Answers the firm hasn't supplied yet ("[PENDING FROM FIRM]") get a holding line instead of the
+  // placeholder, and answered questions come first so the item that opens by default has content.
+  const items = [...section.items]
+    .sort((a, b) => Number(isPending(a.answer)) - Number(isPending(b.answer)))
+    .map((f) => ({
+      id: f.id,
+      question: f.question,
+      answerHtml: isPending(f.answer)
+        ? "<p>We're preparing a full answer to this. In the meantime, message or call the firm and a member of the team will help directly.</p>"
+        : cleanHtml(f.answer),
+    }));
   const shq = section.stillHaveQuestions;
 
   return (

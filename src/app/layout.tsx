@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/footer";
 import { ActionsProvider } from "@/components/forms/actions-context";
 import { designNav } from "@/lib/nav";
 import { cleanHtml } from "@/lib/sanitize";
+import { isPending } from "@/lib/utils";
 import "./globals.css";
 
 const fraunces = Fraunces({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-fraunces", display: "swap" });
@@ -39,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const [site, offices, practiceAreas] = await Promise.all([getSite(), getOffices(), getPracticeAreas()]);
   const filteredNav = designNav(site.nav);
   // Plain-text FAQ for the chat panel (rendered as text, never as HTML).
-  const chatFaqs = site.faqSection.items.map((f) => ({
+  const chatFaqs = site.faqSection.items.filter((f) => !isPending(f.answer)).map((f) => ({
     question: f.question,
     answer: cleanHtml(f.answer)
       .replace(/<\/(p|li|h[2-4])>/g, "\n")

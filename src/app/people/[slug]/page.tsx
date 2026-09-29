@@ -105,7 +105,11 @@ export default async function PersonPage({ params }: Props) {
                 <a href={p.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`${p.displayName} on LinkedIn`} className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200">
                   <SocialIcon name="linkedin" className="size-6" />
                 </a>
-              ) : null}
+              ) : (
+                <span className="grid size-[52px] place-items-center rounded-lg bg-mist text-ink/40" title="LinkedIn profile coming soon">
+                  <SocialIcon name="linkedin" className="size-6" />
+                </span>
+              )}
             </div>
           </div>
 
