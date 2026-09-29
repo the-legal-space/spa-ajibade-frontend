@@ -13,7 +13,7 @@ import { PracticeCarousel } from "@/components/home/practice-carousel";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
-import { FIGMA } from "@/lib/figma-assets";
+import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
-  // The Figma hero photograph leads; any extra CMS slides follow it in the slideshow.
-  const hero = { ...page.hero, image: FIGMA.heroHome };
+  // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
+  const hero = { ...page.hero, image: cmsOr(page.hero.image, FIGMA.heroHome) };
 
   return (
     <>
@@ -55,7 +55,7 @@ export default async function HomePage() {
 
       <VideoShowcase showcase={page.videoShowcase} />
 
-      <RecognitionFeature tabs={page.recognitionTabs} />
+      <RecognitionFeature tabs={page.recognitionTabs} recognitions={[...page.recognitions.achievements, ...page.recognitions.recognizedBy]} />
 
       {/* Focused Practice Areas */}
       {page.practiceAreas.length > 0 ? (
@@ -124,7 +124,7 @@ export default async function HomePage() {
             </ul>
           </div>
           <div className="relative min-h-[360px] overflow-hidden rounded-[5px]">
-            <Media image={FIGMA.whyClients} alt={whyChooseUs.image?.alt ?? FIGMA.whyClients.alt} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
+            <Media image={cmsOr(whyChooseUs.image, FIGMA.whyClients)} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
           </div>
         </div>
       </Section>

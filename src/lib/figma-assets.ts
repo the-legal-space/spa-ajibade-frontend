@@ -2,9 +2,11 @@ import type { ApiImage } from "@/lib/api/schemas";
 
 /**
  * Images exported from the SPA Ajibade Figma file (public/figma).
- * The design is the source of truth for these, so they are used in place of the
- * CMS images where the design has one. Anything the design does not cover
- * (new people, new practice areas, new articles) still comes from the CMS.
+ *
+ * Content images (people, practice areas, articles, hero, section photos, badges) always come
+ * from the CMS first, so the firm can change them without a deploy. The Figma exports are only
+ * a fallback for records whose image field is empty. Design textures and icons (map, marks,
+ * callout and FAQ backgrounds, social icons) are part of the design and live here for good.
  */
 const img = (url: string, width: number, height: number, alt = ""): ApiImage => ({ url, width, height, alt });
 
@@ -62,27 +64,27 @@ const INSIGHTS: Record<string, ApiImage> = {
   "regulatory-update-on-the-2026-supreme-court-practice-directions": img("/figma/insight-4.jpg", 650, 350),
 };
 
-/** Design photo for a person, falling back to the CMS photo. Keeps the CMS alt text when there is one. */
+/** CMS photo for a person, or the Figma export when the CMS has none. */
 export function personPhoto(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
-  const f = PEOPLE[slug];
-  if (!f) return cms ?? null;
-  return cms?.alt ? { ...f, alt: cms.alt } : f;
+  return cms?.url ? cms : (PEOPLE[slug] ?? null);
 }
 
+/** Small author avatar: CMS photo first, then the Figma avatar or portrait. */
 export function personAvatar(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
+  if (cms?.url) return cms;
   const a = AVATARS[slug];
-  if (a) return img(a, 60, 60);
-  return PEOPLE[slug] ?? cms ?? null;
+  return a ? img(a, 60, 60) : (PEOPLE[slug] ?? null);
 }
 
 export function practiceImage(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
-  const f = PRACTICE[slug];
-  if (!f) return cms ?? null;
-  return { ...f, alt: cms?.alt ?? "" };
+  return cms?.url ? cms : (PRACTICE[slug] ?? null);
 }
 
 export function insightCover(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
-  const f = INSIGHTS[slug];
-  if (!f) return cms ?? null;
-  return { ...f, alt: cms?.alt ?? "" };
+  return cms?.url ? cms : (INSIGHTS[slug] ?? null);
+}
+
+/** CMS image when present, otherwise the given Figma fallback. */
+export function cmsOr(cms: ApiImage | null | undefined, fallback: ApiImage): ApiImage {
+  return cms?.url ? cms : fallback;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { HomePage } from "@/lib/api/schemas";
-import { FIGMA } from "@/lib/figma-assets";
+import type { HomePage, Recognition } from "@/lib/api/schemas";
+import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { Media } from "@/components/ui/media";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
@@ -9,8 +9,17 @@ import { buttonClass } from "@/components/ui/button";
  * Home "Recognition" band from the Figma: heading, a strip of award badges that slides
  * continuously (marquee, pauses on hover), a "View Our Recognitions" button and a photo.
  */
-export function RecognitionFeature({ tabs }: { tabs: HomePage["recognitionTabs"] }) {
-  const badges = [...FIGMA.badges, ...FIGMA.badges];
+type Badge = { src: string; alt: string; overlay?: string; href?: string | null };
+
+export function RecognitionFeature({ tabs, recognitions }: { tabs: HomePage["recognitionTabs"]; recognitions: Recognition[] }) {
+  // Badges come from the CMS recognition records; the Figma set is only used when none has an image.
+  const fromCms: Badge[] = recognitions
+    .filter((r) => r.badge?.url)
+    .map((r) => ({ src: r.badge!.url, alt: r.badge!.alt || `${r.organization}: ${r.title}${r.year ? ` ${r.year}` : ""}`, href: r.url }));
+  const base: Badge[] = fromCms.length > 0 ? fromCms : FIGMA.badges.map((b) => ({ ...b }));
+  // Repeat the set so the strip is always wider than its window, then double it for a seamless loop.
+  const set: Badge[] = [];
+  while (set.length < 8) set.push(...base);
   return (
     <section className="bg-mist py-16 text-ink md:py-[68px]" aria-labelledby="recognition-heading">
       <div className="container-site grid items-center gap-10 lg:grid-cols-[811fr_497fr] lg:gap-11">
@@ -21,18 +30,13 @@ export function RecognitionFeature({ tabs }: { tabs: HomePage["recognitionTabs"]
           </Heading>
           <div className="pause-on-hover relative h-[124px] w-full max-w-[601px] overflow-hidden" aria-label="Awards and rankings" role="region">
             <ul className="animate-marquee flex w-max">
-              {[...badges, ...badges].map((b, i) => (
+              {[...set, ...set].map((b, i) => (
                 <li
                   key={i}
-                  aria-hidden={i >= FIGMA.badges.length}
+                  aria-hidden={i >= base.length}
                   className="mr-[38px] flex h-[124px] w-[122px] shrink-0 items-center justify-center border-[1.24px] border-mist bg-white"
                 >
-                  <span className="relative block size-[84px]">
-                    <img src={b.src} alt={i < FIGMA.badges.length ? b.alt : ""} className="absolute inset-0 size-full object-contain" loading="lazy" />
-                    {"overlay" in b && b.overlay ? (
-                      <img src={b.overlay} alt="" className="absolute inset-0 size-full object-contain" loading="lazy" />
-                    ) : null}
-                  </span>
+                  <BadgeImage badge={b} decorative={i >= base.length} tabbable={i < base.length} />
                 </li>
               ))}
             </ul>
@@ -42,9 +46,24 @@ export function RecognitionFeature({ tabs }: { tabs: HomePage["recognitionTabs"]
           </Link>
         </div>
         <div className="h-[320px] overflow-hidden rounded-[24px] md:h-[488px]">
-          <Media image={FIGMA.recognition} alt={tabs.image?.alt ?? FIGMA.recognition.alt} sizes="(min-width:1024px) 35vw, 100vw" />
+          <Media image={cmsOr(tabs.image, FIGMA.recognition)} sizes="(min-width:1024px) 35vw, 100vw" />
         </div>
       </div>
     </section>
+  );
+}
+
+function BadgeImage({ badge, decorative, tabbable }: { badge: Badge; decorative: boolean; tabbable: boolean }) {
+  const inner = (
+    <span className="relative block size-[84px]">
+      <img src={badge.src} alt={decorative ? "" : badge.alt} className="absolute inset-0 size-full object-contain" loading="lazy" />
+      {badge.overlay ? <img src={badge.overlay} alt="" className="absolute inset-0 size-full object-contain" loading="lazy" /> : null}
+    </span>
+  );
+  if (!badge.href) return inner;
+  return (
+    <a href={badge.href} target="_blank" rel="noopener noreferrer" tabIndex={tabbable ? undefined : -1} className="block transition-opacity hover:opacity-80">
+      {inner}
+    </a>
   );
 }
