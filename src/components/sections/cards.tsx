@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { motion } from "motion/react";
 import type { InsightCard as Insight, PersonSummary, PracticeAreaCard as PracticeArea } from "@/lib/api/schemas";
@@ -8,6 +9,7 @@ import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { Chip } from "@/components/ui/primitives";
 import { SocialIcon } from "@/components/ui/social-icons";
+import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { FIGMA, insightCover, personAvatar, personPhoto, practiceImage } from "@/lib/figma-assets";
@@ -42,19 +44,30 @@ export function PracticeAreaCard({ area, headingLevel = "h3" }: { area: Practice
   );
 }
 
+export type PersonCardDetails = {
+  practiceAreas: { slug: string; title: string }[];
+  summary: string | null;
+};
+
+const MANDATE_LINK = { label: "Discuss a Mandate", href: "action:mandate", kind: "action" as const };
+
 /**
- * Figma partner card ("Partner Grid"): white 8px frame, 16px-radius photo on the portrait blue,
- * a white "+" square top right and a black name bar with the LinkedIn mark.
- * The whole card opens the attorney's profile; hovering zooms the photo and turns the "+" black.
+ * Figma partner card ("Partner Grid") with the "HOVER ANIMATION" state: hovering (or focusing)
+ * the card grows the white "+" square into a panel over the photo with the role, practice areas,
+ * a short summary and "Discuss a Mandate". On touch screens the "+" toggles the panel.
+ * The name still opens the attorney's profile.
  */
-export function PersonCard({ person }: { person: PersonSummary }) {
+export function PersonCard({ person, details }: { person: PersonSummary; details?: PersonCardDetails }) {
   const href = `/people/${person.slug}`;
+  const [open, setOpen] = useState(false);
+  const panelId = `person-panel-${person.slug}`;
   return (
     <motion.article
       whileHover={INTERACTION.card.whileHover}
-      whileTap={INTERACTION.card.whileTap}
       transition={TRANSITIONS.hover}
-      className="group relative flex flex-col gap-1.5 rounded-[24px] bg-white p-2 transition-shadow duration-300 hover:shadow-md"
+      data-open={open || undefined}
+      onMouseLeave={() => setOpen(false)}
+      className="group/card relative flex flex-col gap-1.5 rounded-[24px] bg-white p-2 transition-shadow duration-300 hover:shadow-md"
     >
       <div className="relative aspect-square overflow-hidden rounded-[16px] bg-card-blue">
         <Media
@@ -63,25 +76,71 @@ export function PersonCard({ person }: { person: PersonSummary }) {
           placeholder="portrait"
           name={person.displayName}
           sizes="(min-width:1024px) 440px, (min-width:640px) 50vw, 100vw"
-          className="transition duration-500 group-hover:scale-[1.03]"
         />
-        <MotionLink
-          href={href}
-          whileHover={INTERACTION.iconButton.whileHover}
-          whileTap={INTERACTION.iconButton.whileTap}
-          transition={TRANSITIONS.hover}
-          className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-[2px] bg-white text-ink transition-colors duration-300 group-hover:bg-ink group-hover:text-white"
-          aria-label={`View ${person.displayName}'s profile`}
+
+        {/* The "+" square that grows into the panel (top-right anchored, like the Figma smart animate). */}
+        <div
+          id={panelId}
+          className={cn(
+            "absolute right-4 top-4 z-20 overflow-hidden rounded-[2px] bg-white text-ink shadow-sm",
+            "size-9 transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+            "group-hover/card:h-[calc(100%-32px)] group-hover/card:w-[calc(100%-32px)] group-hover/card:rounded-[16px]",
+            "group-focus-within/card:h-[calc(100%-32px)] group-focus-within/card:w-[calc(100%-32px)] group-focus-within/card:rounded-[16px]",
+            "group-data-[open]/card:h-[calc(100%-32px)] group-data-[open]/card:w-[calc(100%-32px)] group-data-[open]/card:rounded-[16px]",
+          )}
         >
-          <svg viewBox="0 0 14 14" className="size-3.5 transition-transform duration-300 group-hover:rotate-90" aria-hidden>
+          <div
+            className={cn(
+              "flex h-full w-[calc(100%)] min-w-[240px] flex-col p-5 opacity-0 transition-opacity duration-200 md:p-6",
+              "group-hover/card:opacity-100 group-hover/card:delay-200 group-focus-within/card:opacity-100 group-data-[open]/card:opacity-100 group-data-[open]/card:delay-200",
+            )}
+          >
+            <p className="text-lg leading-tight">{person.roleLabel}</p>
+            {details?.practiceAreas.length ? (
+              <ul className="mt-3 flex flex-wrap gap-1.5">
+                {details.practiceAreas.slice(0, 3).map((a) => (
+                  <li key={a.slug}>
+                    <Link
+                      href={`/practice-areas/${a.slug}`}
+                      tabIndex={-1}
+                      className="inline-block max-w-full truncate rounded-[4px] border-[0.5px] border-gray bg-mist px-2 py-1.5 text-[11px] leading-none hover:border-ink"
+                    >
+                      {a.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {details?.summary ? <p className="mt-3 line-clamp-4 text-[15px] italic leading-7 text-ink">{details.summary}</p> : null}
+            <div className="mt-auto flex flex-col gap-2 pt-4">
+              <SmartLink link={MANDATE_LINK} practiceArea={details?.practiceAreas[0]?.slug} className={buttonClass("dark", "w-full")} />
+              <Link href={href} className="text-center text-xs text-stone underline underline-offset-2 hover:text-ink">
+                View full profile
+              </Link>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls={panelId}
+          aria-label={`${open ? "Hide" : "Show"} details for ${person.displayName}`}
+          className="absolute right-4 top-4 z-30 grid size-9 place-items-center rounded-[2px] text-ink md:pointer-events-none md:group-focus-within/card:pointer-events-auto"
+        >
+          <svg
+            viewBox="0 0 14 14"
+            className="size-3.5 transition-transform duration-300 group-hover/card:rotate-45 group-focus-within/card:rotate-45 group-data-[open]/card:rotate-45"
+            aria-hidden
+          >
             <path d="M0 7h14M7 0v14" stroke="currentColor" strokeWidth="1" />
           </svg>
-        </MotionLink>
+        </button>
       </div>
       <div className="flex min-h-[84px] items-center justify-between gap-3 rounded-[16px] bg-ink p-4 text-white">
         <div className="min-w-0">
           <h3 className="truncate text-lg font-medium leading-tight md:text-xl">
-            <Link href={href} className="after:absolute after:inset-0 after:content-['']">
+            <Link href={href} className="hover:underline">
               {person.displayName}
             </Link>
           </h3>
