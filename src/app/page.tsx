@@ -14,6 +14,7 @@ import { ScrollRail } from "@/components/home/scroll-rail";
 import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
 import { FIGMA, cmsOr } from "@/lib/figma-assets";
+import { getCardDetails } from "@/lib/person-card";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
@@ -27,6 +28,12 @@ export default async function HomePage() {
   const { aboutFirm, whyChooseUs } = page;
   // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
   const hero = { ...page.hero, image: cmsOr(page.hero.image, FIGMA.heroHome) };
+  const cardDetails = await getCardDetails(page.leadership);
+  // The Figma carousel shows five focus areas, in this order. Anything else the CMS lists stays
+  // on the Practice Areas page. If none of these slugs exist, fall back to the CMS list.
+  const FOCUS = ["corporate-finance-capital-markets", "energy-natural-resources", "dispute-resolution-arbitration", "intellectual-property", "real-estate-succession"];
+  const focused = FOCUS.map((slug) => page.practiceAreas.find((a) => a.slug === slug)).filter((a): a is NonNullable<typeof a> => !!a);
+  const practiceAreas = focused.length > 0 ? focused : page.practiceAreas;
 
   return (
     <>
@@ -58,7 +65,7 @@ export default async function HomePage() {
       <RecognitionFeature tabs={page.recognitionTabs} recognitions={[...page.recognitions.achievements, ...page.recognitions.recognizedBy]} />
 
       {/* Focused Practice Areas */}
-      {page.practiceAreas.length > 0 ? (
+      {practiceAreas.length > 0 ? (
         <section data-header-theme="dark" className="overflow-hidden bg-[#0a0a0b] py-16 text-white md:py-[68px]" aria-labelledby="practice-heading">
           <div className="container-site">
             <div className="flex flex-col items-center gap-1 text-center">
@@ -72,7 +79,7 @@ export default async function HomePage() {
               </Heading>
             </div>
             <div className="mt-1">
-              <PracticeCarousel areas={page.practiceAreas} cta={page.practiceSection.cta} />
+              <PracticeCarousel areas={practiceAreas} cta={page.practiceSection.cta} />
             </div>
           </div>
         </section>
@@ -93,7 +100,7 @@ export default async function HomePage() {
           <MotionList className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {page.leadership.map((p) => (
               <MotionListItem key={p.id}>
-                <PersonCard person={p} />
+                <PersonCard person={p} details={cardDetails[p.slug]} />
               </MotionListItem>
             ))}
           </MotionList>
