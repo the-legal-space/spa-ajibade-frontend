@@ -85,16 +85,21 @@ export default async function CareersPage() {
           </MotionList>
         ) : (
           <div className="mt-10 flex flex-col items-center rounded-[var(--radius-card)] bg-white px-6 py-16 text-center">
-            <Briefcase
-              className="size-10 text-stone"
-              strokeWidth={1.2}
-              aria-hidden
-            />
-            <p className="mt-4 font-serif text-2xl">No open roles right now</p>
-            <p className="mt-2 max-w-md text-sm leading-6 text-stone">
-              We aren&apos;t recruiting at the moment. New vacancies are posted
-              here first, so please check back.
-            </p>
+            <Briefcase className="size-10 text-stone" strokeWidth={1.2} aria-hidden />
+            {page.jobsSection.emptyState ? (
+              <>
+                <p className="mt-4 font-serif text-2xl">{page.jobsSection.emptyState.title}</p>
+                <div className="prose-firm mt-2 max-w-md text-sm leading-6 text-stone" dangerouslySetInnerHTML={{ __html: cleanHtml(page.jobsSection.emptyState.body) }} />
+                <p className="mt-5 text-sm font-medium text-olive">{page.jobsSection.emptyState.ctaLabel}</p>
+              </>
+            ) : (
+              <>
+                <p className="mt-4 font-serif text-2xl">No open roles right now</p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-stone">
+                  We aren&apos;t recruiting at the moment. New vacancies are posted here first, so please check back.
+                </p>
+              </>
+            )}
           </div>
         )}
       </Section>

@@ -61,8 +61,7 @@ export default async function PracticeAreaPage({ params }: Props) {
         hero={{
           title: area.title,
           subtitle: area.heroIntro,
-          image: area.image,
-          images: area.heroImages,
+          images: area.heroImages.length > 0 ? area.heroImages : area.image ? [area.image] : [],
           primaryCta: listing.hero.primaryCta,
           secondaryCta: listing.hero.secondaryCta,
         }}

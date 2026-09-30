@@ -44,10 +44,10 @@ export default async function PersonPage({ params }: Props) {
     getPage("home"),
     getInsights({ pageSize: 50 }).catch(() => null),
   ]);
-  // The person endpoint's `insights` list is empty today even for authors, so articles are
+  // The person endpoint's publication list is empty today even for authors, so articles are
   // also matched on the author of each published insight. Duplicates are dropped.
   const authored = (all?.data ?? []).filter((i) => i.author.type === "person" && i.author.person.slug === p.slug);
-  const insights = [...p.insights, ...authored].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
+  const insights = [...p.recentPublications, ...authored].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
   const bio = cleanHtml(p.bio);
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
@@ -117,6 +117,30 @@ export default async function PersonPage({ params }: Props) {
             {p.quote ? <blockquote className="mb-8 border-l-2 border-ink pl-5 font-serif text-2xl leading-snug">“{p.quote}”</blockquote> : null}
             {bio ? (
               <div className="prose-firm text-[15px] leading-7" dangerouslySetInnerHTML={{ __html: bio }} />
+            ) : null}
+            {p.education.intro || p.education.entries.length > 0 ? (
+              <section className="mt-10" aria-labelledby="education-heading">
+                <h2 id="education-heading" className="font-serif text-xl">Education</h2>
+                {p.education.intro ? <p className="mt-3 text-[15px] leading-7 text-ink-800">{p.education.intro}</p> : null}
+                {p.education.entries.length > 0 ? (
+                  <ul className="mt-4 space-y-3">
+                    {p.education.entries.map((entry) => (
+                      <li key={`${entry.qualification}-${entry.year ?? ""}`} className="flex items-baseline justify-between gap-4 border-b border-mist-200 pb-3 text-sm">
+                        <span>{entry.qualification}</span>
+                        {entry.year ? <span className="shrink-0 text-stone">{entry.year}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            ) : null}
+            {p.memberships.length > 0 ? (
+              <section className="mt-8" aria-labelledby="memberships-heading">
+                <h2 id="memberships-heading" className="font-serif text-xl">Memberships</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-ink-800">
+                  {p.memberships.map((membership) => <li key={membership}>{membership}</li>)}
+                </ul>
+              </section>
             ) : null}
             {mandate ? <SmartLink link={mandate} className={buttonClass("dark", "mt-8")} /> : null}
           </div>

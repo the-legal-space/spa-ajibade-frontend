@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
-  // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
-  const hero = { ...page.hero, image: cmsOr(page.hero.image, FIGMA.heroHome) };
+  // The Figma photograph fills in only when the CMS has no hero slides.
+  const hero = { ...page.hero, images: page.hero.images.length > 0 ? page.hero.images : [FIGMA.heroHome] };
 
   return (
     <>
