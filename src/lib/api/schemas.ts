@@ -14,16 +14,46 @@ export const ImageSchema = z.object({
   alt: z.string(),
   width: z.number(),
   height: z.number(),
-  sizes: z.object({ sm: z.string(), md: z.string(), lg: z.string() }).partial().optional(),
+  sizes: z
+    .object({ sm: z.string(), md: z.string(), lg: z.string() })
+    .partial()
+    .optional(),
   focalPoint: z.object({ x: z.number(), y: z.number() }).optional(),
 });
 export type ApiImage = z.infer<typeof ImageSchema>;
 export const NullableImage = ImageSchema.nullable();
 
 export const LinkKind = z.enum(["internal", "external", "action"]);
-export const LinkSchema = z.object({ label: z.string(), href: z.string(), kind: LinkKind });
+export const LinkSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+  kind: LinkKind,
+});
 export type ApiLink = z.infer<typeof LinkSchema>;
 export const NullableLink = LinkSchema.nullable();
+
+/** Link that tolerates the API's `{ href: null, kind: null }` (and `cta: null`) placeholders. */
+export const OptionalLooseLink = z
+  .object({
+    label: z.string(),
+    href: nullableString.optional(),
+    kind: LinkKind.nullable().optional(),
+  })
+  .nullable()
+  .optional();
+
+/**
+ * CTA on insight cards. Its `kind` uses a card vocabulary ("read_more"…) rather than the nav
+ * `LinkKind`, and the whole object is `null` on some articles — callers only read `label`.
+ */
+export const InsightCta = z
+  .object({
+    label: z.string(),
+    href: nullableString.optional(),
+    kind: z.string().nullable().optional(),
+  })
+  .nullable()
+  .optional();
 
 export const SectionHeader = z.object({
   eyebrow: nullableString.optional(),
@@ -32,7 +62,11 @@ export const SectionHeader = z.object({
 });
 export type SectionHeader = z.infer<typeof SectionHeader>;
 
-export const IconItem = z.object({ icon: z.string(), title: z.string(), text: nullableString });
+export const IconItem = z.object({
+  icon: z.string(),
+  title: z.string(),
+  text: nullableString,
+});
 export type IconItem = z.infer<typeof IconItem>;
 
 export const SeoSchema = z
@@ -47,7 +81,7 @@ export type Seo = z.infer<typeof SeoSchema>;
 export const HeroSchema = z.object({
   title: z.string(),
   subtitle: nullableString.optional(),
-  image: NullableImage,
+  image: NullableImage.optional(),
   /**
    * Extra slides for the auto-advancing home hero. Not in the API yet (backend request:
    * `hero.images: Image[]`); optional so the site works before and after it ships.
@@ -79,14 +113,20 @@ export const InsightCategory = z.enum([
   "news_updates",
   "media_coverage",
   "webinar_resources",
+  // Added by the API after launch ("inside the 2025 annual business luncheon…" is categorised this way).
+  "events",
 ]);
 export type InsightCategory = z.infer<typeof InsightCategory>;
 
 export const PracticeAreaRef = z.object({
-  id: z.string(),
+  /**
+   * Person profiles and insight refs send only `slug` + `title`; the full card payloads add
+   * `id` and `shortLabel`. Both are optional so either variant parses.
+   */
+  id: z.string().optional(),
   slug: z.string(),
   title: z.string(),
-  shortLabel: z.string(),
+  shortLabel: z.string().optional(),
 });
 export type PracticeAreaRef = z.infer<typeof PracticeAreaRef>;
 
@@ -107,7 +147,11 @@ export const PersonSummary = z.object({
 });
 export type PersonSummary = z.infer<typeof PersonSummary>;
 
-export const OfficeRef = z.object({ id: z.string(), slug: z.string(), name: z.string() });
+export const OfficeRef = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+});
 export type OfficeRef = z.infer<typeof OfficeRef>;
 
 export const InsightAuthor = z.discriminatedUnion("type", [
@@ -130,7 +174,7 @@ export const InsightCard = z.object({
   coverImage: NullableImage,
   publishedAt: nullableString,
   featured: z.boolean(),
-  cta: z.object({ label: z.string(), kind: z.string() }),
+  cta: InsightCta,
 });
 export type InsightCard = z.infer<typeof InsightCard>;
 
@@ -142,10 +186,22 @@ export const InsightDetail = InsightCard.extend({
 export type InsightDetail = z.infer<typeof InsightDetail>;
 
 export const PracticeAreaDetail = PracticeAreaCard.extend({
-  body: nullableString,
-  keyServices: z.array(z.string()),
-  contacts: z.array(PersonSummary),
-  relatedInsights: z.array(InsightCard),
+  /** Long-form HTML intro (the API renamed the old `body` to `overview`). */
+  overview: nullableString.optional(),
+  body: nullableString.optional(),
+  /** The API replaced `keyServices: string[]` with titled `coreServices[{ title, description }]`. */
+  coreServices: z
+    .array(
+      z.object({ title: z.string(), description: nullableString.optional() }),
+    )
+    .optional(),
+  keyServices: z.array(z.string()).optional(),
+  /** A single lead contact replaces the old `contacts` list. */
+  lead: PersonSummary.nullable().optional(),
+  contacts: z.array(PersonSummary).optional(),
+  /** The API now names this list `recentPublications`. */
+  recentPublications: z.array(InsightCard).optional(),
+  relatedInsights: z.array(InsightCard).optional(),
   seo: SeoSchema.optional(),
 });
 export type PracticeAreaDetail = z.infer<typeof PracticeAreaDetail>;
@@ -159,7 +215,9 @@ export const PersonDetail = PersonSummary.extend({
   quote: nullableString,
   practiceAreas: z.array(PracticeAreaRef),
   office: OfficeRef.nullable(),
-  insights: z.array(InsightCard),
+  /** The API now names this list `recentPublications`; both keys are accepted. */
+  insights: z.array(InsightCard).optional(),
+  recentPublications: z.array(InsightCard).optional(),
 });
 export type PersonDetail = z.infer<typeof PersonDetail>;
 
@@ -176,18 +234,34 @@ export const OfficeSchema = z.object({
 });
 export type Office = z.infer<typeof OfficeSchema>;
 
+export const RecognitionDirectory = z.object({
+  name: z.string(),
+  slug: z.string(),
+});
+export type RecognitionDirectory = z.infer<typeof RecognitionDirectory>;
+
+/**
+ * A recognition badge. The API now nests the awarding body under `directory`
+ * (`{ name: "IFLR 1000", slug: "iflr-1000" }`) and no longer sends `organization`/`tab`;
+ * those two stay optional so older payloads keep parsing.
+ */
 export const Recognition = z.object({
   id: z.string(),
-  organization: z.string(),
   title: z.string(),
-  year: z.number().nullable(),
-  badge: NullableImage,
-  url: nullableString,
-  tab: z.string(),
+  year: z.number().nullable().optional(),
+  badge: NullableImage.optional(),
+  url: nullableString.optional(),
+  directory: RecognitionDirectory.nullable().optional(),
+  organization: nullableString.optional(),
+  tab: z.string().optional(),
 });
 export type Recognition = z.infer<typeof Recognition>;
 
-export const FaqSchema = z.object({ id: z.string(), question: z.string(), answer: z.string() });
+export const FaqSchema = z.object({
+  id: z.string(),
+  question: z.string(),
+  answer: z.string(),
+});
 export type Faq = z.infer<typeof FaqSchema>;
 
 export const JobSchema = z.object({
@@ -265,21 +339,27 @@ const seo = { seo: SeoSchema.optional() };
 export const HomePage = z.object({
   key: z.literal("home"),
   hero: HeroSchema,
-  aboutFirm: z.object({ title: z.string(), paragraphs: z.array(z.string()), cta: NullableLink }),
+  aboutFirm: z.object({
+    title: z.string(),
+    paragraphs: z.array(z.string()),
+    cta: NullableLink,
+  }),
   videoShowcase: z.object({
     videoUrl: nullableString,
     poster: NullableImage,
     caption: nullableString.optional(),
   }),
-  recognitionTabs: z.object({
-    achievementsLabel: z.string(),
-    recognizedByLabel: z.string(),
+  /**
+   * Recognition band. The API replaced `recognitionTabs` + `recognitions{achievements,recognizedBy}`
+   * with one `recognitionSection` carrying a single `badges` list.
+   */
+  recognitionSection: z.object({
     eyebrow: nullableString.optional(),
     title: nullableString.optional(),
-    cta: NullableLink.optional(),
+    cta: OptionalLooseLink,
     image: NullableImage.optional(),
+    badges: z.array(Recognition),
   }),
-  recognitions: z.object({ achievements: z.array(Recognition), recognizedBy: z.array(Recognition) }),
   practiceSection: SectionHeader,
   practiceAreas: z.array(PracticeAreaCard),
   leadershipSection: SectionHeader,
@@ -309,7 +389,9 @@ export const AboutPage = z.object({
   }),
   stats: z.object({
     title: z.string(),
-    items: z.array(z.object({ value: z.string(), caption: z.string(), label: z.string() })),
+    items: z.array(
+      z.object({ value: z.string(), caption: z.string(), label: z.string() }),
+    ),
   }),
   missionSection: z.object({
     eyebrow: nullableString,
@@ -327,7 +409,14 @@ export const AboutPage = z.object({
     eyebrow: nullableString,
     title: z.string(),
     image: NullableImage,
-    items: z.array(z.object({ name: z.string(), url: nullableString })),
+    items: z.array(
+      z.object({
+        name: z.string(),
+        slug: z.string().optional(),
+        // The API stopped sending `url` on every award; only linked ones carry it.
+        url: nullableString.optional(),
+      }),
+    ),
   }),
   ...seo,
 });
@@ -339,7 +428,14 @@ export const PracticeAreasPage = z.object({
   gridSection: SectionHeader,
   practiceAreas: z.array(PracticeAreaCard),
   csrBanner: z
-    .object({ title: z.string(), text: z.string(), image: NullableImage, cta: NullableLink })
+    .object({
+      title: z.string(),
+      text: z.string(),
+      /** The API now sends `images: Image[]`; `image` is kept for older payloads. */
+      image: NullableImage.optional(),
+      images: z.array(ImageSchema).optional(),
+      cta: NullableLink,
+    })
     .nullable(),
   ...seo,
 });
@@ -373,7 +469,11 @@ export const CareersPage = z.object({
 });
 export type CareersPage = z.infer<typeof CareersPage>;
 
-export const FaqPage = z.object({ key: z.literal("faq"), hero: HeroSchema, ...seo });
+export const FaqPage = z.object({
+  key: z.literal("faq"),
+  hero: HeroSchema,
+  ...seo,
+});
 export type FaqPage = z.infer<typeof FaqPage>;
 
 export const OfficesPage = z.object({
@@ -418,7 +518,9 @@ export const ApiErrorBody = z.object({
   error: z.object({
     code: z.string(),
     message: z.string(),
-    details: z.array(z.object({ path: z.string(), message: z.string() })).optional(),
+    details: z
+      .array(z.object({ path: z.string(), message: z.string() }))
+      .optional(),
   }),
 });
 export type ApiErrorBody = z.infer<typeof ApiErrorBody>;
