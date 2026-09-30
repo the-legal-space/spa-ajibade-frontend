@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { API_BASE_URL } from "@/lib/env";
+import { PaginationMeta as PaginationMetaSchema } from "@/lib/api/schemas";
 
 /**
  * Server-side fetcher for the public content API.
@@ -84,9 +85,7 @@ export async function apiList<T extends z.ZodTypeAny>(
   const parsed = z
     .object({
       data: z.array(itemSchema),
-      meta: z
-        .object({ page: z.number(), pageSize: z.number(), total: z.number(), totalPages: z.number() })
-        .optional(),
+      meta: PaginationMetaSchema.optional(),
     })
     .safeParse(json);
   if (!parsed.success) {

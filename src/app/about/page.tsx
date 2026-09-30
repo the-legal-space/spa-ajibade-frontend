@@ -58,6 +58,14 @@ export default async function AboutPage() {
                 <p key={i}>{p}</p>
               ))}
             </div>
+            {story.profileDownload?.document ? (
+              <p className="mt-6 text-[15px] leading-8 text-ink-800">
+                {story.profileDownload.leadText}{" "}
+                <a href={story.profileDownload.document.url} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4">
+                  {story.profileDownload.linkLabel}
+                </a>
+              </p>
+            ) : null}
           </div>
         </div>
       </Section>

@@ -50,11 +50,20 @@ export default async function InsightsPage({ searchParams }: Props) {
         <Heading as="h1">
           <span id="listing-heading">{content.listingSection.title}</span>
         </Heading>
-        <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mt-6 flex flex-col gap-4">
           <FilterTabs options={content.categoryFilters} param="category" base="/insights" current={current} label="Filter by category" />
-          <Suspense fallback={null}>
-            <SortMenu options={SORTS} defaultValue="newest" />
-          </Suspense>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <FilterTabs
+              options={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
+              param="practiceArea"
+              base="/insights"
+              current={current}
+              label="Filter by practice area"
+            />
+            <Suspense fallback={null}>
+              <SortMenu options={SORTS} defaultValue="newest" />
+            </Suspense>
+          </div>
         </div>
 
         {list.data.length > 0 ? (
