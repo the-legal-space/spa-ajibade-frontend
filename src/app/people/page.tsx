@@ -7,6 +7,7 @@ import { readPage, readString } from "@/lib/utils";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { PersonCard } from "@/components/sections/cards";
+import { getCardDetails } from "@/lib/person-card";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { SortMenu } from "@/components/ui/sort-menu";
@@ -37,6 +38,7 @@ export default async function PeoplePage({ searchParams }: Props) {
   const [content, people] = await Promise.all([getPage("people"), getPeople({ role, practiceArea, sort, page, pageSize: 9 })]);
   const current = { role, practiceArea, sort: sort === "seniority" ? undefined : sort };
   const meta = people.meta ?? { page, totalPages: 1 };
+  const cardDetails = await getCardDetails(people.data);
 
   return (
     <>
@@ -62,7 +64,7 @@ export default async function PeoplePage({ searchParams }: Props) {
           <MotionList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {people.data.map((p) => (
               <MotionListItem key={p.id}>
-                <PersonCard person={p} />
+                <PersonCard person={p} details={cardDetails[p.slug]} />
               </MotionListItem>
             ))}
           </MotionList>
