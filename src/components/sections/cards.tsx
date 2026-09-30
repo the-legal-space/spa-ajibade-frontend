@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { motion } from "motion/react";
-import type { InsightCard as Insight, PersonSummary, PracticeAreaCard as PracticeArea } from "@/lib/api/schemas";
+import type {
+  InsightCard as Insight,
+  PersonSummary,
+  PracticeAreaCard as PracticeArea,
+} from "@/lib/api/schemas";
 import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { Chip } from "@/components/ui/primitives";
@@ -12,11 +16,23 @@ import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
-import { FIGMA, insightCover, personAvatar, personPhoto, practiceImage } from "@/lib/figma-assets";
+import {
+  FIGMA,
+  insightCover,
+  personAvatar,
+  personPhoto,
+  practiceImage,
+} from "@/lib/figma-assets";
 
 const MotionLink = motion.create(Link);
 
-export function PracticeAreaCard({ area, headingLevel = "h3" }: { area: PracticeArea; headingLevel?: "h2" | "h3" }) {
+export function PracticeAreaCard({
+  area,
+  headingLevel = "h3",
+}: {
+  area: PracticeArea;
+  headingLevel?: "h2" | "h3";
+}) {
   const H = headingLevel;
   return (
     <motion.article
@@ -26,10 +42,16 @@ export function PracticeAreaCard({ area, headingLevel = "h3" }: { area: Practice
       className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 shadow-sm transition-shadow duration-300 hover:shadow-md"
     >
       <div className="aspect-[331/240] overflow-hidden rounded-xl">
-        <Media image={practiceImage(area.slug, area.image)} alt="" className="transition duration-500 group-hover:scale-[1.03]" />
+        <Media
+          image={practiceImage(area.slug, area.image)}
+          alt=""
+          className="transition duration-500 group-hover:scale-[1.03]"
+        />
       </div>
       <H className="mt-4 font-serif text-xl">{area.title}</H>
-      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-7 text-ink-700">{area.summary}</p>
+      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-7 text-ink-700">
+        {area.summary}
+      </p>
       <MotionLink
         href={`/practice-areas/${area.slug}`}
         whileHover={INTERACTION.button.whileHover}
@@ -49,7 +71,11 @@ export type PersonCardDetails = {
   summary: string | null;
 };
 
-const MANDATE_LINK = { label: "Discuss a Mandate", href: "action:mandate", kind: "action" as const };
+const MANDATE_LINK = {
+  label: "Discuss a Mandate",
+  href: "action:mandate",
+  kind: "action" as const,
+};
 
 /**
  * Figma partner card ("Partner Grid") with the "HOVER ANIMATION" state: hovering (or focusing)
@@ -57,7 +83,13 @@ const MANDATE_LINK = { label: "Discuss a Mandate", href: "action:mandate", kind:
  * a short summary and "Discuss a Mandate". On touch screens the "+" toggles the panel.
  * The name still opens the attorney's profile.
  */
-export function PersonCard({ person, details }: { person: PersonSummary; details?: PersonCardDetails }) {
+export function PersonCard({
+  person,
+  details,
+}: {
+  person: PersonSummary;
+  details?: PersonCardDetails;
+}) {
   const href = `/people/${person.slug}`;
   const [open, setOpen] = useState(false);
   const panelId = `person-panel-${person.slug}`;
@@ -111,10 +143,21 @@ export function PersonCard({ person, details }: { person: PersonSummary; details
                 ))}
               </ul>
             ) : null}
-            {details?.summary ? <p className="mt-3 line-clamp-4 text-[15px] italic leading-7 text-ink">{details.summary}</p> : null}
+            {details?.summary ? (
+              <p className="mt-3 line-clamp-4 text-[15px] italic leading-7 text-ink">
+                {details.summary}
+              </p>
+            ) : null}
             <div className="mt-auto flex flex-col gap-2 pt-4">
-              <SmartLink link={MANDATE_LINK} practiceArea={details?.practiceAreas[0]?.slug} className={buttonClass("dark", "w-full")} />
-              <Link href={href} className="text-center text-xs text-stone underline underline-offset-2 hover:text-ink">
+              <SmartLink
+                link={MANDATE_LINK}
+                practiceArea={details?.practiceAreas[0]?.slug}
+                className={buttonClass("dark", "w-full")}
+              />
+              <Link
+                href={href}
+                className="text-center text-xs text-stone underline underline-offset-2 hover:text-ink"
+              >
                 View full profile
               </Link>
             </div>
@@ -144,7 +187,9 @@ export function PersonCard({ person, details }: { person: PersonSummary; details
               {person.displayName}
             </Link>
           </h3>
-          <p className="truncate text-base leading-6 tracking-[-0.02em] text-mist">{person.roleLabel}</p>
+          <p className="truncate text-base leading-6 tracking-[-0.02em] text-mist">
+            {person.roleLabel}
+          </p>
         </div>
         {person.linkedinUrl ? (
           <motion.a
@@ -172,17 +217,26 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
     const p = author.person;
     const avatar = personAvatar(p.slug, p.photo);
     return (
-      <Link href={`/people/${p.slug}`} className="group/author flex min-w-0 items-center gap-2">
+      <Link
+        href={`/people/${p.slug}`}
+        className="group/author flex min-w-0 items-center gap-2"
+      >
         <span className="size-[30px] shrink-0 overflow-hidden rounded-full bg-card-blue">
           {avatar ? (
             <Media image={avatar} alt="" sizes="30px" />
           ) : (
-            <span className="grid size-full place-items-center text-[10px] text-white">{initials(p.displayName)}</span>
+            <span className="grid size-full place-items-center text-[10px] text-white">
+              {initials(p.displayName)}
+            </span>
           )}
         </span>
         <span className="flex min-w-0 flex-col gap-0.5 leading-none">
-          <span className="block truncate text-xs text-ink group-hover/author:underline">{p.displayName}</span>
-          <span className="block truncate text-[10px] text-ink/80">{p.roleLabel}</span>
+          <span className="block truncate text-xs text-ink group-hover/author:underline">
+            {p.displayName}
+          </span>
+          <span className="block truncate text-[10px] text-ink/80">
+            {p.roleLabel}
+          </span>
         </span>
       </Link>
     );
@@ -190,16 +244,30 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   return (
     <span className="flex min-w-0 items-center gap-2">
       {/* The firm's own mark from the Figma, the same on every firm-authored card. */}
-      <img src={FIGMA.firmAvatar} alt="" width={30} height={30} className="size-[30px] shrink-0 rounded-full" />
+      <img
+        src={FIGMA.firmAvatar}
+        alt=""
+        width={30}
+        height={30}
+        className="size-[30px] shrink-0 rounded-full"
+      />
       <span className="flex min-w-0 flex-col gap-0.5 leading-none">
         <span className="block truncate text-xs text-ink">{author.name}</span>
-        <span className="block truncate text-[10px] text-ink/80">{author.label}</span>
+        <span className="block truncate text-[10px] text-ink/80">
+          {author.label}
+        </span>
       </span>
     </span>
   );
 }
 
-export function InsightCard({ insight, className }: { insight: Insight; className?: string }) {
+export function InsightCard({
+  insight,
+  className,
+}: {
+  insight: Insight;
+  className?: string;
+}) {
   const href = `/insights/${insight.slug}`;
   const date = formatMonthYear(insight.publishedAt);
   const isVideo = insight.format === "video";
@@ -210,8 +278,18 @@ export function InsightCard({ insight, className }: { insight: Insight; classNam
       transition={TRANSITIONS.hover}
       className={cn("group flex h-full flex-col", className)}
     >
-      <Link href={href} className="relative block aspect-[437/271] overflow-hidden rounded-[4px]" tabIndex={-1} aria-hidden>
-        <Media image={insightCover(insight.slug, insight.coverImage)} alt="" sizes="(min-width:1024px) 437px, (min-width:640px) 50vw, 85vw" className="transition duration-500 group-hover:scale-[1.03]" />
+      <Link
+        href={href}
+        className="relative block aspect-[437/271] overflow-hidden rounded-[4px]"
+        tabIndex={-1}
+        aria-hidden
+      >
+        <Media
+          image={insightCover(insight.slug, insight.coverImage)}
+          alt=""
+          sizes="(min-width:1024px) 437px, (min-width:640px) 50vw, 85vw"
+          className="transition duration-500 group-hover:scale-[1.03]"
+        />
         {isVideo ? (
           <span className="absolute inset-0 grid place-items-center">
             <motion.span
@@ -233,7 +311,11 @@ export function InsightCard({ insight, className }: { insight: Insight; classNam
             </Chip>
           ))}
         </div>
-        {date ? <Chip compact className="shrink-0">{date}</Chip> : null}
+        {date ? (
+          <Chip compact className="shrink-0">
+            {date}
+          </Chip>
+        ) : null}
       </div>
       <h3 className="mt-3 line-clamp-3 flex-1 text-base font-medium leading-7 text-ink">
         <Link href={href} className="hover:underline">
@@ -249,7 +331,8 @@ export function InsightCard({ insight, className }: { insight: Insight; classNam
           transition={TRANSITIONS.hover}
           className="inline-flex shrink-0 items-center gap-1 rounded-[4px] border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
         >
-          {isVideo ? "Watch Video" : insight.cta.label || "Read More"} <ArrowUpRight className="size-3.5" aria-hidden />
+          {isVideo ? "Watch Video" : insight.cta?.label || "Read More"}{" "}
+          <ArrowUpRight className="size-3.5" aria-hidden />
         </MotionLink>
       </div>
     </motion.article>

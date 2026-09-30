@@ -32,7 +32,11 @@ async function load(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const [p, site] = await Promise.all([load(slug), getSite()]);
-  return pageMetadata(undefined, { title: p.displayName, description: `${p.displayName}, ${p.roleLabel}, ${site.settings.firmName}`, path: `/people/${slug}` });
+  return pageMetadata(undefined, {
+    title: p.displayName,
+    description: `${p.displayName}, ${p.roleLabel}, ${site.settings.firmName}`,
+    path: `/people/${slug}`,
+  });
 }
 
 /** Attorney profile, following the "ATTORNEY DETAILS" frame (white header, two columns). */
@@ -46,8 +50,13 @@ export default async function PersonPage({ params }: Props) {
   ]);
   // The person endpoint's `insights` list is empty today even for authors, so articles are
   // also matched on the author of each published insight. Duplicates are dropped.
-  const authored = (all?.data ?? []).filter((i) => i.author.type === "person" && i.author.person.slug === p.slug);
-  const insights = [...p.insights, ...authored].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
+  const authored = (all?.data ?? []).filter(
+    (i) => i.author.type === "person" && i.author.person.slug === p.slug,
+  );
+  const insights = [
+    ...(p.insights ?? p.recentPublications ?? []),
+    ...authored,
+  ].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
   const bio = cleanHtml(p.bio);
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
@@ -59,7 +68,11 @@ export default async function PersonPage({ params }: Props) {
     honorificPrefix: p.honorific ?? undefined,
     honorificSuffix: p.postNominals ?? undefined,
     jobTitle: p.roleLabel,
-    worksFor: { "@type": "LegalService", name: site.settings.firmName, url: SITE_URL },
+    worksFor: {
+      "@type": "LegalService",
+      name: site.settings.firmName,
+      url: SITE_URL,
+    },
     url: `${SITE_URL}/people/${p.slug}`,
     sameAs: p.linkedinUrl ? [p.linkedinUrl] : undefined,
   };
@@ -70,7 +83,10 @@ export default async function PersonPage({ params }: Props) {
         <div className="container-site grid gap-12 py-12 md:py-16 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div>
             {back ? (
-              <Link href="/people" className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-stone hover:text-ink">
+              <Link
+                href="/people"
+                className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-stone hover:text-ink"
+              >
                 <ArrowLeft className="size-3.5" aria-hidden /> {back}
               </Link>
             ) : null}
@@ -79,34 +95,58 @@ export default async function PersonPage({ params }: Props) {
               {p.displayName}
             </Heading>
             <div className="mt-8 aspect-[395/390] w-full max-w-[395px] overflow-hidden bg-card-blue">
-              <Media image={personPhoto(p.slug, p.photo)} placeholder="portrait" name={p.displayName} alt={`Portrait of ${p.displayName}`} priority sizes="395px" />
+              <Media
+                image={personPhoto(p.slug, p.photo)}
+                placeholder="portrait"
+                name={p.displayName}
+                alt={`Portrait of ${p.displayName}`}
+                priority
+                sizes="395px"
+              />
             </div>
             {p.practiceAreas.length > 0 ? (
               <p className="mt-6 text-lg">
                 {p.practiceAreas.map((a, i) => (
                   <span key={a.slug}>
                     {i > 0 ? ", " : null}
-                    <Link href={`/practice-areas/${a.slug}`} className="hover:underline">
+                    <Link
+                      href={`/practice-areas/${a.slug}`}
+                      className="hover:underline"
+                    >
                       {a.title}
                     </Link>
                   </span>
                 ))}
               </p>
             ) : null}
-            {p.office ? <p className="mt-1 text-sm text-stone">{p.office.name}</p> : null}
+            {p.office ? (
+              <p className="mt-1 text-sm text-stone">{p.office.name}</p>
+            ) : null}
             <div className="mt-5 flex flex-wrap gap-3">
               {mandate ? (
-                <SmartLink link={mandate} className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200" >
+                <SmartLink
+                  link={mandate}
+                  className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
+                >
                   <Mail className="size-6" aria-hidden />
                   <span className="sr-only">{mandate.label}</span>
                 </SmartLink>
               ) : null}
               {p.linkedinUrl ? (
-                <a href={p.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`${p.displayName} on LinkedIn`} className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200">
+                <a
+                  href={p.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${p.displayName} on LinkedIn`}
+                  className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
+                >
                   <SocialIcon name="linkedin" className="size-6" />
                 </a>
               ) : (
-                <span className="grid size-[52px] place-items-center rounded-lg bg-mist text-ink/40" title="LinkedIn profile coming soon">
+                <span
+                  className="grid size-[52px] place-items-center rounded-lg bg-mist text-ink/40"
+                  title="LinkedIn profile coming soon"
+                >
                   <SocialIcon name="linkedin" className="size-6" />
                 </span>
               )}
@@ -114,11 +154,23 @@ export default async function PersonPage({ params }: Props) {
           </div>
 
           <div className="lg:pt-10">
-            {p.quote ? <blockquote className="mb-8 border-l-2 border-ink pl-5 font-serif text-2xl leading-snug">“{p.quote}”</blockquote> : null}
-            {bio ? (
-              <div className="prose-firm text-[15px] leading-7" dangerouslySetInnerHTML={{ __html: bio }} />
+            {p.quote ? (
+              <blockquote className="mb-8 border-l-2 border-ink pl-5 font-serif text-2xl leading-snug">
+                “{p.quote}”
+              </blockquote>
             ) : null}
-            {mandate ? <SmartLink link={mandate} className={buttonClass("dark", "mt-8")} /> : null}
+            {bio ? (
+              <div
+                className="prose-firm text-[15px] leading-7"
+                dangerouslySetInnerHTML={{ __html: bio }}
+              />
+            ) : null}
+            {mandate ? (
+              <SmartLink
+                link={mandate}
+                className={buttonClass("dark", "mt-8")}
+              />
+            ) : null}
           </div>
         </div>
       </section>
@@ -127,17 +179,29 @@ export default async function PersonPage({ params }: Props) {
         <Section tone="mist" labelledBy="person-insights">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
-              {home.insightsSection.eyebrow ? <Eyebrow>{home.insightsSection.eyebrow}</Eyebrow> : null}
+              {home.insightsSection.eyebrow ? (
+                <Eyebrow>{home.insightsSection.eyebrow}</Eyebrow>
+              ) : null}
               <Heading className="mt-2">
-                <span id="person-insights">Publications by {p.displayName}</span>
+                <span id="person-insights">
+                  Publications by {p.displayName}
+                </span>
               </Heading>
             </div>
-            {home.insightsSection.cta ? <SmartLink link={home.insightsSection.cta} className={buttonClass("outline")} /> : null}
+            {home.insightsSection.cta ? (
+              <SmartLink
+                link={home.insightsSection.cta}
+                className={buttonClass("outline")}
+              />
+            ) : null}
           </div>
           <div className="mt-10">
             <ScrollRail label={`Publications by ${p.displayName}`}>
               {insights.map((i) => (
-                <div key={i.id} className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]">
+                <div
+                  key={i.id}
+                  className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]"
+                >
                   <InsightCard insight={i} />
                 </div>
               ))}
@@ -147,7 +211,12 @@ export default async function PersonPage({ params }: Props) {
       ) : null}
 
       <PageEnd />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
     </>
   );
 }
