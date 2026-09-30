@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Recognition } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
+import { Media } from "@/components/ui/media";
 import { MotionP } from "@/components/ui/motion-p";
 import { INTERACTION, tabContentVariants, TRANSITIONS } from "@/lib/motion";
 
@@ -17,8 +18,16 @@ export function RecognitionTabs({
   recognizedBy: Recognition[];
 }) {
   const tabs = [
-    { key: "achievements", label: labels.achievementsLabel, items: achievements },
-    { key: "recognizedBy", label: labels.recognizedByLabel, items: recognizedBy },
+    {
+      key: "achievements",
+      label: labels.achievementsLabel,
+      items: achievements,
+    },
+    {
+      key: "recognizedBy",
+      label: labels.recognizedByLabel,
+      items: recognizedBy,
+    },
   ].filter((t) => t.items.length > 0);
   const [active, setActive] = useState(tabs[0]?.key);
   const current = tabs.find((t) => t.key === active) ?? tabs[0];
@@ -27,7 +36,11 @@ export function RecognitionTabs({
   return (
     <div>
       {tabs.length > 1 ? (
-        <div role="tablist" aria-label="Recognition" className="relative flex gap-6 border-b border-mist-300">
+        <div
+          role="tablist"
+          aria-label="Recognition"
+          className="relative flex gap-6 border-b border-mist-300"
+        >
           {tabs.map((t) => {
             const isSelected = t.key === current.key;
             return (
@@ -40,7 +53,9 @@ export function RecognitionTabs({
                 onClick={() => setActive(t.key)}
                 className={cn(
                   "relative pb-3 text-sm transition-colors",
-                  isSelected ? "font-medium text-ink" : "text-stone hover:text-ink",
+                  isSelected
+                    ? "font-medium text-ink"
+                    : "text-stone hover:text-ink",
                 )}
               >
                 {t.label}
@@ -56,7 +71,9 @@ export function RecognitionTabs({
           })}
         </div>
       ) : (
-        <MotionP className="font-serif text-[2rem] leading-tight md:text-[2.75rem]">{current.label}</MotionP>
+        <MotionP className="font-serif text-[2rem] leading-tight md:text-[2.75rem]">
+          {current.label}
+        </MotionP>
       )}
 
       <AnimatePresence mode="wait">
@@ -67,7 +84,7 @@ export function RecognitionTabs({
           animate="animate"
           exit="exit"
           role={tabs.length > 1 ? "tabpanel" : undefined}
-          className="mt-6 space-y-0 divide-y divide-black/10 border-t border-black/10"
+          className="mt-6 flex flex-wrap gap-4"
         >
           {current.items.map((b) => (
             <li key={b.id}>
@@ -81,16 +98,48 @@ export function RecognitionTabs({
 }
 
 function Badge({ item }: { item: Recognition }) {
-  const label = `${item.organization}: ${item.title}${item.year ? ` ${item.year}` : ""}`;
+  const organization = item.organization || item.directory?.name || "";
+  const label = `${organization ? `${organization}: ` : ""}${item.title}${item.year ? ` ${item.year}` : ""}`;
+  const inner = item.badge ? (
+    <span className="block h-[100px] w-[88px] bg-white p-2">
+      <Media image={item.badge} alt={label} className="object-contain" />
+    </span>
+  ) : (
+    <span
+      className="flex h-[100px] w-[112px] flex-col items-center justify-center bg-white px-2 text-center"
+      aria-label={label}
+    >
+      <span className="font-serif text-[13px] leading-tight">
+        {organization}
+      </span>
+      <span className="mt-1 text-[9px] uppercase tracking-wider text-stone">
+        {item.title}
+      </span>
+      {item.year ? (
+        <span className="mt-1 text-[11px] font-semibold">{item.year}</span>
+      ) : null}
+    </span>
+  );
 
   return (
     <motion.div
       whileHover={INTERACTION.card.whileHover}
       whileTap={INTERACTION.card.whileTap}
       transition={TRANSITIONS.hover}
-      className="flex items-center justify-between gap-4 border-b border-black/10 py-4"
+      className="shadow-xs transition-shadow duration-300 hover:shadow-sm"
     >
-      <span className="text-xl leading-tight text-ink" aria-label={label}>{item.organization}</span>
+      {item.url ? (
+        <a
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block transition hover:opacity-85"
+        >
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
     </motion.div>
   );
 }
