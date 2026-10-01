@@ -12,6 +12,7 @@ import {
   MotionList,
   MotionListItem,
 } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("careers");
@@ -84,7 +85,7 @@ export default async function CareersPage() {
             ))}
           </MotionList>
         ) : (
-          <div className="mt-10 flex flex-col items-center rounded-[var(--radius-card)] bg-white px-6 py-16 text-center">
+          <Reveal className="mt-10 flex flex-col items-center rounded-[var(--radius-card)] bg-white px-6 py-16 text-center">
             <Briefcase className="size-10 text-stone" strokeWidth={1.2} aria-hidden />
             {page.jobsSection.emptyState ? (
               <>
@@ -100,7 +101,7 @@ export default async function CareersPage() {
                 </p>
               </>
             )}
-          </div>
+          </Reveal>
         )}
       </Section>
 

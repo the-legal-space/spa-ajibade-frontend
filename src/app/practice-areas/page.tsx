@@ -10,6 +10,7 @@ import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { FIGMA } from "@/lib/figma-assets";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("practice-areas");
@@ -60,7 +61,7 @@ export default async function PracticeAreasPage() {
       {csr ? (
         <section className="bg-white py-12" aria-labelledby="csr-heading">
           <div className="container-site">
-            <div className="relative overflow-hidden rounded-xl bg-ink text-white">
+            <Reveal className="relative overflow-hidden rounded-xl bg-ink text-white">
               <div className="absolute inset-0">
                 <Media
                   image={csr.image ?? csr.images?.[0] ?? null}
@@ -83,7 +84,7 @@ export default async function PracticeAreasPage() {
                   />
                 ) : null}
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}
