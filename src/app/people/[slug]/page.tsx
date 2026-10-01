@@ -93,7 +93,7 @@ export default async function PersonPage({ params }: Props) {
               </Link>
             ) : null}
             <p className="text-lg">{p.roleLabel}</p>
-            <Heading as="h1" className="mt-2">
+            <Heading as="h1" reveal={false} className="mt-2">
               {p.displayName}
             </Heading>
             <div className="mt-8 aspect-[395/390] w-full max-w-[395px] overflow-hidden bg-card-blue">

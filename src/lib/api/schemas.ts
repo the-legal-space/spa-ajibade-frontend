@@ -119,6 +119,8 @@ export const InsightCategory = z.enum([
   "webinar_resources",
   // Added by the API after launch ("inside the 2025 annual business luncheon…" is categorised this way).
   "events",
+  // "Pro Bono & Community Commitment": the stories behind the Responsible Business page.
+  "pro_bono",
 ]);
 export type InsightCategory = z.infer<typeof InsightCategory>;
 
@@ -538,6 +540,16 @@ export const OfficesPage = z.object({
 });
 export type OfficesPage = z.infer<typeof OfficesPage>;
 
+/** "Responsible Business" (CSR): page title, carousel images and back link. The stories themselves are insights tagged `pro_bono`. */
+export const ResponsibleBusinessPage = z.object({
+  key: z.literal("responsible-business"),
+  title: z.string(),
+  images: z.array(ImageSchema),
+  backLink: LinkSchema,
+  ...seo,
+});
+export type ResponsibleBusinessPage = z.infer<typeof ResponsibleBusinessPage>;
+
 export const PageSchemas = {
   home: HomePage,
   about: AboutPage,
@@ -547,6 +559,7 @@ export const PageSchemas = {
   careers: CareersPage,
   faq: FaqPage,
   offices: OfficesPage,
+  "responsible-business": ResponsibleBusinessPage,
 } as const;
 export type PageKey = keyof typeof PageSchemas;
 export type PageOf<K extends PageKey> = z.infer<(typeof PageSchemas)[K]>;

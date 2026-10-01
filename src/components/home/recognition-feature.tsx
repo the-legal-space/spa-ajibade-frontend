@@ -4,6 +4,7 @@ import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { Media } from "@/components/ui/media";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
+import { Reveal } from "@/components/ui/reveal";
 
 /**
  * Home "Recognition" band from the Figma: heading, a strip of award badges that slides
@@ -54,8 +55,9 @@ export function RecognitionFeature({
                 "Ranked Among Nigeria's Top Firms By Key Global Legal Institutions."}
             </span>
           </Heading>
+          <Reveal className="w-full max-w-[601px]">
           <div
-            className="pause-on-hover relative h-[124px] w-full max-w-[601px] overflow-hidden"
+            className="pause-on-hover relative h-[124px] w-full overflow-hidden"
             aria-label="Awards and rankings"
             role="region"
           >
@@ -75,16 +77,19 @@ export function RecognitionFeature({
               ))}
             </ul>
           </div>
-          <Link href="/about#recognition" className={buttonClass("dark")}>
-            {section.cta?.label || "View Our Recognitions"}
-          </Link>
+          </Reveal>
+          <Reveal>
+            <Link href="/about#recognition" className={buttonClass("dark")}>
+              {section.cta?.label || "View Our Recognitions"}
+            </Link>
+          </Reveal>
         </div>
-        <div className="h-[510px] overflow-hidden rounded-[24px] md:h-[488px]">
+        <Reveal className="h-[510px] overflow-hidden rounded-[24px] md:h-[488px]">
           <Media
             image={cmsOr(section.image, FIGMA.recognition)}
             sizes="(min-width:1024px) 35vw, 100vw"
           />
-        </div>
+        </Reveal>
       </div>
     </section>
   );

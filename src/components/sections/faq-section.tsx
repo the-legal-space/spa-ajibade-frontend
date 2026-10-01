@@ -6,6 +6,7 @@ import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { SmartLink } from "@/components/ui/smart-link";
 import { FaqAccordion } from "./faq-accordion";
 import { FIGMA } from "@/lib/figma-assets";
+import { Reveal } from "@/components/ui/reveal";
 
 const actionIcon: Record<string, typeof Bot> = {
   "action:chat": Bot,
@@ -39,7 +40,7 @@ export function FaqSection({ section, headingLevel = "h2" }: { section: Site["fa
             </Heading>
           </div>
           {/* Figma "FAQ Contact Panel": black-to-grey glow artwork behind the copy. */}
-          <div
+          <Reveal
             className="relative overflow-hidden rounded-[12px] bg-ink bg-cover bg-center p-6 text-white"
             style={{ backgroundImage: `url(${FIGMA.faqPanel})` }}
           >
@@ -56,9 +57,11 @@ export function FaqSection({ section, headingLevel = "h2" }: { section: Site["fa
                 );
               })}
             </div>
-          </div>
+          </Reveal>
         </div>
-        <FaqAccordion items={items} />
+        <Reveal delay={0.1}>
+          <FaqAccordion items={items} />
+        </Reveal>
       </div>
     </Section>
   );

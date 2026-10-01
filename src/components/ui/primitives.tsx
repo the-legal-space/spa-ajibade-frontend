@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { MotionP } from "@/components/ui/motion-p";
+import { MotionHeading } from "@/components/ui/motion-heading";
 
 export function Eyebrow({ children, tone = "dark", className }: { children: ReactNode; tone?: "dark" | "light"; className?: string }) {
   return (
@@ -17,18 +18,28 @@ export function Heading({
   children,
   className,
   size = "h2",
+  reveal = true,
 }: {
   as?: "h1" | "h2" | "h3";
   children: ReactNode;
   className?: string;
   size?: "display" | "h2" | "h3";
+  /** Fade up once on scroll-in. Turn off for above-the-fold titles so they paint immediately. */
+  reveal?: boolean;
 }) {
   const sizes = {
     display: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
     h2: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
     h3: "text-2xl leading-tight md:text-[1.75rem]",
   };
-  return <Tag className={cn("font-serif font-normal text-balance", sizes[size], className)}>{children}</Tag>;
+  const classes = cn("font-serif font-normal text-balance", sizes[size], className);
+  return reveal ? (
+    <MotionHeading as={Tag} className={classes}>
+      {children}
+    </MotionHeading>
+  ) : (
+    <Tag className={classes}>{children}</Tag>
+  );
 }
 
 export function Section({

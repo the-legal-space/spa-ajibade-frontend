@@ -4,11 +4,13 @@ import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { PracticeAreaCard } from "@/components/sections/cards";
-import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
+import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { FIGMA } from "@/lib/figma-assets";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("practice-areas");
@@ -27,26 +29,39 @@ export default async function PracticeAreasPage() {
     <>
       <PageHero hero={page.hero} />
 
-      <Section tone="mist" labelledBy="grid-heading">
-        {page.gridSection.eyebrow ? (
-          <Eyebrow>{page.gridSection.eyebrow}</Eyebrow>
-        ) : null}
-        <Heading className="mt-2 max-w-4xl">
-          <span id="grid-heading">{page.gridSection.title}</span>
-        </Heading>
-        <MotionList className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {page.practiceAreas.map((a) => (
-            <MotionListItem key={a.id}>
-              <PracticeAreaCard area={a} />
-            </MotionListItem>
-          ))}
-        </MotionList>
-      </Section>
+      {/* Figma "Map Image": the world map sits behind the copy to show the firm's reach
+          across Nigeria and beyond. No max-width of the old 4xl so the heading sets in two lines. */}
+      <section
+        id="practice-areas"
+        aria-labelledby="grid-heading"
+        className="relative overflow-hidden bg-mist py-16 text-ink md:py-[68px]"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-no-repeat opacity-[0.08] [background-position:right_-20vw_top_-8vw] [background-size:max(1100px,120vw)_auto]"
+          style={{ backgroundImage: `url(${FIGMA.aboutMap})` }}
+        />
+        <div className="container-site relative">
+          {page.gridSection.eyebrow ? (
+            <Eyebrow>{page.gridSection.eyebrow}</Eyebrow>
+          ) : null}
+          <Heading className="mt-2 max-w-[1200px] font-serif">
+            <span id="grid-heading">{page.gridSection.title}</span>
+          </Heading>
+          <MotionList className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {page.practiceAreas.map((a) => (
+              <MotionListItem key={a.id}>
+                <PracticeAreaCard area={a} />
+              </MotionListItem>
+            ))}
+          </MotionList>
+        </div>
+      </section>
 
       {csr ? (
         <section className="bg-white py-12" aria-labelledby="csr-heading">
           <div className="container-site">
-            <div className="relative overflow-hidden rounded-xl bg-ink text-white">
+            <Reveal className="relative overflow-hidden rounded-xl bg-ink text-white">
               <div className="absolute inset-0">
                 <Media
                   image={csr.image ?? csr.images?.[0] ?? null}
@@ -69,7 +84,7 @@ export default async function PracticeAreasPage() {
                   />
                 ) : null}
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}

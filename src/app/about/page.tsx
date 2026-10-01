@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
+import { withoutDefaultFocus } from "@/lib/utils";
+import { cleanHtml } from "@/lib/sanitize";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
@@ -12,6 +14,7 @@ import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
 import { buttonClass } from "@/components/ui/button";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -32,13 +35,14 @@ export default async function AboutPage() {
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
             {story.quote ? (
-              <figure className="mt-12 lg:mt-24">
+              <Reveal className="mt-12 lg:mt-24">
+              <figure>
                 <blockquote className="max-w-sm font-serif text-2xl leading-snug md:text-[1.75rem]">
                   {story.quote} <span className="text-5xl leading-none text-mist-300" aria-hidden>&rdquo;</span>
                 </blockquote>
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
-                    <div className="aspect-[294/357] w-full max-w-[350px] overflow-hidden">
+                    <div className="aspect-294/357 w-full max-w-87.5 overflow-hidden">
                       <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
@@ -48,6 +52,7 @@ export default async function AboutPage() {
                   </figcaption>
                 ) : null}
               </figure>
+              </Reveal>
             ) : null}
           </div>
           <div>
@@ -55,11 +60,11 @@ export default async function AboutPage() {
               <span id="story-heading">{story.title}</span>
             </Heading>
             <hr className="my-8 border-mist-200" />
-            <div className="space-y-6 text-[15px] leading-8 text-ink-800">
+            <Reveal className="space-y-6 text-[15px] leading-8 text-ink-800">
               {story.paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
-            </div>
+            </Reveal>
             {story.profileDownload?.document ? (
               <p className="mt-6 text-[15px] leading-8 text-ink-800">
                 {story.profileDownload.leadText}{" "}
@@ -78,6 +83,7 @@ export default async function AboutPage() {
           <Heading>
             <span id="stats-heading">{stats.title}</span>
           </Heading>
+          <Reveal>
           <dl className="mt-8 grid border-l border-t border-mist-200 sm:grid-cols-2 lg:grid-cols-4">
             {stats.items.map((s) => (
               <div key={s.value} className="border-b border-r border-mist-200 px-5 py-8">
@@ -90,6 +96,7 @@ export default async function AboutPage() {
               </div>
             ))}
           </dl>
+          </Reveal>
         </Section>
       ) : null}
 
@@ -100,25 +107,34 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <div className="aspect-[544/520] overflow-hidden rounded-md">
-            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" />
-          </div>
+          <Reveal className="relative aspect-544/520 overflow-hidden rounded-md lg:aspect-auto">
+            {/* Favour the top of the photo (the raised hand and staff): only 20% of whatever has to
+                be cropped comes off the top, so the taller the frame gets as the accordion opens,
+                the less is lost there. */}
+            <Media
+              image={missionSection.image ? withoutDefaultFocus(missionSection.image) : missionSection.image}
+              sizes="(min-width:1024px) 50vw, 100vw"
+              className="absolute inset-0 object-[50%_20%]"
+            />
+          </Reveal>
+          <Reveal delay={0.1}>
           <FaqAccordion
             tone="white"
             defaultOpen={0}
             items={missionSection.items.map((m, i) => ({
               id: `mission-${i}`,
               question: m.title,
-              answerHtml: `<p>${escapeHtml(m.body)}</p>`,
+              answerHtml: /<\/?[a-z][^>]*>/i.test(m.body) ? cleanHtml(m.body) : `<p>${escapeHtml(m.body)}</p>`,
             }))}
           />
+          </Reveal>
         </div>
       </Section>
 
       {/* Principles */}
       <Section tone="white" id="principles" className="relative overflow-hidden" labelledBy="principles-heading">
         {principles.image ? (
-          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[389px] lg:block" aria-hidden>
+          <div className="pointer-events-none absolute right-0 top-0 hidden h-105 w-97.25 lg:block" aria-hidden>
             <Media image={principles.image} className="object-contain" />
           </div>
         ) : null}
@@ -175,9 +191,9 @@ export default async function AboutPage() {
                 })}
               </MotionList>
             </div>
-            <div className="hidden aspect-[524/560] overflow-hidden lg:block">
+            <Reveal className="hidden aspect-[524/560] overflow-hidden lg:block">
               <Media image={awardsList.image} placeholder="dark" />
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}

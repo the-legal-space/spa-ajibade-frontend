@@ -84,6 +84,16 @@ export function insightCover(slug: string, cms: ApiImage | null | undefined): Ap
   return cms?.url ? cms : (INSIGHTS[slug] ?? null);
 }
 
+/** Card thumbnails of the Pro Bono & Community Commitment stories show the Supreme Court photo in the designs. */
+const CARD_COVERS: Record<string, ApiImage> = {
+  "spa-ajibade-co-sponsors-team-titans-an-american-flag-football-team": img("/figma/insight-4.jpg", 650, 350),
+};
+
+/** Listing-card thumbnail: CMS cover first, then the card-specific Figma image, then the article fallback. */
+export function insightCardCover(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
+  return cms?.url ? cms : (CARD_COVERS[slug] ?? INSIGHTS[slug] ?? null);
+}
+
 /** CMS image when present, otherwise the given Figma fallback. */
 export function cmsOr(cms: ApiImage | null | undefined, fallback: ApiImage): ApiImage {
   return cms?.url ? cms : fallback;

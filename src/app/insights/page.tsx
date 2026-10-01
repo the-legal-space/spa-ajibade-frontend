@@ -11,6 +11,7 @@ import { FeaturedInsights } from "@/components/sections/featured-insights";
 import { Heading, Section } from "@/components/ui/primitives";
 import { FilterMenu, FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -41,10 +42,10 @@ export default async function InsightsPage({ searchParams }: Props) {
       {!content.hero && content.featured.length === 0 ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
 
       <Section tone="mist" labelledBy="listing-heading" id="listing">
-        <Heading as="h1">
+        <Heading as="h1" reveal={false}>
           <span id="listing-heading">{content.listingSection.title}</span>
         </Heading>
-        <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Reveal className="relative z-[35] mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.categoryFilters} param="category" base="/insights" current={current} label="Filter by category" />
           <Suspense fallback={null}>
             <FilterMenu
@@ -55,7 +56,7 @@ export default async function InsightsPage({ searchParams }: Props) {
               label="Practice Area"
             />
           </Suspense>
-        </div>
+        </Reveal>
 
         {list.data.length > 0 ? (
           <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
