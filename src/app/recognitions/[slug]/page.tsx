@@ -4,7 +4,7 @@ import { ApiNotFoundError } from "@/lib/api/client";
 import { getRecognitionDirectory } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageEnd } from "@/components/sections/page-end";
-import { Eyebrow } from "@/components/ui/primitives";
+import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
@@ -39,7 +39,7 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
   return (
     <>
       <HeroSlideshow count={images.length}>
-        <section className="relative -mt-[var(--header-h)] min-h-[300px] overflow-hidden bg-ink pt-[var(--header-h)] text-white">
+        <section data-header-theme="dark" className="relative -mt-[var(--header-h)] min-h-[400px] overflow-hidden bg-ink text-white md:min-h-[493px]">
           <div className="absolute inset-0">
             {images.length > 1 ? (
               <HeroSlides images={images} />
@@ -51,18 +51,18 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
             <div className="absolute inset-0 bg-black/55" aria-hidden />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.22)_100%)]" aria-hidden />
           </div>
-          <div className="container-site relative flex min-h-[300px] items-center py-10">
-            <div className="max-w-[590px]">
-              <h1 className="font-serif text-[2.25rem] leading-tight md:text-[2.75rem]">
+          <div className="container-site relative flex min-h-[400px] items-center pt-[var(--header-h)] md:min-h-[493px]">
+            <div className="max-w-[776px] py-12">
+              <Heading as="h1" size="display" reveal={false}>
                 {page.hero.title}
-              </h1>
+              </Heading>
               {page.hero.subtitle ? (
-                <p className="mt-2 max-w-[560px] text-sm leading-6 text-white/85 md:text-base">
+                <p className="mt-5 text-lg leading-8 text-mist md:text-xl md:leading-9">
                   {page.hero.subtitle}
                 </p>
               ) : null}
               {page.hero.primaryCta || page.hero.secondaryCta ? (
-                <div className="mt-4 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-wrap gap-3">
                   {page.hero.primaryCta ? (
                     <SmartLink link={page.hero.primaryCta} className={buttonClass("light")} />
                   ) : null}

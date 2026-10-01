@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
+import { withoutDefaultFocus } from "@/lib/utils";
 import { cleanHtml } from "@/lib/sanitize";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
@@ -41,7 +42,7 @@ export default async function AboutPage() {
                 </blockquote>
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
-                    <div className="aspect-[294/357] w-full max-w-[350px] overflow-hidden">
+                    <div className="aspect-294/357 w-full max-w-87.5 overflow-hidden">
                       <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
@@ -106,8 +107,15 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <Reveal className="relative aspect-[544/520] overflow-hidden rounded-md lg:aspect-auto">
-            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
+          <Reveal className="relative aspect-544/520 overflow-hidden rounded-md lg:aspect-auto">
+            {/* Favour the top of the photo (the raised hand and staff): only 20% of whatever has to
+                be cropped comes off the top, so the taller the frame gets as the accordion opens,
+                the less is lost there. */}
+            <Media
+              image={missionSection.image ? withoutDefaultFocus(missionSection.image) : missionSection.image}
+              sizes="(min-width:1024px) 50vw, 100vw"
+              className="absolute inset-0 object-[50%_20%]"
+            />
           </Reveal>
           <Reveal delay={0.1}>
           <FaqAccordion
@@ -126,7 +134,7 @@ export default async function AboutPage() {
       {/* Principles */}
       <Section tone="white" id="principles" className="relative overflow-hidden" labelledBy="principles-heading">
         {principles.image ? (
-          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[389px] lg:block" aria-hidden>
+          <div className="pointer-events-none absolute right-0 top-0 hidden h-105 w-97.25 lg:block" aria-hidden>
             <Media image={principles.image} className="object-contain" />
           </div>
         ) : null}

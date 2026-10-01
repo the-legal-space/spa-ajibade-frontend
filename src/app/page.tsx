@@ -15,6 +15,7 @@ import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
 import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
+import { withoutDefaultFocus } from "@/lib/utils";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
@@ -22,15 +23,6 @@ import { Reveal } from "@/components/ui/reveal";
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("home");
   return pageMetadata(page.seo, { absoluteTitle: true, path: "/" });
-}
-
-/**
- * The CMS stamps every upload with a centre focal point (0.5, 0.5), which would override the
- * designed crops below. Treat that default as "no focal point"; any real focal point still wins.
- */
-function withoutDefaultFocus<T extends { focalPoint?: { x: number; y: number } | null }>(img: T): T {
-  const f = img.focalPoint;
-  return f && f.x === 0.5 && f.y === 0.5 ? { ...img, focalPoint: null } : img;
 }
 
 export default async function HomePage() {

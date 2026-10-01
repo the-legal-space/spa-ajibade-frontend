@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { useAutoplay } from "@/components/home/scroll-rail";
 
-export type CsrSlide = { slug: string; title: string; date: string | null; image: ApiImage | null };
+export type CsrSlide = { slug: string | null; title: string | null; date: string | null; image: ApiImage | null };
 
 /**
  * Responsible Business carousel: cross-fades through the latest stories. Hovering (or focusing)
@@ -23,37 +23,43 @@ export function CsrCarousel({ slides }: { slides: CsrSlide[] }) {
   return (
     <div className="mt-6">
       <div {...pause} className="group relative aspect-[1352/540] overflow-hidden bg-mist-200">
-        {slides.map((s, i) => (
-          <Link
-            key={s.slug}
-            href={`/insights/${s.slug}`}
-            aria-hidden={i !== index}
-            tabIndex={i === index ? 0 : -1}
-            className={cn(
-              "absolute inset-0 block transition-opacity duration-[1000ms] ease-out motion-reduce:transition-none",
-              i === index ? "opacity-100" : "pointer-events-none opacity-0",
-            )}
-          >
-            <Media image={s.image} priority={i === 0} sizes="(min-width:1024px) 1352px, 100vw" />
-            <div
-              className={cn(
-                "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-5 pb-6 pt-24 text-white md:px-6",
-                "translate-y-6 opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
-                "[@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
-              )}
-            >
-              {s.date ? <p className="text-xs leading-none">{s.date}</p> : null}
-              <p className="mt-3 text-xl leading-7 md:text-[1.75rem] md:leading-9">{s.title}</p>
-            </div>
-          </Link>
-        ))}
+        {slides.map((s, i) => {
+          const layer = cn(
+            "absolute inset-0 block transition-opacity duration-[1000ms] ease-out motion-reduce:transition-none",
+            i === index ? "opacity-100" : "pointer-events-none opacity-0",
+          );
+          const media = <Media image={s.image} priority={i === 0} sizes="(min-width:1024px) 1352px, 100vw" />;
+          // Slides without a story (extra CMS images) are just pictures: no link, no details.
+          if (!s.slug || !s.title) {
+            return (
+              <div key={`img-${i}`} aria-hidden={i !== index} className={layer}>
+                {media}
+              </div>
+            );
+          }
+          return (
+            <Link key={s.slug} href={`/insights/${s.slug}`} aria-hidden={i !== index} tabIndex={i === index ? 0 : -1} className={layer}>
+              {media}
+              <div
+                className={cn(
+                  "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-5 pb-6 pt-24 text-white md:px-6",
+                  "translate-y-6 opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                  "[@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
+                )}
+              >
+                {s.date ? <p className="text-xs leading-none">{s.date}</p> : null}
+                <p className="mt-3 text-xl leading-7 md:text-[1.75rem] md:leading-9">{s.title}</p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {count > 1 ? (
         <div className="mt-5 flex h-2 items-center justify-center gap-2" role="group" aria-label="Stories">
           {slides.map((s, i) => (
             <button
-              key={s.slug}
+              key={s.slug ?? `dot-${i}`}
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`Show story ${i + 1} of ${count}`}

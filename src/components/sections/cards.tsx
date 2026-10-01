@@ -18,7 +18,7 @@ import { buttonClass } from "@/components/ui/button";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import {
   FIGMA,
-  insightCover,
+  insightCardCover,
   personAvatar,
   personPhoto,
   practiceImage,
@@ -39,7 +39,7 @@ export function PracticeAreaCard({
       whileHover={INTERACTION.card.whileHover}
       whileTap={INTERACTION.card.whileTap}
       transition={TRANSITIONS.hover}
-      className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 shadow-sm transition-shadow duration-300 hover:shadow-md"
+      className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 transition-shadow duration-300 hover:shadow-md"
     >
       <div className="aspect-[331/240] overflow-hidden rounded-xl">
         <Media
@@ -57,7 +57,7 @@ export function PracticeAreaCard({
         whileHover={INTERACTION.button.whileHover}
         whileTap={INTERACTION.button.whileTap}
         transition={TRANSITIONS.hover}
-        className={buttonClass("dark", "mt-4 w-full py-2.5")}
+        className={buttonClass("dark", "mt-4 w-full rounded-[12px]! py-2.5")}
         aria-label={`Learn more about ${area.title}`}
       >
         Learn More <ArrowRight className="size-4" aria-hidden />
@@ -296,7 +296,7 @@ export function InsightCard({
         aria-hidden
       >
         <Media
-          image={insightCover(insight.slug, insight.coverImage)}
+          image={insightCardCover(insight.slug, insight.coverImage)}
           alt=""
           sizes="(min-width:1024px) 437px, (min-width:640px) 50vw, 85vw"
           className="transition duration-500 group-hover:scale-[1.03]"
