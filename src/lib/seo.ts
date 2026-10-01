@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import type { Seo } from "@/lib/api/schemas";
+import type { Seo, SeoBasic } from "@/lib/api/schemas";
 
 /** Turns a CMS seo block into Next metadata, with sensible fallbacks. */
 export function pageMetadata(
-  seo: Seo | undefined,
+  seo: Seo | SeoBasic | undefined,
   fallback: { title?: string; description?: string | null; path: string; absoluteTitle?: boolean },
 ): Metadata {
   const title = seo?.title ?? fallback.title;
   const description = seo?.description ?? fallback.description ?? undefined;
-  const og = seo?.ogImage;
+  const og = seo && "ogImage" in seo ? seo.ogImage : undefined;
   return {
     title: title ? (fallback.absoluteTitle ? { absolute: title } : title) : undefined,
     description,

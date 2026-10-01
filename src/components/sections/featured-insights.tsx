@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
@@ -9,7 +10,7 @@ import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { useAutoplay, useSwipe } from "@/components/home/scroll-rail";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
-import { insightCover } from "@/lib/figma-assets";
+import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
 
 const MotionLink = motion.create(Link);
 
@@ -37,6 +38,10 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
           >
             {items.map((item, n) => {
               const date = formatMonthYear(item.publishedAt);
+              const filterHref = featuredInsightFilterHref(item);
+              const authorAvatar = item.author.type === "person"
+                ? personAvatar(item.author.person.slug, item.author.person.photo)
+                : null;
               return (
                 <article
                   key={item.id}
@@ -49,9 +54,15 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                     {date ? <span className="inline-block rounded-[4px] border border-white/20 px-3 py-1.5 text-[11px]">{date}</span> : null}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {item.chips.slice(0, 2).map((c) => (
-                        <span key={c} className="rounded-[4px] border border-white/20 px-3 py-1.5 text-[11px] underline underline-offset-2">
+                        <Link
+                          key={c}
+                          href={filterHref}
+                          tabIndex={n === i ? undefined : -1}
+                          scroll={false}
+                          className="rounded-[4px] border border-white/20 px-3 py-1.5 text-[11px] underline underline-offset-2 hover:bg-white/10"
+                        >
                           {c}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                     <h2 className="mt-5 font-serif text-2xl leading-snug md:text-[1.75rem]">
@@ -60,23 +71,41 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                       </Link>
                     </h2>
                     {item.excerpt ? <p className="mt-3 line-clamp-3 text-[13px] leading-6 text-white/75">{item.excerpt}</p> : null}
-                    <div className="mt-5 flex items-center justify-between gap-4">
-                      <span className="flex items-center gap-2 text-xs">
-                        <span className="grid size-7 place-items-center rounded-full bg-[#56697a] text-[10px]">
-                          {item.author.type === "person" ? initials(item.author.person.displayName) : "SPA"}
+                    <div className="mt-5 flex items-center justify-between gap-4 overflow-visible">
+                      {item.author.type === "person" ? (
+                        <Link
+                          href={`/people/${item.author.person.slug}`}
+                          tabIndex={n === i ? undefined : -1}
+                          className="group/author flex min-w-0 items-center gap-2 text-xs"
+                        >
+                          <span className="size-9 shrink-0 overflow-hidden rounded-full bg-[#56697a]">
+                            {authorAvatar ? (
+                              <Media image={authorAvatar} alt="" sizes="36px" />
+                            ) : (
+                              <span className="grid size-full place-items-center text-[10px]">{initials(item.author.person.displayName)}</span>
+                            )}
+                          </span>
+                          <span className="min-w-0 leading-tight">
+                            <span className="block truncate group-hover/author:underline">{item.author.person.displayName}</span>
+                            <span className="block truncate text-[10px] text-white/60">{item.author.person.roleLabel}</span>
+                          </span>
+                        </Link>
+                      ) : (
+                        <span className="flex min-w-0 items-center gap-2 text-xs">
+                          <Image src={FIGMA.firmAvatar} alt="" width={36} height={36} className="size-9 shrink-0 rounded-full" />
+                          <span className="min-w-0 leading-tight">
+                            <span className="block truncate">{item.author.name}</span>
+                            <span className="block truncate text-[10px] text-white/60">{item.author.label}</span>
+                          </span>
                         </span>
-                        <span className="leading-tight">
-                          <span className="block">{item.author.type === "person" ? item.author.person.displayName : item.author.name}</span>
-                          <span className="block text-[10px] text-white/60">{item.author.type === "person" ? item.author.person.roleLabel : item.author.label}</span>
-                        </span>
-                      </span>
+                      )}
                       <MotionLink
                         href={`/insights/${item.slug}`}
                         tabIndex={n === i ? undefined : -1}
                         whileHover={INTERACTION.button.whileHover}
                         whileTap={INTERACTION.button.whileTap}
                         transition={TRANSITIONS.hover}
-                        className="inline-flex items-center gap-1 rounded-[4px] border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
+                        className="inline-flex origin-right items-center gap-1 rounded-[4px] border border-white/20 px-3 py-2 text-xs hover:bg-white/10"
                       >
                         {item.format === "video" ? "Watch Video" : "Read More"} <ArrowUpRight className="size-3.5" aria-hidden />
                       </MotionLink>
@@ -139,4 +168,11 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
       </div>
     </section>
   );
+}
+
+function featuredInsightFilterHref(item: InsightCard) {
+  const params = new URLSearchParams();
+  if (item.categories[0]) params.set("category", item.categories[0]);
+  if (item.practiceAreas[0]) params.set("practiceArea", item.practiceAreas[0].slug);
+  return params.size ? `/insights?${params.toString()}` : "/insights";
 }

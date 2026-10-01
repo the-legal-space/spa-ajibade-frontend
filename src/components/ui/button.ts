@@ -13,7 +13,7 @@ const variants: Record<ButtonVariant, string> = {
   // Translucent on dark imagery ("Explore Our Practice Areas" in the hero).
   ghostDark: "rounded-[4px] border border-white/20 bg-white/5 p-4 text-white backdrop-blur-[15px] hover:bg-white/15",
   // Thin outline on light surfaces ("View full directory", "Read More").
-  outline: "h-[46px] rounded-[4px] border-[0.5px] border-gray bg-transparent px-4 text-ink hover:border-ink",
+  outline: "h-[46px] rounded-[4px] border-[0.5px] border-gray bg-transparent px-4 text-ink transition-colors hover:border-ink hover:bg-mist/40",
   // Rounded pills in the "Still have questions?" card.
   pill: "rounded-full bg-mist px-4 py-2.5 text-ink hover:bg-white",
   pillDark: "rounded-full bg-ink px-5 py-3 text-white hover:bg-ink-700",

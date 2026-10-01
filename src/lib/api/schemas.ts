@@ -8,6 +8,8 @@ import { z } from "zod";
  */
 
 const nullableString = z.string().nullable();
+const ObjectId = z.string().regex(/^[0-9a-f]{24}$/);
+const Slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(140);
 
 export const ImageSchema = z.object({
   url: z.string(),
@@ -77,6 +79,8 @@ export const SeoSchema = z
   })
   .partial();
 export type Seo = z.infer<typeof SeoSchema>;
+export const SeoBasicSchema = z.object({ title: nullableString, description: nullableString });
+export type SeoBasic = z.infer<typeof SeoBasicSchema>;
 
 export const HeroSchema = z.object({
   title: z.string(),
@@ -115,6 +119,8 @@ export const InsightCategory = z.enum([
   "webinar_resources",
   // Added by the API after launch ("inside the 2025 annual business luncheon…" is categorised this way).
   "events",
+  // "Pro Bono & Community Commitment": the stories behind the Responsible Business page.
+  "pro_bono",
 ]);
 export type InsightCategory = z.infer<typeof InsightCategory>;
 
@@ -129,6 +135,7 @@ export const PracticeAreaRef = z.object({
   shortLabel: z.string().optional(),
 });
 export type PracticeAreaRef = z.infer<typeof PracticeAreaRef>;
+export const PracticeAreaLink = z.object({ slug: Slug, title: z.string() });
 
 export const PracticeAreaCard = PracticeAreaRef.extend({
   summary: z.string(),
@@ -144,6 +151,8 @@ export const PersonSummary = z.object({
   roleLabel: z.string(),
   photo: NullableImage,
   linkedinUrl: nullableString,
+  cardBio: nullableString,
+  practiceAreas: z.array(PracticeAreaLink),
 });
 export type PersonSummary = z.infer<typeof PersonSummary>;
 
@@ -153,6 +162,8 @@ export const OfficeRef = z.object({
   name: z.string(),
 });
 export type OfficeRef = z.infer<typeof OfficeRef>;
+export const FooterOffice = z.object({ id: ObjectId, slug: Slug, name: z.string(), address: z.string(), phone: nullableString, email: nullableString });
+export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean() });
 
 export const InsightAuthor = z.discriminatedUnion("type", [
   z.object({ type: z.literal("person"), person: PersonSummary }),
@@ -179,6 +190,8 @@ export const InsightCard = z.object({
 export type InsightCard = z.infer<typeof InsightCard>;
 
 export const InsightDetail = InsightCard.extend({
+  cta: z.object({ label: z.string(), url: z.string() }).nullable(),
+  backLink: LinkSchema,
   body: nullableString,
   videoUrl: nullableString,
   related: z.array(InsightCard),
@@ -202,7 +215,13 @@ export const PracticeAreaDetail = PracticeAreaCard.extend({
   /** The API now names this list `recentPublications`. */
   recentPublications: z.array(InsightCard).optional(),
   relatedInsights: z.array(InsightCard).optional(),
-  seo: SeoSchema.optional(),
+  homeSummary: z.string().optional(),
+  heroIntro: z.string().optional(),
+  heroImages: z.array(ImageSchema).optional(),
+  approach: z.object({ text: z.string(), points: z.array(z.string()) }).nullable().optional(),
+  industries: z.array(z.object({ name: z.string(), slug: Slug })).optional(),
+  siblings: z.array(PracticeAreaLink).optional(),
+  seo: SeoBasicSchema.optional(),
 });
 export type PracticeAreaDetail = z.infer<typeof PracticeAreaDetail>;
 
@@ -211,9 +230,13 @@ export const PersonDetail = PersonSummary.extend({
   lastName: z.string(),
   honorific: nullableString,
   postNominals: nullableString,
+  instagramUrl: nullableString.optional(),
+  email: nullableString.optional(),
   bio: nullableString,
   quote: nullableString,
-  practiceAreas: z.array(PracticeAreaRef),
+  primaryPracticeArea: PracticeAreaLink.nullable().optional(),
+  education: z.object({ intro: nullableString, entries: z.array(z.object({ qualification: z.string(), year: z.number().nullable() })) }).optional(),
+  memberships: z.array(z.string()).optional(),
   office: OfficeRef.nullable(),
   /** The API now names this list `recentPublications`; both keys are accepted. */
   insights: z.array(InsightCard).optional(),
@@ -256,6 +279,29 @@ export const Recognition = z.object({
   tab: z.string().optional(),
 });
 export type Recognition = z.infer<typeof Recognition>;
+
+export const RecognitionDirectoryRef = z.object({
+  id: ObjectId,
+  name: z.string(),
+  slug: Slug,
+  logo: NullableImage,
+});
+
+export const RecognitionAward = z.object({
+  id: ObjectId,
+  title: z.string(),
+  year: z.number().int(),
+  badge: NullableImage,
+  directory: RecognitionDirectory,
+});
+
+export const RecognitionDirectoryPage = z.object({
+  directory: RecognitionDirectoryRef,
+  hero: HeroSchema,
+  awardsEyebrow: z.string(),
+  awards: z.array(RecognitionAward),
+});
+export type RecognitionDirectoryPage = z.infer<typeof RecognitionDirectoryPage>;
 
 export const FaqSchema = z.object({
   id: z.string(),
@@ -309,7 +355,9 @@ export const SiteSchema = z.object({
     tagline: z.string(),
     links: z.array(LinkSchema),
     practiceAreas: z.array(PracticeAreaRef),
-    offices: z.array(OfficeRef),
+    offices: z.array(FooterOffice),
+    legalLinks: z.array(LinkSchema),
+    newsletter: SiteNewsletter,
     socials: Socials,
     copyright: z.string(),
   }),
@@ -386,6 +434,7 @@ export const AboutPage = z.object({
     paragraphs: z.array(z.string()),
     quote: nullableString,
     quotePerson: PersonSummary.nullable(),
+    profileDownload: z.object({ leadText: z.string(), linkLabel: z.string(), document: z.object({ url: z.string(), title: z.string(), bytes: z.number(), mimeType: z.literal("application/pdf") }).nullable() }).nullable().optional(),
   }),
   stats: z.object({
     title: z.string(),
@@ -446,6 +495,7 @@ export const PeoplePage = z.object({
   hero: HeroSchema,
   directorySection: SectionHeader,
   roleFilters: z.array(FilterOption),
+  practiceAreaFilters: z.array(FilterOption),
   ...seo,
 });
 export type PeoplePage = z.infer<typeof PeoplePage>;
@@ -455,6 +505,7 @@ export const InsightsPage = z.object({
   hero: HeroSchema.nullable(),
   featured: z.array(InsightCard),
   categoryFilters: z.array(FilterOption),
+  practiceAreaFilters: z.array(FilterOption),
   listingSection: SectionHeader,
   ...seo,
 });
@@ -463,7 +514,12 @@ export type InsightsPage = z.infer<typeof InsightsPage>;
 export const CareersPage = z.object({
   key: z.literal("careers"),
   hero: HeroSchema,
-  jobsSection: SectionHeader,
+  jobsSection: z.object({
+    eyebrow: nullableString.optional(),
+    title: z.string(),
+    cta: NullableLink.optional(),
+    emptyState: z.object({ title: z.string(), body: z.string(), ctaLabel: z.string() }).nullable().optional(),
+  }),
   jobs: z.array(JobSchema),
   ...seo,
 });
@@ -500,10 +556,10 @@ export type PageOf<K extends PageKey> = z.infer<(typeof PageSchemas)[K]>;
 /* ---------- Envelopes ---------- */
 
 export const PaginationMeta = z.object({
-  page: z.number(),
-  pageSize: z.number(),
-  total: z.number(),
-  totalPages: z.number(),
+  page: z.number().int().min(1),
+  pageSize: z.number().int().min(1),
+  total: z.number().int().min(0),
+  totalPages: z.number().int().min(0),
 });
 export type PaginationMeta = z.infer<typeof PaginationMeta>;
 

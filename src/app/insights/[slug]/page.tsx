@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getInsight, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
-import { formatMonthYear, initials, navLabel } from "@/lib/utils";
+import { formatMonthYear, initials } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { VideoEmbed } from "@/components/sections/video-embed";
+import { buttonClass } from "@/components/ui/button";
 import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -45,7 +46,6 @@ export default async function InsightPage({ params }: Props) {
   const { slug } = await params;
   const [i, site] = await Promise.all([load(slug), getSite()]);
   const body = cleanHtml(i.body);
-  const back = navLabel(site.nav, "/insights");
   const date = formatMonthYear(i.publishedAt);
   const author =
     i.author.type === "person"
@@ -71,22 +71,22 @@ export default async function InsightPage({ params }: Props) {
     <>
       <article className="bg-white">
         <div className="container-site py-10 md:py-12">
-          {back ? (
-            <Link href="/insights" className="inline-flex items-center gap-1.5 text-[13px] hover:underline">
-              <ArrowLeft className="size-3.5" aria-hidden /> Back to {back}
-            </Link>
-          ) : null}
+          <Link href={i.backLink.href} className="inline-flex items-center gap-1.5 text-[13px] hover:underline">
+            <ArrowLeft className="size-3.5" aria-hidden /> {i.backLink.label}
+          </Link>
 
           <div className="mt-8 flex items-start justify-between gap-4">
             <div className="flex flex-wrap gap-1.5">
               {i.chips.map((c, n) => {
-                const cat = i.categories[n];
-                return cat ? (
-                  <Link key={c} href={`/insights?category=${cat}`}>
-                    <Chip className="underline underline-offset-2">{c}</Chip>
-                  </Link>
-                ) : (
-                  <Chip key={c} className="underline underline-offset-2">
+                const params = new URLSearchParams();
+                const category = i.categories[n] ?? i.categories[0];
+                const practiceArea = i.practiceAreas[0]?.slug;
+
+                if (category) params.set("category", category);
+                if (practiceArea) params.set("practiceArea", practiceArea);
+
+                return (
+                  <Chip key={c} href={params.size > 0 ? `/insights?${params.toString()}` : undefined} className="underline underline-offset-2">
                     {c}
                   </Chip>
                 );
@@ -99,7 +99,7 @@ export default async function InsightPage({ params }: Props) {
             ) : null}
           </div>
 
-          <Heading as="h1" size="h2" className="mt-5 max-w-5xl">
+          <Heading as="h1" size="h2" className="mt-5 w-full">
             {i.title}
           </Heading>
 
@@ -115,6 +115,11 @@ export default async function InsightPage({ params }: Props) {
 
           {i.excerpt && !body ? <p className="mt-8 text-[15px] leading-8 text-ink-800">{i.excerpt}</p> : null}
           {body ? <div className="prose-firm mt-8 text-[15px] leading-8" dangerouslySetInnerHTML={{ __html: body }} /> : null}
+          {i.cta ? (
+            <a href={i.cta.url} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-8")}>
+              {i.cta.label} <ArrowUpRight className="size-4" aria-hidden />
+            </a>
+          ) : null}
 
           <div className="mt-6 flex items-center gap-3">
             <span className="size-11 shrink-0 overflow-hidden rounded-full">

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { getPage, getPeople } from "@/lib/api/endpoints";
 import { PersonRole } from "@/lib/api/schemas";
 import { pageMetadata } from "@/lib/seo";
@@ -10,7 +9,7 @@ import { PersonCard } from "@/components/sections/cards";
 import { getCardDetails } from "@/lib/person-card";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
-import { SortMenu } from "@/components/ui/sort-menu";
+import { PeopleSortMenu } from "@/components/ui/people-sort-menu";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -30,12 +29,13 @@ export default async function PeoplePage({ searchParams }: Props) {
   const sp = await searchParams;
   const roleParsed = PersonRole.safeParse(readString(sp.role));
   const role = roleParsed.success ? roleParsed.data : undefined;
+  const practiceArea = readString(sp.practiceArea)?.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0];
   const sortRaw = readString(sp.sort);
   const sort = SORTS.find((s) => s.value === sortRaw)?.value ?? "seniority";
   const page = readPage(sp.page);
 
-  const [content, people] = await Promise.all([getPage("people"), getPeople({ role, sort, page, pageSize: 9 })]);
-  const current = { role, sort: sort === "seniority" ? undefined : sort };
+  const [content, people] = await Promise.all([getPage("people"), getPeople({ role, practiceArea, sort, page, pageSize: 9 })]);
+  const current = { role, practiceArea, sort: sort === "seniority" ? undefined : sort };
   const meta = people.meta ?? { page, totalPages: 1 };
   const cardDetails = await getCardDetails(people.data);
 
@@ -49,11 +49,15 @@ export default async function PeoplePage({ searchParams }: Props) {
           <span id="directory-heading">{content.directorySection.title}</span>
         </Heading>
 
-        <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
-          <Suspense fallback={null}>
-            <SortMenu options={[...SORTS]} defaultValue="seniority" />
-          </Suspense>
+          <PeopleSortMenu
+            practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
+            sorts={[...SORTS]}
+            defaultSort="seniority"
+            base="/people"
+            current={current}
+          />
         </div>
 
         {people.data.length > 0 ? (

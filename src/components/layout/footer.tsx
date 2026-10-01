@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { Mail, PhoneCall } from "lucide-react";
 import type { Office, Site } from "@/lib/api/schemas";
 import { telHref } from "@/lib/utils";
@@ -36,11 +37,13 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
       <div className="container-site relative flex flex-col gap-11 py-14 md:py-[68px]">
         <div className="grid gap-12 md:grid-cols-2 xl:flex xl:items-start xl:justify-between">
           <div className="flex w-full max-w-[437px] flex-col gap-10">
-            <div className="flex max-w-[414px] flex-col gap-6">
-              <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">Subscribe for legal insights</h2>
-              <NewsletterForm firmEmail={settings.email} />
-              <p className="text-sm leading-7 text-[#e2e2e2]">Your information is kept confidential</p>
-            </div>
+            {footer.newsletter.enabled ? (
+              <div className="flex max-w-[414px] flex-col gap-6">
+                <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title}</h2>
+                <NewsletterForm firmEmail={settings.email} />
+                <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note}</p>
+              </div>
+            ) : null}
             <SocialLinks socials={footer.socials} always className="gap-5" iconClassName="size-5" />
           </div>
 
@@ -101,13 +104,12 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
         <div className="flex flex-col gap-3 border-t border-white/15 pt-6 text-sm leading-7 text-white md:flex-row md:items-center md:justify-between">
           <p>{footer.copyright || settings.copyright}</p>
           <p className="flex items-center gap-6">
-            <Link href="/terms" className="hover:opacity-75">
-              Terms of Service
-            </Link>
-            <span aria-hidden className="size-1.5 rounded-full bg-white" />
-            <Link href="/privacy" className="hover:opacity-75">
-              Privacy Policy
-            </Link>
+            {footer.legalLinks.map((link, index) => (
+              <Fragment key={link.href}>
+                {index > 0 ? <span aria-hidden className="size-1.5 rounded-full bg-white" /> : null}
+                <Link href={legalHref(link.href)} className="hover:opacity-75">{link.label}</Link>
+              </Fragment>
+            ))}
           </p>
         </div>
       </div>
@@ -118,6 +120,11 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
 function rank(name: string) {
   const i = OFFICE_ORDER.indexOf(name.trim().toLowerCase());
   return i === -1 ? OFFICE_ORDER.length : i;
+}
+
+function legalHref(href: string) {
+  const key = href.split("/").at(-1);
+  return key === "terms" || key === "privacy" ? `/${key}` : href;
 }
 
 function FooterColumn({ title, children, gap = "gap-2" }: { title: string; children: React.ReactNode; gap?: string }) {

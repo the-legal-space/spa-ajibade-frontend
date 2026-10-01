@@ -26,7 +26,7 @@ export function HeroSlideshow({ count, delay = 5000, children }: { count: number
   return <SlideCtx.Provider value={{ index, count, go }}>{children}</SlideCtx.Provider>;
 }
 
-export function HeroSlides({ images }: { images: ApiImage[] }) {
+export function HeroSlides({ images, imageClassName }: { images: ApiImage[]; imageClassName?: string }) {
   const { index } = useContext(SlideCtx);
   return (
     <>
@@ -35,18 +35,18 @@ export function HeroSlides({ images }: { images: ApiImage[] }) {
           key={img.url + i}
           aria-hidden={i !== index}
           className={cn(
-            "absolute inset-0 transition-[opacity,transform] duration-[1400ms] ease-out motion-reduce:transition-none",
-            i === index ? "scale-100 opacity-100" : "scale-[1.04] opacity-0",
+            "absolute inset-0 transition-opacity duration-[1400ms] ease-out motion-reduce:transition-none",
+            i === index ? "opacity-100" : "opacity-0",
           )}
         >
-          <Media image={img} priority={i === 0} sizes="100vw" />
+          <Media image={img} priority={i === 0} sizes="100vw" className={imageClassName} />
         </div>
       ))}
     </>
   );
 }
 
-export function HeroDots({ className }: { className?: string }) {
+export function HeroDots({ className, tone = "light" }: { className?: string; tone?: "light" | "dark" }) {
   const { index, count, go } = useContext(SlideCtx);
   if (count < 2) return null;
   return (
@@ -65,7 +65,9 @@ export function HeroDots({ className }: { className?: string }) {
           <span
             className={cn(
               "block size-2 rounded-full transition-colors duration-500",
-              i === index ? "bg-white" : "bg-white/40 hover:bg-white/70",
+              tone === "dark"
+                ? i === index ? "bg-ink" : "bg-ink/25 hover:bg-ink/50"
+                : i === index ? "bg-white" : "bg-white/40 hover:bg-white/70",
             )}
           />
         </motion.button>

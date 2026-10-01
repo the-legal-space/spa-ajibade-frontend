@@ -3,15 +3,16 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
+import { cleanHtml } from "@/lib/sanitize";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { CmsIcon } from "@/components/ui/icon";
-import { buttonClass } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
+import { buttonClass } from "@/components/ui/button";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -28,7 +29,7 @@ export default async function AboutPage() {
 
       {/* Our story */}
       <Section tone="white" id="our-story" labelledBy="story-heading">
-        <div className="grid gap-12 lg:grid-cols-[1fr_551px]">
+        <div className="grid gap-12 lg:grid-cols-[2fr_3fr]">
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
             {story.quote ? (
@@ -38,7 +39,7 @@ export default async function AboutPage() {
                 </blockquote>
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
-                    <div className="aspect-[278/337] w-full max-w-[278px] overflow-hidden">
+                    <div className="aspect-[294/357] w-full max-w-[350px] overflow-hidden">
                       <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
@@ -60,6 +61,14 @@ export default async function AboutPage() {
                 <p key={i}>{p}</p>
               ))}
             </div>
+            {story.profileDownload?.document ? (
+              <p className="mt-6 text-[15px] leading-8 text-ink-800">
+                {story.profileDownload.leadText}{" "}
+                <a href={story.profileDownload.document.url} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4">
+                  {story.profileDownload.linkLabel}
+                </a>
+              </p>
+            ) : null}
           </div>
         </div>
       </Section>
@@ -92,8 +101,8 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <div className="aspect-[544/520] overflow-hidden rounded-md">
-            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" />
+          <div className="relative aspect-[544/520] overflow-hidden rounded-md lg:aspect-auto">
+            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
           </div>
           <FaqAccordion
             tone="white"
@@ -101,7 +110,7 @@ export default async function AboutPage() {
             items={missionSection.items.map((m, i) => ({
               id: `mission-${i}`,
               question: m.title,
-              answerHtml: `<p>${escapeHtml(m.body)}</p>`,
+              answerHtml: /<\/?[a-z][^>]*>/i.test(m.body) ? cleanHtml(m.body) : `<p>${escapeHtml(m.body)}</p>`,
             }))}
           />
         </div>
@@ -110,7 +119,7 @@ export default async function AboutPage() {
       {/* Principles */}
       <Section tone="white" id="principles" className="relative overflow-hidden" labelledBy="principles-heading">
         {principles.image ? (
-          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[340px] lg:block" aria-hidden>
+          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[389px] lg:block" aria-hidden>
             <Media image={principles.image} className="object-contain" />
           </div>
         ) : null}
@@ -133,7 +142,7 @@ export default async function AboutPage() {
 
       {/* Awards */}
       {awardsList.items.length > 0 ? (
-        <section id="recognition" data-header-theme="dark" className="site-dark-surface py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
+        <section id="recognition" className="bg-ink py-16 text-white md:py-[68px]" aria-labelledby="awards-heading">
           <div className="container-site grid items-center gap-10 lg:grid-cols-2">
             <div>
               {awardsList.eyebrow ? <p className="text-xs text-white/70">{awardsList.eyebrow}</p> : null}
@@ -141,16 +150,30 @@ export default async function AboutPage() {
                 <span id="awards-heading">{awardsList.title}</span>
               </Heading>
               <MotionList className="mt-6 border-t border-white/15">
-                {awardsList.items.map((a) => (
-                  <MotionListItem key={a.name} className="flex items-center justify-between gap-4 border-b border-white/15 py-4">
-                    <span className="text-xl">{a.name}</span>
-                    {a.url ? (
-                      <a href={a.url} target="_blank" rel="noopener noreferrer" className={buttonClass("light", "px-5")}>
-                        View Awards <ArrowUpRight className="size-4" aria-hidden />
-                      </a>
-                    ) : null}
-                  </MotionListItem>
-                ))}
+                {awardsList.items.map((a, index) => {
+                  const href = a.url ?? (a.slug ? `/recognitions/${a.slug}` : null);
+                  const button = (
+                    <>
+                      View Awards <ArrowUpRight className="size-4" aria-hidden />
+                    </>
+                  );
+                  const className = buttonClass("light", "min-w-[143px] justify-between");
+
+                  return (
+                    <MotionListItem key={a.slug ?? a.url ?? `${a.name}-${index}`} className="flex items-center justify-between gap-5 border-b border-white/15 py-4">
+                      <span className="text-xl">{a.name}</span>
+                      {href ? (
+                        /^https?:\/\//i.test(href) ? (
+                          <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{button}</a>
+                        ) : (
+                          <Link href={href} className={className}>{button}</Link>
+                        )
+                      ) : (
+                        <span aria-disabled="true" className={`${className} cursor-not-allowed opacity-50`}>{button}</span>
+                      )}
+                    </MotionListItem>
+                  );
+                })}
               </MotionList>
             </div>
             <div className="hidden aspect-[524/560] overflow-hidden lg:block">
