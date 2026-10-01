@@ -13,7 +13,7 @@ import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
  */
 type PageHeroData = Omit<Hero, "images"> & { images: ApiImage[] };
 
-export function PageHero({ hero, size = "md", children, top }: { hero: PageHeroData; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode }) {
+export function PageHero({ hero, size = "md", children, top, imageClassName }: { hero: PageHeroData; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode; imageClassName?: string }) {
   const seen = new Set<string>();
   const images = hero.images.filter((img) => {
     if (!img?.url || seen.has(img.url)) return false;
@@ -26,9 +26,9 @@ export function PageHero({ hero, size = "md", children, top }: { hero: PageHeroD
     <section data-header-theme="dark" className={cn("relative -mt-[var(--header-h)] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
       <div className="absolute inset-0">
         {images.length > 1 ? (
-          <HeroSlides images={images} />
+          <HeroSlides images={images} imageClassName={imageClassName} />
         ) : images[0] ? (
-          <Media image={images[0]} priority sizes="100vw" />
+          <Media image={images[0]} priority sizes="100vw" className={imageClassName} />
         ) : (
           <div className="size-full bg-[radial-gradient(ellipse_at_70%_30%,#3a3a3a_0%,#141414_45%,#000_80%)]" aria-hidden />
         )}

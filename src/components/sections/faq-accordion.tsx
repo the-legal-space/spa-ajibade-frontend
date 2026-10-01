@@ -73,7 +73,7 @@ export function FaqAccordion({
                   exit="collapsed"
                   className="overflow-hidden"
                 >
-                  <div className="-mt-3 px-5 pb-5 md:px-6 md:pb-6">
+                  <div className="px-5 pb-5 md:px-6 md:pb-6">
                     <div className="prose-firm text-sm leading-7 text-ink [&_p:last-child]:mb-0" dangerouslySetInnerHTML={{ __html: item.answerHtml }} />
                   </div>
                 </motion.div>

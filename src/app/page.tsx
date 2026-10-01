@@ -22,15 +22,24 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata(page.seo, { absoluteTitle: true, path: "/" });
 }
 
+/**
+ * The CMS stamps every upload with a centre focal point (0.5, 0.5), which would override the
+ * designed crops below. Treat that default as "no focal point"; any real focal point still wins.
+ */
+function withoutDefaultFocus<T extends { focalPoint?: { x: number; y: number } | null }>(img: T): T {
+  const f = img.focalPoint;
+  return f && f.x === 0.5 && f.y === 0.5 ? { ...img, focalPoint: null } : img;
+}
+
 export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
   // The Figma photograph fills in only when the CMS has no hero slides.
-  const hero = { ...page.hero, images: page.hero.images.length > 0 ? page.hero.images : [FIGMA.heroHome] };
+  const hero = { ...page.hero, images: (page.hero.images.length > 0 ? page.hero.images : [FIGMA.heroHome]).map(withoutDefaultFocus) };
 
   return (
     <>
-      <PageHero hero={hero} size="lg" />
+      <PageHero hero={hero} size="lg" imageClassName="object-top" />
 
       {/* A Firm Built On Integrity */}
       <section className="relative overflow-hidden bg-mist py-16 text-ink md:py-[68px]" aria-labelledby="about-firm">
@@ -124,7 +133,7 @@ export default async function HomePage() {
             </ul>
           </div>
           <div className="relative min-h-[360px] overflow-hidden rounded-[5px]">
-            <Media image={cmsOr(whyChooseUs.image, FIGMA.whyClients)} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
+            <Media image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0 object-[50%_21%]" />
           </div>
         </div>
       </Section>

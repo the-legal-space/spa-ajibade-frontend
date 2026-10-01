@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
+import { cleanHtml } from "@/lib/sanitize";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
@@ -98,8 +99,8 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <div className="aspect-[544/520] overflow-hidden rounded-md">
-            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" />
+          <div className="relative aspect-[544/520] overflow-hidden rounded-md lg:aspect-auto">
+            <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
           </div>
           <FaqAccordion
             tone="white"
@@ -107,7 +108,7 @@ export default async function AboutPage() {
             items={missionSection.items.map((m, i) => ({
               id: `mission-${i}`,
               question: m.title,
-              answerHtml: `<p>${escapeHtml(m.body)}</p>`,
+              answerHtml: /<\/?[a-z][^>]*>/i.test(m.body) ? cleanHtml(m.body) : `<p>${escapeHtml(m.body)}</p>`,
             }))}
           />
         </div>
