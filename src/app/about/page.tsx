@@ -13,6 +13,7 @@ import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
 import { buttonClass } from "@/components/ui/button";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -33,7 +34,8 @@ export default async function AboutPage() {
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
             {story.quote ? (
-              <figure className="mt-12 lg:mt-24">
+              <Reveal className="mt-12 lg:mt-24">
+              <figure>
                 <blockquote className="max-w-sm font-serif text-2xl leading-snug md:text-[1.75rem]">
                   {story.quote} <span className="text-5xl leading-none text-mist-300" aria-hidden>&rdquo;</span>
                 </blockquote>
@@ -49,6 +51,7 @@ export default async function AboutPage() {
                   </figcaption>
                 ) : null}
               </figure>
+              </Reveal>
             ) : null}
           </div>
           <div>
@@ -56,11 +59,11 @@ export default async function AboutPage() {
               <span id="story-heading">{story.title}</span>
             </Heading>
             <hr className="my-8 border-mist-200" />
-            <div className="space-y-6 text-[15px] leading-8 text-ink-800">
+            <Reveal className="space-y-6 text-[15px] leading-8 text-ink-800">
               {story.paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
-            </div>
+            </Reveal>
             {story.profileDownload?.document ? (
               <p className="mt-6 text-[15px] leading-8 text-ink-800">
                 {story.profileDownload.leadText}{" "}
@@ -79,6 +82,7 @@ export default async function AboutPage() {
           <Heading>
             <span id="stats-heading">{stats.title}</span>
           </Heading>
+          <Reveal>
           <dl className="mt-8 grid border-l border-t border-mist-200 sm:grid-cols-2 lg:grid-cols-4">
             {stats.items.map((s) => (
               <div key={s.value} className="border-b border-r border-mist-200 px-5 py-8">
@@ -91,6 +95,7 @@ export default async function AboutPage() {
               </div>
             ))}
           </dl>
+          </Reveal>
         </Section>
       ) : null}
 
@@ -101,9 +106,10 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <div className="relative aspect-[544/520] overflow-hidden rounded-md lg:aspect-auto">
+          <Reveal className="relative aspect-[544/520] overflow-hidden rounded-md lg:aspect-auto">
             <Media image={missionSection.image} sizes="(min-width:1024px) 50vw, 100vw" className="absolute inset-0" />
-          </div>
+          </Reveal>
+          <Reveal delay={0.1}>
           <FaqAccordion
             tone="white"
             defaultOpen={0}
@@ -113,6 +119,7 @@ export default async function AboutPage() {
               answerHtml: /<\/?[a-z][^>]*>/i.test(m.body) ? cleanHtml(m.body) : `<p>${escapeHtml(m.body)}</p>`,
             }))}
           />
+          </Reveal>
         </div>
       </Section>
 
@@ -176,9 +183,9 @@ export default async function AboutPage() {
                 })}
               </MotionList>
             </div>
-            <div className="hidden aspect-[524/560] overflow-hidden lg:block">
+            <Reveal className="hidden aspect-[524/560] overflow-hidden lg:block">
               <Media image={awardsList.image} placeholder="dark" />
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}

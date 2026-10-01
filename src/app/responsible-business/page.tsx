@@ -10,6 +10,7 @@ import { InsightCard } from "@/components/sections/cards";
 import { CsrCarousel } from "@/components/sections/csr-carousel";
 import { Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -44,7 +45,9 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
             Responsible Business
           </h1>
 
-          <CsrCarousel slides={slides} />
+          <Reveal>
+            <CsrCarousel slides={slides} />
+          </Reveal>
 
           {list.data.length > 0 ? (
             <MotionList className="mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">

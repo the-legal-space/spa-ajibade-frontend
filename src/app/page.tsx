@@ -17,6 +17,7 @@ import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("home");
@@ -88,10 +89,12 @@ export default async function HomePage() {
             </div>
           </div>
           {aboutFirm.cta ? (
-            <SmartLink
-              link={aboutFirm.cta}
-              className={buttonClass("outline")}
-            />
+            <Reveal>
+              <SmartLink
+                link={aboutFirm.cta}
+                className={buttonClass("outline")}
+              />
+            </Reveal>
           ) : null}
         </div>
       </section>
@@ -118,12 +121,12 @@ export default async function HomePage() {
                 <span id="practice-heading">{page.practiceSection.title}</span>
               </Heading>
             </div>
-            <div className="mt-1">
+            <Reveal className="mt-1">
               <PracticeCarousel
                 areas={practiceAreas}
                 cta={page.practiceSection.cta}
               />
-            </div>
+            </Reveal>
           </div>
         </section>
       ) : null}
@@ -143,10 +146,12 @@ export default async function HomePage() {
               </Heading>
             </div>
             {page.leadershipSection.cta ? (
-              <SmartLink
-                link={page.leadershipSection.cta}
-                className={buttonClass("outline")}
-              />
+              <Reveal>
+                <SmartLink
+                  link={page.leadershipSection.cta}
+                  className={buttonClass("outline")}
+                />
+              </Reveal>
             ) : null}
           </div>
           <MotionList className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -176,6 +181,7 @@ export default async function HomePage() {
                 {whyChooseUs.text}
               </MotionP>
             </div>
+            <Reveal>
             <ul className="flex max-w-[328px] flex-col gap-3">
               {whyChooseUs.points.map((pt) => (
                 <li
@@ -196,14 +202,15 @@ export default async function HomePage() {
                 </li>
               ))}
             </ul>
+            </Reveal>
           </div>
-          <div className="relative min-h-[560px] overflow-hidden rounded-[5px]">
+          <Reveal className="relative min-h-[560px] overflow-hidden rounded-[5px]">
             <Media
               image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))}
               sizes="(min-width:1024px) 50vw, 100vw"
               className="absolute inset-0 object-[50%_21%]"
             />
-          </div>
+          </Reveal>
         </div>
       </Section>
 
@@ -220,13 +227,15 @@ export default async function HomePage() {
               </Heading>
             </div>
             {page.insightsSection.cta ? (
-              <SmartLink
-                link={page.insightsSection.cta}
-                className={buttonClass("outline")}
-              />
+              <Reveal>
+                <SmartLink
+                  link={page.insightsSection.cta}
+                  className={buttonClass("outline")}
+                />
+              </Reveal>
             ) : null}
           </div>
-          <div className="mt-11">
+          <Reveal className="mt-11">
             <ScrollRail label="Recent publications">
               {page.latestInsights.map((i) => (
                 <div
@@ -237,7 +246,7 @@ export default async function HomePage() {
                 </div>
               ))}
             </ScrollRail>
-          </div>
+          </Reveal>
         </Section>
       ) : null}
 

@@ -178,3 +178,14 @@ export const modalDialogVariants: Variants = {
     transition: { duration: 0.18, ease: "easeIn" },
   },
 };
+
+/**
+ * Scroll-reveal tokens shared by `Reveal` and `Heading`. Animates once, only opacity and a short
+ * translate. `amount: "some"` plus a small bottom margin means tall blocks start as soon as they
+ * show (a fixed fraction could never be reached by a block taller than the screen).
+ */
+export const REVEAL = {
+  distance: 20,
+  transition: { duration: 0.6, ease: EASINGS.easeOut } satisfies Transition,
+  viewport: { once: true, amount: "some", margin: "0px 0px -8% 0px" },
+} as const;

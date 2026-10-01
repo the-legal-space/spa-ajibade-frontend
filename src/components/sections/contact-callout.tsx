@@ -4,6 +4,7 @@ import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { Heading } from "@/components/ui/primitives";
 import { MotionP } from "@/components/ui/motion-p";
+import { Reveal } from "@/components/ui/reveal";
 
 /** Figma "Contact Callout": sunset sky photograph under 70% black, centred copy and two buttons. */
 export function ContactCallout({ callout }: { callout: Site["contactCallout"] }) {
@@ -16,10 +17,10 @@ export function ContactCallout({ callout }: { callout: Site["contactCallout"] })
           <Heading className="max-w-5xl">{callout.title}</Heading>
           <MotionP className="max-w-[894px] text-lg leading-8 text-mist md:text-2xl md:leading-[44px]">{callout.text}</MotionP>
         </div>
-        <div className="flex flex-wrap justify-center gap-3">
+        <Reveal className="flex flex-wrap justify-center gap-3" delay={0.1}>
           {callout.primaryCta ? <SmartLink link={callout.primaryCta} className={buttonClass("light")} /> : null}
           {callout.secondaryCta ? <SmartLink link={callout.secondaryCta} className={buttonClass("ghostDark")} /> : null}
-        </div>
+        </Reveal>
       </div>
     </section>
   );

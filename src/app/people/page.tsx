@@ -11,6 +11,7 @@ import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { PeopleSortMenu } from "@/components/ui/people-sort-menu";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -49,7 +50,7 @@ export default async function PeoplePage({ searchParams }: Props) {
           <span id="directory-heading">{content.directorySection.title}</span>
         </Heading>
 
-        <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Reveal className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
           <PeopleSortMenu
             practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
@@ -58,7 +59,7 @@ export default async function PeoplePage({ searchParams }: Props) {
             base="/people"
             current={current}
           />
-        </div>
+        </Reveal>
 
         {people.data.length > 0 ? (
           <MotionList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

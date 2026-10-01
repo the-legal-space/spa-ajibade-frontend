@@ -99,7 +99,7 @@ export default async function InsightPage({ params }: Props) {
             ) : null}
           </div>
 
-          <Heading as="h1" size="h2" className="mt-5 w-full">
+          <Heading as="h1" size="h2" reveal={false} className="mt-5 w-full">
             {i.title}
           </Heading>
 
