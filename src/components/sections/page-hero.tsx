@@ -52,7 +52,7 @@ export function PageHero({
       <div className={cn("container-site relative flex flex-col justify-center pt-[var(--header-h)]", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
         <div className="max-w-[776px] py-16">
           {top ? <div className="mb-3 text-[13px] text-white/85">{top}</div> : null}
-          <Heading as="h1" size="display">
+          <Heading as="h1" size="display" reveal={false}>
             {hero.title}
           </Heading>
           {hero.subtitle ? (
@@ -80,7 +80,7 @@ export function DetailHero({ eyebrow, title, children }: { eyebrow?: React.React
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,#2a2a2a_0%,#000_60%)]" aria-hidden />
       <div className="container-site relative py-16 md:py-20">
         {eyebrow ? <div className="mb-4 text-sm text-white/70">{eyebrow}</div> : null}
-        <Heading as="h1" size="display" className="max-w-4xl normal-case">
+        <Heading as="h1" size="display" reveal={false} className="max-w-4xl normal-case">
           {title}
         </Heading>
         {children}

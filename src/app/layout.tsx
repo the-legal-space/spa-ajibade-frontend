@@ -7,6 +7,7 @@ import { TopBar } from "@/components/layout/top-bar";
 import { ChatButton, Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ActionsProvider } from "@/components/forms/actions-context";
+import { MotionProvider } from "@/components/ui/motion-provider";
 import { designNav } from "@/lib/nav";
 import { cleanHtml } from "@/lib/sanitize";
 import { isPending } from "@/lib/utils";
@@ -124,6 +125,11 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
+        {/* Scroll-reveal content starts hidden for the animation; without JS it must still show. */}
+        <noscript>
+          <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        <MotionProvider>
         <ActionsProvider
           firmName={site.settings.firmName}
           phone={site.settings.phone}
@@ -148,6 +154,7 @@ export default async function RootLayout({
             )}
           />
         </ActionsProvider>
+        </MotionProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

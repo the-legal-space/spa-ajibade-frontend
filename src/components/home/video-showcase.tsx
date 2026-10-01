@@ -8,6 +8,7 @@ import { FIGMA } from "@/lib/figma-assets";
 import { toEmbedUrl } from "@/components/sections/video-embed";
 import { MotionP } from "@/components/ui/motion-p";
 import { TRANSITIONS } from "@/lib/motion";
+import { Reveal } from "@/components/ui/reveal";
 
 const DEFAULT_CAPTION = "Our Managing Partner on what fifty-nine years of practice has taught us.";
 
@@ -68,7 +69,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
         style={{ backgroundImage: `url(${FIGMA.videoMark})` }}
       />
       <div className="container-site relative flex flex-col items-center gap-8 py-12 md:gap-11 md:py-[68px]">
-        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[12px] border-8 border-[rgba(156,155,155,0.2)] sm:aspect-video md:border-[16px] lg:aspect-auto lg:h-[759px]">
+        <Reveal className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[12px] border-8 border-[rgba(156,155,155,0.2)] sm:aspect-video md:border-[16px] lg:aspect-auto lg:h-[759px]">
           <video
             ref={preview}
             className="absolute inset-0 size-full object-cover"
@@ -107,7 +108,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
               </svg>
             )}
           </motion.button>
-        </div>
+        </Reveal>
         <MotionP className="max-w-[666px] text-center font-serif text-xl leading-7 md:text-2xl md:leading-[28px]">{caption}</MotionP>
       </div>
 
