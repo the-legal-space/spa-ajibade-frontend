@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronDown, Mail } from "lucide-react";
-import { getInsights, getPage, getPerson, getSite } from "@/lib/api/endpoints";
+import { getPage, getPerson, getSite } from "@/lib/api/endpoints";
 import { personPhoto } from "@/lib/figma-assets";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
@@ -16,7 +16,7 @@ import { Media } from "@/components/ui/media";
 import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
-import { ScrollRail } from "@/components/home/scroll-rail";
+import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -42,21 +42,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Attorney profile, following the "ATTORNEY DETAILS" frame (white header, two columns). */
 export default async function PersonPage({ params }: Props) {
   const { slug } = await params;
-  const [p, site, home, all] = await Promise.all([
+  const [p, site, home] = await Promise.all([
     load(slug),
     getSite(),
     getPage("home"),
-    getInsights({ pageSize: 50 }).catch(() => null),
   ]);
-  // The person endpoint's `insights` list is empty today even for authors, so articles are
-  // also matched on the author of each published insight. Duplicates are dropped.
-  const authored = (all?.data ?? []).filter(
-    (i) => i.author.type === "person" && i.author.person.slug === p.slug,
-  );
-  const insights = [
-    ...(p.insights ?? p.recentPublications ?? []),
-    ...authored,
-  ].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
+  const insights = p.recentPublications ?? p.insights ?? [];
   const bio = cleanHtml(p.bio);
   const educationIntro = cleanHtml(p.education?.intro);
   const educationEntries = p.education?.entries ?? [];
@@ -107,22 +98,18 @@ export default async function PersonPage({ params }: Props) {
               />
             </div>
             {p.practiceAreas.length > 0 ? (
-              <p className="mt-6 text-lg">
-                {p.practiceAreas.map((a, i) => (
-                  <span key={a.slug}>
-                    {i > 0 ? ", " : null}
+              <ul className="mt-6 space-y-1 text-lg">
+                {p.practiceAreas.map((a) => (
+                  <li key={a.slug}>
                     <Link
                       href={`/practice-areas/${a.slug}`}
                       className="hover:underline"
                     >
                       {a.title}
                     </Link>
-                  </span>
+                  </li>
                 ))}
-              </p>
-            ) : null}
-            {p.office ? (
-              <p className="mt-1 text-sm text-stone">{p.office.name}</p>
+              </ul>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-3">
               {p.email ? (
@@ -238,9 +225,7 @@ export default async function PersonPage({ params }: Props) {
                 <Eyebrow>{home.insightsSection.eyebrow}</Eyebrow>
               ) : null}
               <Heading className="mt-2">
-                <span id="person-insights">
-                  Publications by {p.displayName}
-                </span>
+                <span id="person-insights">Recent Publications</span>
               </Heading>
             </div>
             {home.insightsSection.cta ? (
@@ -250,18 +235,13 @@ export default async function PersonPage({ params }: Props) {
               />
             ) : null}
           </div>
-          <div className="mt-10">
-            <ScrollRail label={`Publications by ${p.displayName}`}>
-              {insights.map((i) => (
-                <div
-                  key={i.id}
-                  className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]"
-                >
+          <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+            {insights.map((i) => (
+              <MotionListItem key={i.id}>
                   <InsightCard insight={i} />
-                </div>
-              ))}
-            </ScrollRail>
-          </div>
+              </MotionListItem>
+            ))}
+          </MotionList>
         </Section>
       ) : null}
 
