@@ -62,7 +62,11 @@ export default async function PracticeAreasPage() {
           <div className="container-site">
             <div className="relative overflow-hidden rounded-xl bg-ink text-white">
               <div className="absolute inset-0">
-                <Media image={csr.images[0]} placeholder="dark" sizes="100vw" />
+                <Media
+                  image={csr.image ?? csr.images?.[0] ?? null}
+                  placeholder="dark"
+                  sizes="100vw"
+                />
                 <div className="absolute inset-0 bg-black/50" aria-hidden />
               </div>
               <div className="relative mx-auto flex min-h-[440px] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">

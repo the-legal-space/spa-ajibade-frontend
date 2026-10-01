@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { MotionP } from "@/components/ui/motion-p";
 
@@ -58,21 +59,30 @@ export function Chip({
   className,
   title,
   compact = false,
+  href,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
   compact?: boolean;
+  href?: string;
 }) {
+  const base = cn(
+    "inline-block min-w-0 truncate whitespace-nowrap rounded-[4px] border-[0.5px] border-gray bg-white py-2 text-[10px] leading-none text-ink",
+    compact ? "px-3" : "px-4",
+    className,
+  );
+
+  if (href) {
+    return (
+      <Link href={href} title={title} className={base}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <span
-      title={title}
-      className={cn(
-        "inline-block min-w-0 truncate whitespace-nowrap rounded-[4px] border-[0.5px] border-gray bg-white py-2 text-[10px] leading-none text-ink",
-        compact ? "px-3" : "px-4",
-        className,
-      )}
-    >
+    <span title={title} className={base}>
       {children}
     </span>
   );

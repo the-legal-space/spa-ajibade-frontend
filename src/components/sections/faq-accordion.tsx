@@ -44,7 +44,7 @@ export function FaqAccordion({
                 whileTap={INTERACTION.button.whileTap}
                 transition={TRANSITIONS.tap}
                 onClick={() => setOpen(item.id)}
-                className="group flex w-full items-center justify-between gap-5 p-5 text-left transition-colors md:p-6"
+                className={cn("group flex w-full items-center justify-between gap-5 p-5 text-left transition-[padding] duration-300 md:p-6", isOpen && "pb-2 md:pb-2")}
               >
                 <span className="font-serif text-xl leading-7 text-[#0a0a0b] transition-colors group-hover:text-ink-700 md:text-2xl md:leading-[28px]">
                   {item.question}

@@ -21,7 +21,11 @@ const MotionLink = motion.create(Link);
  * Pills, arrows, clicking a side card, swiping and autoplay all move the same track.
  */
 export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; cta?: ApiLink | null }) {
-  const [index, setIndex] = useState(Math.min(3, Math.max(0, areas.length - 1)));
+  // Start on Dispute Resolution when it's in the list, as in the Figma.
+  const [index, setIndex] = useState(() => {
+    const i = areas.findIndex((a) => a.slug === "dispute-resolution-arbitration");
+    return i >= 0 ? i : Math.min(2, Math.max(0, areas.length - 1));
+  });
   const count = Math.max(1, areas.length);
   const go = (i: number) => setIndex(((i % count) + count) % count);
   const autoplay = useAutoplay(() => setIndex((i) => (i + 1) % count), { enabled: areas.length > 1 });
@@ -103,7 +107,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                 <div className="flex min-w-0 flex-1 flex-col justify-between gap-8 p-5 md:p-8">
                   <div className="flex flex-col gap-3.5">
                     <h3 className="font-card text-[2rem] capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
-                    <p className="line-clamp-2 text-sm leading-7 text-cream/88">{a.summary}</p>
+                    <p className="line-clamp-4 text-sm leading-7 text-cream/88">{a.summary}</p>
                   </div>
                   <MotionLink
                     href={`/practice-areas/${a.slug}`}

@@ -1,4 +1,4 @@
-import type { ApiImage, Hero } from "@/lib/api/schemas";
+import type { Hero } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
@@ -11,11 +11,23 @@ import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
  * Dark photographic hero used at the top of every page. It slides up under the
  * translucent sticky header (the -mt / pt pair), as in the designs.
  */
-type PageHeroData = Omit<Hero, "images"> & { images: ApiImage[] };
-
-export function PageHero({ hero, size = "md", children, top, imageClassName }: { hero: PageHeroData; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode; imageClassName?: string }) {
+export function PageHero({
+  hero,
+  size = "md",
+  children,
+  top,
+  imageClassName,
+}: {
+  hero: Hero;
+  size?: "lg" | "md";
+  children?: React.ReactNode;
+  top?: React.ReactNode;
+  /** Classes for the background photo, e.g. `object-top` to control the crop. */
+  imageClassName?: string;
+}) {
+  // Keep legacy single-image fallbacks while preferring the API's image array.
   const seen = new Set<string>();
-  const images = hero.images.filter((img) => {
+  const images = [hero.image, ...(hero.images ?? [])].filter((img): img is NonNullable<typeof img> => {
     if (!img?.url || seen.has(img.url)) return false;
     seen.add(img.url);
     return true;

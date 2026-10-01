@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { motion } from "motion/react";
 import type { FilterOption } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,7 @@ export function FilterTabs({
                 whileTap={INTERACTION.button.whileTap}
                 transition={TRANSITIONS.hover}
                 className={cn(
-                  "inline-flex h-[34px] items-center rounded-[4px] border px-4 text-[13px] transition-colors",
+                  "inline-flex h-[34px] items-center rounded-[4px] border-[0.5px] px-4 text-[13px] transition-colors",
                   isActive ? "border-ink bg-ink text-white shadow-xs" : "border-mist-300 bg-white text-ink hover:border-ink",
                 )}
               >
@@ -60,6 +61,52 @@ export function FilterTabs({
         })}
       </ul>
     </nav>
+  );
+}
+
+/** Compact practice-area dropdown used beside the Insights category tabs. */
+export function FilterMenu({
+  options,
+  param,
+  base,
+  current,
+  label,
+}: {
+  options: FilterOption[];
+  param: string;
+  base: string;
+  current: Record<string, string | undefined>;
+  label: string;
+}) {
+  const active = current[param] ?? "";
+
+  return (
+    <details className="group relative z-20 shrink-0 self-end lg:self-auto">
+      <summary className="flex h-[34px] min-w-[120px] cursor-pointer list-none items-center justify-between gap-3 rounded-[4px] border-[0.5px] border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs marker:hidden hover:border-ink">
+        Sort By
+        <ChevronDown className="size-4 text-stone transition-transform group-open:rotate-180" aria-hidden />
+      </summary>
+      <div className="absolute right-0 top-[calc(100%+4px)] w-[min(300px,calc(100vw-40px))] overflow-hidden rounded-xl border border-mist-200 bg-white shadow-lg">
+        <p className="px-4 pb-2 pt-3 text-[11px] font-semibold text-ink">{label}</p>
+        <ul className="max-h-[320px] overflow-y-auto pb-2">
+          {[{ value: "", label: "All Practice Areas" }, ...options].map((option) => (
+            <li key={option.value || "all"}>
+              <Link
+                href={withParams(base, current, { [param]: option.value || undefined, page: undefined })}
+                scroll={false}
+                aria-current={option.value === active ? "page" : undefined}
+                className={cn(
+                  "block border-t border-mist-100 px-4 py-2.5 text-[12px] transition-colors hover:bg-mist",
+                  option.value === active ? "font-medium text-ink" : "text-ink-700",
+                )}
+              >
+                {option.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </details>
   );
 }
 
@@ -77,7 +124,7 @@ export function Pagination({
   if (totalPages < 1) return null;
   const prev = page > 1 ? withParams(base, current, { page: page - 1 }) : null;
   const next = page < totalPages ? withParams(base, current, { page: page + 1 }) : null;
-  const btn = "inline-flex h-9 items-center rounded-[4px] border border-mist-300 bg-white px-3 text-[13px] transition-colors";
+  const btn = "inline-flex h-9 items-center rounded-[4px] border-[0.5px] border-mist-300 bg-white px-3 text-[13px] transition-colors";
   return (
     <nav aria-label="Pagination" className="mt-10 flex items-center justify-between rounded-[4px] border border-mist-300 bg-white px-5 py-3.5 shadow-xs">
       <p className="text-[13px] text-ink-700">
