@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, ChevronDown, Mail } from "lucide-react";
 import { getInsights, getPage, getPerson, getSite } from "@/lib/api/endpoints";
 import { personPhoto } from "@/lib/figma-assets";
 import { ApiNotFoundError } from "@/lib/api/client";
@@ -58,6 +58,8 @@ export default async function PersonPage({ params }: Props) {
     ...authored,
   ].filter((i, idx, arr) => arr.findIndex((x) => x.id === i.id) === idx);
   const bio = cleanHtml(p.bio);
+  const educationIntro = cleanHtml(p.education?.intro);
+  const educationEntries = p.education?.entries ?? [];
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
 
@@ -123,7 +125,15 @@ export default async function PersonPage({ params }: Props) {
               <p className="mt-1 text-sm text-stone">{p.office.name}</p>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-3">
-              {mandate ? (
+              {p.email ? (
+                <a
+                  href={`mailto:${p.email}`}
+                  aria-label={`Email ${p.displayName}`}
+                  className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
+                >
+                  <Mail className="size-6" aria-hidden />
+                </a>
+              ) : mandate ? (
                 <SmartLink
                   link={mandate}
                   className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
@@ -150,20 +160,65 @@ export default async function PersonPage({ params }: Props) {
                   <SocialIcon name="linkedin" className="size-6" />
                 </span>
               )}
+              {p.instagramUrl ? (
+                <a
+                  href={p.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${p.displayName} on Instagram`}
+                  className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
+                >
+                  <SocialIcon name="instagram" className="size-6" />
+                </a>
+              ) : null}
             </div>
           </div>
 
           <div className="lg:pt-10">
-            {p.quote ? (
-              <blockquote className="mb-8 border-l-2 border-ink pl-5 font-serif text-2xl leading-snug">
-                “{p.quote}”
-              </blockquote>
-            ) : null}
             {bio ? (
               <div
                 className="prose-firm text-[15px] leading-7"
                 dangerouslySetInnerHTML={{ __html: bio }}
               />
+            ) : null}
+            {educationIntro || educationEntries.length > 0 ? (
+              <details open className="group mt-7 border-t border-mist-200 pt-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between font-serif text-xl marker:hidden">
+                  Education &amp; Bar Associations
+                  <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
+                </summary>
+                {educationIntro ? (
+                  <div
+                    className="prose-firm mt-2 text-sm leading-6"
+                    dangerouslySetInnerHTML={{ __html: educationIntro }}
+                  />
+                ) : null}
+                {educationEntries.length > 0 ? (
+                  <ul className="mt-3 space-y-1">
+                    {educationEntries.map((entry, index) => (
+                      <li key={`${entry.qualification}-${index}`} className="flex items-center justify-between gap-4 bg-mist px-4 py-3 text-sm">
+                        <span>{entry.qualification}</span>
+                        {entry.year !== null ? <span className="shrink-0">{entry.year}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </details>
+            ) : null}
+            {p.memberships?.length ? (
+              <details open className="group mt-5 border-t border-mist-200 pt-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between font-serif text-xl marker:hidden">
+                  Professional Memberships
+                  <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
+                </summary>
+                <ul className="mt-3 space-y-1">
+                  {p.memberships.map((membership, index) => (
+                    <li key={`${membership}-${index}`} className="bg-mist px-4 py-3 text-sm">
+                      {membership}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             ) : null}
             {mandate ? (
               <SmartLink

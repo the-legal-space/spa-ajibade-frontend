@@ -35,8 +35,8 @@ export function HeroSlides({ images }: { images: ApiImage[] }) {
           key={img.url + i}
           aria-hidden={i !== index}
           className={cn(
-            "absolute inset-0 transition-[opacity,transform] duration-[1400ms] ease-out motion-reduce:transition-none",
-            i === index ? "scale-100 opacity-100" : "scale-[1.04] opacity-0",
+            "absolute inset-0 transition-opacity duration-[1400ms] ease-out motion-reduce:transition-none",
+            i === index ? "opacity-100" : "opacity-0",
           )}
         >
           <Media image={img} priority={i === 0} sizes="100vw" />

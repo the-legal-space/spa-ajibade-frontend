@@ -278,6 +278,29 @@ export const Recognition = z.object({
 });
 export type Recognition = z.infer<typeof Recognition>;
 
+export const RecognitionDirectoryRef = z.object({
+  id: ObjectId,
+  name: z.string(),
+  slug: Slug,
+  logo: NullableImage,
+});
+
+export const RecognitionAward = z.object({
+  id: ObjectId,
+  title: z.string(),
+  year: z.number().int(),
+  badge: NullableImage,
+  directory: RecognitionDirectory,
+});
+
+export const RecognitionDirectoryPage = z.object({
+  directory: RecognitionDirectoryRef,
+  hero: HeroSchema,
+  awardsEyebrow: z.string(),
+  awards: z.array(RecognitionAward),
+});
+export type RecognitionDirectoryPage = z.infer<typeof RecognitionDirectoryPage>;
+
 export const FaqSchema = z.object({
   id: z.string(),
   question: z.string(),

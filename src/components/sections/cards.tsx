@@ -261,6 +261,17 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   );
 }
 
+function insightChipHref(insight: Pick<Insight, "categories" | "practiceAreas">) {
+  const params = new URLSearchParams();
+  const category = insight.categories[0];
+  const practiceArea = insight.practiceAreas[0]?.slug;
+
+  if (category) params.set("category", category);
+  if (practiceArea) params.set("practiceArea", practiceArea);
+
+  return params.size > 0 ? `/insights?${params.toString()}` : undefined;
+}
+
 export function InsightCard({
   insight,
   className,
@@ -305,11 +316,14 @@ export function InsightCard({
       {/* Chips stay on one line: long labels ("Dispute Resolution and Arbitration") truncate. */}
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex min-w-0 gap-1">
-          {insight.chips.slice(0, 2).map((c) => (
-            <Chip key={c} title={c} className="underline underline-offset-2">
-              {c}
-            </Chip>
-          ))}
+          {insight.chips.slice(0, 2).map((c) => {
+            const href = insightChipHref(insight);
+            return (
+              <Chip key={c} title={c} href={href} className="underline underline-offset-2">
+                {c}
+              </Chip>
+            );
+          })}
         </div>
         {date ? (
           <Chip compact className="shrink-0">
@@ -322,14 +336,14 @@ export function InsightCard({
           {insight.title}
         </Link>
       </h3>
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-3 flex items-center justify-between gap-3 overflow-visible">
         <AuthorLine author={insight.author} />
         <MotionLink
           href={href}
           whileHover={INTERACTION.button.whileHover}
           whileTap={INTERACTION.button.whileTap}
           transition={TRANSITIONS.hover}
-          className="inline-flex shrink-0 items-center gap-1 rounded-[4px] border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
+          className="inline-flex shrink-0 origin-right items-center gap-1 rounded-[4px] border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
         >
           {isVideo ? "Watch Video" : insight.cta?.label || "Read More"}{" "}
           <ArrowUpRight className="size-3.5" aria-hidden />

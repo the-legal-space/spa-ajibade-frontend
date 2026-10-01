@@ -53,8 +53,7 @@ export function ActionsProvider({
       const name = action.replace(/^action:/, "");
       switch (name) {
         case "mandate":
-          setPresetArea(context?.practiceArea);
-          setOpen("mandate");
+          window.open("https://spaajibade.com/book/", "_blank", "noopener,noreferrer");
           break;
         case "call":
           if (phoneHref) window.location.href = phoneHref;

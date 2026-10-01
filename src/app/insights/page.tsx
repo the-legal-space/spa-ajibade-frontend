@@ -9,16 +9,10 @@ import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard } from "@/components/sections/cards";
 import { FeaturedInsights } from "@/components/sections/featured-insights";
 import { Heading, Section } from "@/components/ui/primitives";
-import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
-import { SortMenu } from "@/components/ui/sort-menu";
+import { FilterMenu, FilterTabs, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
-
-const SORTS = [
-  { value: "newest", label: "Newest" },
-  { value: "oldest", label: "Oldest" },
-];
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("insights");
@@ -50,20 +44,17 @@ export default async function InsightsPage({ searchParams }: Props) {
         <Heading as="h1">
           <span id="listing-heading">{content.listingSection.title}</span>
         </Heading>
-        <div className="mt-6 flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.categoryFilters} param="category" base="/insights" current={current} label="Filter by category" />
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <FilterTabs
-              options={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
+          <Suspense fallback={null}>
+            <FilterMenu
+              options={content.practiceAreaFilters}
               param="practiceArea"
               base="/insights"
               current={current}
-              label="Filter by practice area"
+              label="Practice Area"
             />
-            <Suspense fallback={null}>
-              <SortMenu options={SORTS} defaultValue="newest" />
-            </Suspense>
-          </div>
+          </Suspense>
         </div>
 
         {list.data.length > 0 ? (
