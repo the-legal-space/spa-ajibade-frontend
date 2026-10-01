@@ -10,7 +10,8 @@ export type AccordionItem = { id: string; question: string; answerHtml: string }
 
 /**
  * Figma FAQ accordion: one item is always open (the first by default). Opening another closes
- * the current one; clicking the open item keeps it open, so the panel never collapses to nothing.
+ * the current one. Clicking the open item's "−" closes it and opens the next one (wrapping from
+ * the last back to the first), per the prototype, so the panel never collapses to nothing.
  */
 export function FaqAccordion({
   items,
@@ -25,7 +26,7 @@ export function FaqAccordion({
 
   return (
     <ul className="flex flex-col gap-4 lg:gap-5">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const isOpen = open === item.id;
         const panelId = `faq-panel-${item.id}`;
         return (
@@ -43,7 +44,7 @@ export function FaqAccordion({
                 aria-controls={panelId}
                 whileTap={INTERACTION.button.whileTap}
                 transition={TRANSITIONS.tap}
-                onClick={() => setOpen(item.id)}
+                onClick={() => setOpen(isOpen ? (items[(index + 1) % items.length]?.id ?? item.id) : item.id)}
                 className={cn("group flex w-full items-center justify-between gap-5 p-5 text-left transition-[padding] duration-300 md:p-6", isOpen && "pb-2 md:pb-2")}
               >
                 <span className="font-serif text-xl leading-7 text-[#0a0a0b] transition-colors group-hover:text-ink-700 md:text-2xl md:leading-[28px]">

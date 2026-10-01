@@ -38,7 +38,7 @@ export default async function PracticeAreasPage() {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.08]"
+          className="pointer-events-none absolute inset-0 bg-no-repeat opacity-[0.08] [background-position:right_-20vw_top_-8vw] [background-size:max(1100px,120vw)_auto]"
           style={{ backgroundImage: `url(${FIGMA.aboutMap})` }}
         />
         <div className="container-site relative">

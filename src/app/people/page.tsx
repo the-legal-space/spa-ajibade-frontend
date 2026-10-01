@@ -50,7 +50,7 @@ export default async function PeoplePage({ searchParams }: Props) {
           <span id="directory-heading">{content.directorySection.title}</span>
         </Heading>
 
-        <Reveal className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Reveal className="relative z-[35] mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
           <PeopleSortMenu
             practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}

@@ -59,3 +59,13 @@ export function navLabel(nav: { label: string; href: string; children?: { label:
   }
   return null;
 }
+
+/**
+ * The CMS stamps every upload with a centre focal point (0.5, 0.5), which would override a
+ * deliberate crop set with `object-*` classes. Treat that default as "no focal point"; any
+ * focal point an editor actually set still wins.
+ */
+export function withoutDefaultFocus<T extends { focalPoint?: { x: number; y: number } | null }>(img: T): T {
+  const f = img.focalPoint;
+  return f && f.x === 0.5 && f.y === 0.5 ? { ...img, focalPoint: null } : img;
+}

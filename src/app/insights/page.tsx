@@ -45,7 +45,7 @@ export default async function InsightsPage({ searchParams }: Props) {
         <Heading as="h1" reveal={false}>
           <span id="listing-heading">{content.listingSection.title}</span>
         </Heading>
-        <Reveal className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Reveal className="relative z-[35] mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.categoryFilters} param="category" base="/insights" current={current} label="Filter by category" />
           <Suspense fallback={null}>
             <FilterMenu
