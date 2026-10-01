@@ -46,9 +46,6 @@ export function FilterTabs({
                 href={withParams(base, current, { [param]: o.value || undefined, page: undefined })}
                 scroll={false}
                 aria-current={isActive ? "page" : undefined}
-                whileHover={INTERACTION.button.whileHover}
-                whileTap={INTERACTION.button.whileTap}
-                transition={TRANSITIONS.hover}
                 className={cn(
                   "inline-flex h-[34px] items-center rounded-[4px] border-[0.5px] px-4 text-[13px] transition-colors",
                   isActive ? "border-ink bg-ink text-white shadow-xs" : "border-mist-300 bg-white text-ink hover:border-ink",
