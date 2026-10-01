@@ -11,7 +11,20 @@ import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
  * Dark photographic hero used at the top of every page. It slides up under the
  * translucent sticky header (the -mt / pt pair), as in the designs.
  */
-export function PageHero({ hero, size = "md", children, top }: { hero: Hero; size?: "lg" | "md"; children?: React.ReactNode; top?: React.ReactNode }) {
+export function PageHero({
+  hero,
+  size = "md",
+  children,
+  top,
+  imageClassName,
+}: {
+  hero: Hero;
+  size?: "lg" | "md";
+  children?: React.ReactNode;
+  top?: React.ReactNode;
+  /** Classes for the background photo, e.g. `object-top` to control the crop. */
+  imageClassName?: string;
+}) {
   // Keep legacy single-image fallbacks while preferring the API's image array.
   const seen = new Set<string>();
   const images = [hero.image, ...(hero.images ?? [])].filter((img): img is NonNullable<typeof img> => {
@@ -25,9 +38,9 @@ export function PageHero({ hero, size = "md", children, top }: { hero: Hero; siz
     <section data-header-theme="dark" className={cn("relative -mt-[var(--header-h)] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
       <div className="absolute inset-0">
         {images.length > 1 ? (
-          <HeroSlides images={images} />
+          <HeroSlides images={images} imageClassName={imageClassName} />
         ) : images[0] ? (
-          <Media image={images[0]} priority sizes="100vw" />
+          <Media image={images[0]} priority sizes="100vw" className={imageClassName} />
         ) : (
           <div className="size-full bg-[radial-gradient(ellipse_at_70%_30%,#3a3a3a_0%,#141414_45%,#000_80%)]" aria-hidden />
         )}

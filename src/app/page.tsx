@@ -23,11 +23,20 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata(page.seo, { absoluteTitle: true, path: "/" });
 }
 
+/**
+ * The CMS stamps every upload with a centre focal point (0.5, 0.5), which would override the
+ * designed crops below. Treat that default as "no focal point"; any real focal point still wins.
+ */
+function withoutDefaultFocus<T extends { focalPoint?: { x: number; y: number } | null }>(img: T): T {
+  const f = img.focalPoint;
+  return f && f.x === 0.5 && f.y === 0.5 ? { ...img, focalPoint: null } : img;
+}
+
 export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
   // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
-  const hero = { ...page.hero, image: cmsOr(page.hero.image, FIGMA.heroHome) };
+  const hero = { ...page.hero, image: withoutDefaultFocus(cmsOr(page.hero.image, FIGMA.heroHome)) };
   const cardDetails = await getCardDetails(page.leadership);
   // The Figma carousel shows five focus areas, in this order. Anything else the CMS lists stays
   // on the Practice Areas page. If none of these slugs exist, fall back to the CMS list.
@@ -45,7 +54,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <PageHero hero={hero} size="lg" />
+      <PageHero hero={hero} size="lg" imageClassName="object-top" />
 
       {/* A Firm Built On Integrity */}
       <section
@@ -190,9 +199,9 @@ export default async function HomePage() {
           </div>
           <div className="relative min-h-[560px] overflow-hidden rounded-[5px]">
             <Media
-              image={cmsOr(whyChooseUs.image, FIGMA.whyClients)}
+              image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))}
               sizes="(min-width:1024px) 50vw, 100vw"
-              className="absolute inset-0"
+              className="absolute inset-0 object-[50%_21%]"
             />
           </div>
         </div>

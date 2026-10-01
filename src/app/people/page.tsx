@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { getPage, getPeople } from "@/lib/api/endpoints";
 import { PersonRole } from "@/lib/api/schemas";
 import { pageMetadata } from "@/lib/seo";
@@ -10,7 +9,7 @@ import { PersonCard } from "@/components/sections/cards";
 import { getCardDetails } from "@/lib/person-card";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { FilterTabs, Pagination } from "@/components/ui/listing-controls";
-import { SortMenu } from "@/components/ui/sort-menu";
+import { PeopleSortMenu } from "@/components/ui/people-sort-menu";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -52,12 +51,13 @@ export default async function PeoplePage({ searchParams }: Props) {
 
         <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
-          <div className="flex flex-wrap items-center gap-3">
-            <FilterTabs options={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]} param="practiceArea" base="/people" current={current} label="Filter attorneys by practice area" />
-            <Suspense fallback={null}>
-              <SortMenu options={[...SORTS]} defaultValue="seniority" />
-            </Suspense>
-          </div>
+          <PeopleSortMenu
+            practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
+            sorts={[...SORTS]}
+            defaultSort="seniority"
+            base="/people"
+            current={current}
+          />
         </div>
 
         {people.data.length > 0 ? (
