@@ -78,13 +78,15 @@ export default async function InsightPage({ params }: Props) {
           <div className="mt-8 flex items-start justify-between gap-4">
             <div className="flex flex-wrap gap-1.5">
               {i.chips.map((c, n) => {
-                const cat = i.categories[n];
-                return cat ? (
-                  <Link key={c} href={`/insights?category=${cat}`}>
-                    <Chip className="underline underline-offset-2">{c}</Chip>
-                  </Link>
-                ) : (
-                  <Chip key={c} className="underline underline-offset-2">
+                const params = new URLSearchParams();
+                const category = i.categories[n] ?? i.categories[0];
+                const practiceArea = i.practiceAreas[0]?.slug;
+
+                if (category) params.set("category", category);
+                if (practiceArea) params.set("practiceArea", practiceArea);
+
+                return (
+                  <Chip key={c} href={params.size > 0 ? `/insights?${params.toString()}` : undefined} className="underline underline-offset-2">
                     {c}
                   </Chip>
                 );
@@ -97,7 +99,7 @@ export default async function InsightPage({ params }: Props) {
             ) : null}
           </div>
 
-          <Heading as="h1" size="h2" className="mt-5 max-w-5xl">
+          <Heading as="h1" size="h2" className="mt-5 w-full">
             {i.title}
           </Heading>
 

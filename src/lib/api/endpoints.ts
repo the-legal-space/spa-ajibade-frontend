@@ -14,6 +14,7 @@ import {
   PersonSummary,
   PracticeAreaCard,
   PracticeAreaDetail,
+  RecognitionDirectoryPage,
   SiteSchema,
   type PageKey,
   type PageOf,
@@ -68,4 +69,10 @@ export const getJobs = cache(() => apiList("/jobs", JobSchema, { tags: ["jobs"] 
 
 export const getJob = cache((id: string) =>
   apiGet(`/jobs/${encodeURIComponent(id)}`, JobSchema, { tags: ["jobs", `job:${id}`] }),
+);
+
+export const getRecognitionDirectory = cache((slug: string) =>
+  apiGet(`/recognitions/${encodeURIComponent(slug)}`, RecognitionDirectoryPage, {
+    tags: ["recognitions", `recognition:${slug}`],
+  }),
 );

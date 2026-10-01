@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
 import {
   getPage,
   getPracticeArea,
-  getPracticeAreas,
   getSite,
 } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
@@ -49,10 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Practice area detail, following the "LEARN MORE PRACTICE AREA" frames. */
 export default async function PracticeAreaPage({ params }: Props) {
   const { slug } = await params;
-  const [area, site, allAreas, listing, home] = await Promise.all([
+  const [area, site, listing, home] = await Promise.all([
     load(slug),
     getSite(),
-    getPracticeAreas(),
     getPage("practice-areas"),
     getPage("home"),
   ]);
@@ -63,17 +62,8 @@ export default async function PracticeAreaPage({ params }: Props) {
     : (area.keyServices ?? []).map((title) => ({ title, description: null }));
   const contacts = area.lead ? [area.lead] : (area.contacts ?? []);
   const related = area.recentPublications ?? area.relatedInsights ?? [];
+  const allAreas = area.siblings ?? [];
   const areasLabel = navLabel(site.nav, "/practice-areas");
-  const mark = (
-    <svg viewBox="0 0 32 32" className="size-4 text-stone" aria-hidden>
-      <path
-        d="M5 6 L16 16 L5 26 M27 6 L16 16 L27 26"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3.5"
-      />
-    </svg>
-  );
 
   return (
     <>
@@ -154,7 +144,7 @@ export default async function PracticeAreaPage({ params }: Props) {
                       key={s.title}
                       className="flex min-h-[140px] flex-col justify-between rounded-xl bg-mist p-4 transition-shadow duration-200 hover:shadow-xs"
                     >
-                      {mark}
+                      <PracticeMark />
                       <div className="mt-6">
                         <p className="font-serif text-lg leading-snug">
                           {s.title}
@@ -169,6 +159,41 @@ export default async function PracticeAreaPage({ params }: Props) {
                   ))}
                 </MotionList>
               </div>
+            ) : null}
+
+            {area.approach ? (
+              <section className="mt-8 border-t border-mist-200 pt-5" aria-labelledby="approach-heading">
+                <h2 id="approach-heading" className="font-serif text-xl">Our Approach</h2>
+                {area.approach.text ? (
+                  <p className="mt-3 text-[15px] leading-7 text-ink-800 md:text-base md:leading-8">
+                    {area.approach.text}
+                  </p>
+                ) : null}
+                {area.approach.points.length > 0 ? (
+                  <ul className="mt-3">
+                    {area.approach.points.map((point, index) => (
+                      <li key={`${point}-${index}`} className="flex items-center gap-2 border-b border-mist-200 py-3 text-sm leading-6 text-ink-800">
+                        <PracticeMark />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            ) : null}
+
+            {area.industries?.length ? (
+              <section className="mt-8 border-t border-mist-200 pt-5" aria-labelledby="industries-heading">
+                <h2 id="industries-heading" className="font-serif text-xl">Industries we serve</h2>
+                <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  {area.industries.map((industry) => (
+                    <li key={industry.slug} className="flex min-h-[118px] flex-col justify-between rounded-xl bg-mist p-4">
+                      <PracticeMark />
+                      <span className="font-serif text-base leading-snug">{industry.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ) : null}
           </div>
         </div>
@@ -212,6 +237,19 @@ export default async function PracticeAreaPage({ params }: Props) {
 
       <PageEnd />
     </>
+  );
+}
+
+function PracticeMark() {
+  return (
+    <Image
+      src="/figma/video-mark-bg.png"
+      alt=""
+      aria-hidden
+      width={24}
+      height={24}
+      className="size-4 shrink-0 object-contain"
+    />
   );
 }
 

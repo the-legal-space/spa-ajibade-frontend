@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
@@ -10,6 +11,7 @@ import { CmsIcon } from "@/components/ui/icon";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
+import { buttonClass } from "@/components/ui/button";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -26,7 +28,7 @@ export default async function AboutPage() {
 
       {/* Our story */}
       <Section tone="white" id="our-story" labelledBy="story-heading">
-        <div className="grid gap-12 lg:grid-cols-[1fr_551px]">
+        <div className="grid gap-12 lg:grid-cols-[2fr_3fr]">
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
             {story.quote ? (
@@ -36,7 +38,7 @@ export default async function AboutPage() {
                 </blockquote>
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
-                    <div className="aspect-[278/337] w-full max-w-[278px] overflow-hidden">
+                    <div className="aspect-[294/357] w-full max-w-[350px] overflow-hidden">
                       <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
@@ -116,7 +118,7 @@ export default async function AboutPage() {
       {/* Principles */}
       <Section tone="white" id="principles" className="relative overflow-hidden" labelledBy="principles-heading">
         {principles.image ? (
-          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[340px] lg:block" aria-hidden>
+          <div className="pointer-events-none absolute right-0 top-0 hidden h-[420px] w-[389px] lg:block" aria-hidden>
             <Media image={principles.image} className="object-contain" />
           </div>
         ) : null}
@@ -147,11 +149,30 @@ export default async function AboutPage() {
                 <span id="awards-heading">{awardsList.title}</span>
               </Heading>
               <MotionList className="mt-6 border-t border-white/15">
-                {awardsList.items.map((a) => (
-                  <MotionListItem key={a.slug} className="border-b border-white/15 py-4">
-                    <span className="text-xl">{a.name}</span>
-                  </MotionListItem>
-                ))}
+                {awardsList.items.map((a, index) => {
+                  const href = a.url ?? (a.slug ? `/recognitions/${a.slug}` : null);
+                  const button = (
+                    <>
+                      View Awards <ArrowUpRight className="size-4" aria-hidden />
+                    </>
+                  );
+                  const className = buttonClass("light", "min-w-[143px] justify-between");
+
+                  return (
+                    <MotionListItem key={a.slug ?? a.url ?? `${a.name}-${index}`} className="flex items-center justify-between gap-5 border-b border-white/15 py-4">
+                      <span className="text-xl">{a.name}</span>
+                      {href ? (
+                        /^https?:\/\//i.test(href) ? (
+                          <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{button}</a>
+                        ) : (
+                          <Link href={href} className={className}>{button}</Link>
+                        )
+                      ) : (
+                        <span aria-disabled="true" className={`${className} cursor-not-allowed opacity-50`}>{button}</span>
+                      )}
+                    </MotionListItem>
+                  );
+                })}
               </MotionList>
             </div>
             <div className="hidden aspect-[524/560] overflow-hidden lg:block">

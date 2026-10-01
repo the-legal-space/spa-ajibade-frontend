@@ -188,7 +188,7 @@ export default async function HomePage() {
               ))}
             </ul>
           </div>
-          <div className="relative min-h-[360px] overflow-hidden rounded-[5px]">
+          <div className="relative min-h-[560px] overflow-hidden rounded-[5px]">
             <Media
               image={cmsOr(whyChooseUs.image, FIGMA.whyClients)}
               sizes="(min-width:1024px) 50vw, 100vw"
