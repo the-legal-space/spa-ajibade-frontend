@@ -119,6 +119,8 @@ export const InsightCategory = z.enum([
   "webinar_resources",
   // Added by the API after launch ("inside the 2025 annual business luncheon…" is categorised this way).
   "events",
+  // "Pro Bono & Community Commitment": the stories behind the Responsible Business page.
+  "pro_bono",
 ]);
 export type InsightCategory = z.infer<typeof InsightCategory>;
 
