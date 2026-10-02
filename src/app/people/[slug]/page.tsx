@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronDown, Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import { getPage, getPerson, getSite } from "@/lib/api/endpoints";
 import { personPhoto } from "@/lib/figma-assets";
 import { ApiNotFoundError } from "@/lib/api/client";
@@ -17,6 +17,7 @@ import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { PersonDetailsAccordion } from "@/components/people/person-details-accordion";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -51,6 +52,9 @@ export default async function PersonPage({ params }: Props) {
   const bio = cleanHtml(p.bio);
   const educationIntro = cleanHtml(p.education?.intro);
   const educationEntries = p.education?.entries ?? [];
+  const secondaryPracticeAreas = p.practiceAreas.filter(
+    (practiceArea) => practiceArea.slug !== p.primaryPracticeArea?.slug,
+  );
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
 
@@ -97,9 +101,22 @@ export default async function PersonPage({ params }: Props) {
                 sizes="395px"
               />
             </div>
-            {p.practiceAreas.length > 0 ? (
-              <ul className="mt-6 space-y-1 text-lg">
-                {p.practiceAreas.map((a) => (
+            {p.primaryPracticeArea ? (
+              <div className="mt-6">
+                <p className="text-xs text-stone">Primary Practice Area</p>
+                <Link
+                  href={`/practice-areas/${p.primaryPracticeArea.slug}`}
+                  className="text-lg hover:underline"
+                >
+                  {p.primaryPracticeArea.title}
+                </Link>
+              </div>
+            ) : null}
+            {secondaryPracticeAreas.length > 0 ? (
+              <div className={p.primaryPracticeArea ? "mt-3" : "mt-6"}>
+                <p className="text-xs text-stone">Secondary Practice Areas</p>
+                <ul className="mt-1 space-y-1 text-lg">
+                  {secondaryPracticeAreas.map((a) => (
                   <li key={a.slug}>
                     <Link
                       href={`/practice-areas/${a.slug}`}
@@ -109,7 +126,8 @@ export default async function PersonPage({ params }: Props) {
                     </Link>
                   </li>
                 ))}
-              </ul>
+                </ul>
+              </div>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-3">
               {p.email ? (
@@ -168,45 +186,11 @@ export default async function PersonPage({ params }: Props) {
                 dangerouslySetInnerHTML={{ __html: bio }}
               />
             ) : null}
-            {educationIntro || educationEntries.length > 0 ? (
-              <details open className="group mt-7 border-t border-mist-200 pt-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between font-serif text-xl marker:hidden">
-                  Education &amp; Bar Associations
-                  <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
-                </summary>
-                {educationIntro ? (
-                  <div
-                    className="prose-firm mt-2 text-sm leading-6"
-                    dangerouslySetInnerHTML={{ __html: educationIntro }}
-                  />
-                ) : null}
-                {educationEntries.length > 0 ? (
-                  <ul className="mt-3 space-y-1">
-                    {educationEntries.map((entry, index) => (
-                      <li key={`${entry.qualification}-${index}`} className="flex items-center justify-between gap-4 bg-mist px-4 py-3 text-sm">
-                        <span>{entry.qualification}</span>
-                        {entry.year !== null ? <span className="shrink-0">{entry.year}</span> : null}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </details>
-            ) : null}
-            {p.memberships?.length ? (
-              <details open className="group mt-5 border-t border-mist-200 pt-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between font-serif text-xl marker:hidden">
-                  Professional Memberships
-                  <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden />
-                </summary>
-                <ul className="mt-3 space-y-1">
-                  {p.memberships.map((membership, index) => (
-                    <li key={`${membership}-${index}`} className="bg-mist px-4 py-3 text-sm">
-                      {membership}
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ) : null}
+            <PersonDetailsAccordion
+              educationIntro={educationIntro}
+              educationEntries={educationEntries}
+              memberships={p.memberships ?? []}
+            />
             {mandate ? (
               <SmartLink
                 link={mandate}

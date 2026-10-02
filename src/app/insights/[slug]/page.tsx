@@ -12,8 +12,6 @@ import { PageEnd } from "@/components/sections/page-end";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { VideoEmbed } from "@/components/sections/video-embed";
-import { buttonClass } from "@/components/ui/button";
-import { mockCsrEnabled } from "@/lib/mock/csr-stories";
 import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
 import { getInsightChipHref } from "@/lib/insight-links";
 
@@ -60,14 +58,7 @@ export default async function InsightPage({ params }: Props) {
   const [i, site] = await Promise.all([load(slug), getSite()]);
   const body = cleanHtml(i.body);
   const date = formatMonthYear(i.publishedAt);
-  // Most articles are PDFs hosted on another site, so the page is an intro plus a "Read More" link to
-  // wherever it lives (the CMS `cta`). While the CMS has no link yet, dev and preview builds show a
-  // placeholder one so the button can be reviewed; production shows it only when a real link exists.
-  const readMore =
-    i.cta ??
-    (mockCsrEnabled()
-      ? { label: "Read More", url: "https://example.com" }
-      : null);
+  const readMore = i.cta;
   const author =
     i.author.type === "person"
       ? {
@@ -135,7 +126,7 @@ export default async function InsightPage({ params }: Props) {
             size="h2"
             reveal={false}
             balance={false}
-            className="mt-5 w-full"
+            className="mt-5 block w-full max-w-none text-[2.5rem] leading-[1.08] md:text-[3.5rem] md:leading-[1.05]"
           >
             {i.title}
           </Heading>
@@ -174,9 +165,9 @@ export default async function InsightPage({ params }: Props) {
               href={readMore.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={buttonClass("dark", "mt-8")}
+              className="mt-8 inline-flex items-center gap-1 text-sm font-medium text-blue-700 underline underline-offset-4 hover:text-blue-900"
             >
-              {readMore.label || "Read More"}{" "}
+              {i.format === "video" ? readMore.label || "Watch Video" : "Read More"}{" "}
               <ArrowUpRight className="size-4" aria-hidden />
             </a>
           ) : null}
