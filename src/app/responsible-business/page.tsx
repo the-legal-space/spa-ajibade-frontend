@@ -11,13 +11,16 @@ import { Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
 
-type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+type Props = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getPage("responsible-business");
   return pageMetadata(content.seo, {
     title: content.title,
-    description: "How SPA Ajibade & Co. gives back through pro bono work and community commitment.",
+    description:
+      "How SPA Ajibade & Co. gives back through pro bono work and community commitment.",
     path: "/responsible-business",
   });
 }
@@ -42,7 +45,10 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
       slug: i?.slug ?? null,
       title: i?.title ?? null,
       date: i ? formatLongDate(i.publishedAt) : null,
-      image: (i?.coverImage?.url ? i.coverImage : banner[n % Math.max(1, banner.length)]) ?? null,
+      image:
+        (i?.coverImage?.url
+          ? i.coverImage
+          : banner[n % Math.max(1, banner.length)]) ?? null,
     };
   });
   const meta = list.meta ?? { page, totalPages: 1 };
@@ -51,10 +57,17 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
     <>
       <section className="bg-white py-10 md:py-12" aria-labelledby="rb-heading">
         <div className="container-site">
-          <Link href={content.backLink.href} className="inline-flex items-center gap-1.5 text-[13px] hover:underline">
-            <ArrowLeft className="size-3.5" aria-hidden /> {content.backLink.label}
+          <Link
+            href={content.backLink.href}
+            className="inline-flex items-center gap-1.5 text-[13px] hover:underline"
+          >
+            <ArrowLeft className="size-3.5" aria-hidden />{" "}
+            {content.backLink.label}
           </Link>
-          <h1 id="rb-heading" className="mt-8 font-serif text-[2rem] font-normal uppercase leading-[1.15] text-balance md:text-[2.75rem]">
+          <h1
+            id="rb-heading"
+            className="mt-8 font-serif text-[2rem] font-normal uppercase leading-[1.15] text-balance md:text-[2.75rem]"
+          >
             {content.title}
           </h1>
 
@@ -71,10 +84,17 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
               ))}
             </MotionList>
           ) : (
-            <p className="mt-10 rounded-xl bg-mist p-10 text-center text-stone">No stories have been published yet.</p>
+            <p className="mt-10 rounded-xl bg-mist p-10 text-center text-stone">
+              No stories have been published yet.
+            </p>
           )}
 
-          <Pagination page={meta.page} totalPages={meta.totalPages} base="/responsible-business" current={{}} />
+          <Pagination
+            page={meta.page}
+            totalPages={meta.totalPages}
+            base="/responsible-business"
+            current={{}}
+          />
         </div>
       </section>
 
