@@ -19,6 +19,7 @@ export function Heading({
   className,
   size = "h2",
   reveal = true,
+  balance = true,
 }: {
   as?: "h1" | "h2" | "h3";
   children: ReactNode;
@@ -26,13 +27,15 @@ export function Heading({
   size?: "display" | "h2" | "h3";
   /** Fade up once on scroll-in. Turn off for above-the-fold titles so they paint immediately. */
   reveal?: boolean;
+  /** Balance the line lengths (default). Turn off to let the text run the full available width. */
+  balance?: boolean;
 }) {
   const sizes = {
     display: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
     h2: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
     h3: "text-2xl leading-tight md:text-[1.75rem]",
   };
-  const classes = cn("font-serif font-normal text-balance", sizes[size], className);
+  const classes = cn("font-serif font-normal", balance && "text-balance", sizes[size], className);
   return reveal ? (
     <MotionHeading as={Tag} className={classes}>
       {children}

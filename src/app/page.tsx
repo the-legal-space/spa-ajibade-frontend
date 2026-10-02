@@ -16,6 +16,7 @@ import { RecognitionFeature } from "@/components/home/recognition-feature";
 import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
 import { withoutDefaultFocus } from "@/lib/utils";
+import { REVEAL } from "@/lib/motion";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
@@ -69,11 +70,7 @@ export default async function HomePage() {
               {aboutFirm.paragraphs.map((p, i) => (
                 <MotionP
                   key={i}
-                  transition={{
-                    duration: 0.55,
-                    delay: i * 0.08,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                  transition={{ ...REVEAL.transition, delay: i * 0.15 }}
                 >
                   {p}
                 </MotionP>
