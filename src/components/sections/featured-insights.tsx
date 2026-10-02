@@ -11,6 +11,7 @@ import { Media } from "@/components/ui/media";
 import { useAutoplay, useSwipe } from "@/components/home/scroll-rail";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
+import { getInsightChipHref } from "@/lib/insight-links";
 
 const MotionLink = motion.create(Link);
 
@@ -38,7 +39,6 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
           >
             {items.map((item, n) => {
               const date = formatMonthYear(item.publishedAt);
-              const filterHref = featuredInsightFilterHref(item);
               const authorAvatar = item.author.type === "person"
                 ? personAvatar(item.author.person.slug, item.author.person.photo)
                 : null;
@@ -56,7 +56,7 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                       {item.chips.slice(0, 2).map((c) => (
                         <Link
                           key={c}
-                          href={filterHref}
+                          href={getInsightChipHref(item, c)}
                           tabIndex={n === i ? undefined : -1}
                           scroll={false}
                           className="rounded-[4px] border border-white/20 px-3 py-1.5 text-[11px] underline underline-offset-2 hover:bg-white/10"
@@ -168,11 +168,4 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
       </div>
     </section>
   );
-}
-
-function featuredInsightFilterHref(item: InsightCard) {
-  const params = new URLSearchParams();
-  if (item.categories[0]) params.set("category", item.categories[0]);
-  if (item.practiceAreas[0]) params.set("practiceArea", item.practiceAreas[0].slug);
-  return params.size ? `/insights?${params.toString()}` : "/insights";
 }

@@ -15,6 +15,7 @@ import { VideoEmbed } from "@/components/sections/video-embed";
 import { buttonClass } from "@/components/ui/button";
 import { mockCsrEnabled } from "@/lib/mock/csr-stories";
 import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
+import { getInsightChipHref } from "@/lib/insight-links";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -112,28 +113,15 @@ export default async function InsightPage({ params }: Props) {
 
           <div className="mt-8 flex items-start justify-between gap-4">
             <div className="flex flex-wrap gap-1.5">
-              {i.chips.map((c, n) => {
-                const params = new URLSearchParams();
-                const category = i.categories[n] ?? i.categories[0];
-                const practiceArea = i.practiceAreas[0]?.slug;
-
-                if (category) params.set("category", category);
-                if (practiceArea) params.set("practiceArea", practiceArea);
-
-                return (
-                  <Chip
-                    key={c}
-                    href={
-                      params.size > 0
-                        ? `/insights?${params.toString()}`
-                        : undefined
-                    }
-                    className="underline underline-offset-2"
-                  >
-                    {c}
-                  </Chip>
-                );
-              })}
+              {i.chips.map((c) => (
+                <Chip
+                  key={c}
+                  href={getInsightChipHref(i, c)}
+                  className="underline underline-offset-2"
+                >
+                  {c}
+                </Chip>
+              ))}
             </div>
             {date && i.publishedAt ? (
               <time dateTime={i.publishedAt}>
