@@ -23,9 +23,9 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Article and attorney pages use the white header from the Figma ("READ MORE", "ATTORNEY DETAILS"). */
+/** Article, attorney and Responsible Business pages use the white header from the Figma ("READ MORE", "ATTORNEY DETAILS"). */
 function usesLightHeader(pathname: string) {
-  return /^\/(people|insights)\/[^/]+\/?$/.test(pathname);
+  return /^\/(people|insights)\/[^/]+\/?$/.test(pathname) || /^\/responsible-business\/?$/.test(pathname);
 }
 
 /**

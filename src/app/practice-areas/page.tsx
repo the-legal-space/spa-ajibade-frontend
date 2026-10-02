@@ -3,6 +3,7 @@ import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
+import { HeroDots, HeroSlides, HeroSlideshow } from "@/components/sections/hero-slideshow";
 import { PracticeAreaCard } from "@/components/sections/cards";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
@@ -24,6 +25,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PracticeAreasPage() {
   const page = await getPage("practice-areas");
   const csr = page.csrBanner;
+  // The CSR banner is a carousel of the CMS images (older payloads send a single `image`).
+  const csrSeen = new Set<string>();
+  const csrImages = [csr?.image, ...(csr?.images ?? [])].filter((img): img is NonNullable<typeof img> => {
+    if (!img?.url || csrSeen.has(img.url)) return false;
+    csrSeen.add(img.url);
+    return true;
+  });
 
   return (
     <>
@@ -62,12 +70,13 @@ export default async function PracticeAreasPage() {
         <section className="bg-white py-12" aria-labelledby="csr-heading">
           <div className="container-site">
             <Reveal className="relative overflow-hidden rounded-xl bg-ink text-white">
+              <HeroSlideshow count={csrImages.length}>
               <div className="absolute inset-0">
-                <Media
-                  image={csr.image ?? csr.images?.[0] ?? null}
-                  placeholder="dark"
-                  sizes="100vw"
-                />
+                {csrImages.length > 1 ? (
+                  <HeroSlides images={csrImages} />
+                ) : (
+                  <Media image={csrImages[0] ?? null} placeholder="dark" sizes="100vw" />
+                )}
                 <div className="absolute inset-0 bg-black/50" aria-hidden />
               </div>
               <div className="relative mx-auto flex min-h-[440px] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
@@ -77,6 +86,7 @@ export default async function PracticeAreasPage() {
                 <p className="mt-4 text-lg leading-8 text-white/85">
                   {csr.text}
                 </p>
+                <HeroDots className="mt-5" />
                 {csr.cta ? (
                   <SmartLink
                     link={csr.cta}
@@ -84,6 +94,7 @@ export default async function PracticeAreasPage() {
                   />
                 ) : null}
               </div>
+              </HeroSlideshow>
             </Reveal>
           </div>
         </section>
