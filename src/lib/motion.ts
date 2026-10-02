@@ -80,6 +80,19 @@ export const INTERACTION = {
   },
 } as const;
 
+
+/**
+ * Scroll-reveal tokens shared by `Reveal`, `Heading`, `MotionP` and the staggered lists. Animates
+ * once, only opacity and a translate. Deliberately slow and long-travelling so the entrance is
+ * clearly noticeable. `amount: "some"` plus a bottom margin means tall blocks start as soon as they
+ * show (a fixed fraction could never be reached by a block taller than the screen).
+ */
+export const REVEAL = {
+  distance: 48,
+  transition: { duration: 1.1, ease: EASINGS.easeOut } satisfies Transition,
+  viewport: { once: true, amount: "some", margin: "0px 0px -12% 0px" },
+} as const;
+
 /** Stagger container & item variants for lists and grids */
 export const staggerContainerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -93,11 +106,11 @@ export const staggerContainerVariants: Variants = {
 };
 
 export const staggerItemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: REVEAL.distance },
   show: {
     opacity: 1,
     y: 0,
-    transition: TRANSITIONS.entrance,
+    transition: REVEAL.transition,
   },
 };
 
@@ -178,14 +191,3 @@ export const modalDialogVariants: Variants = {
     transition: { duration: 0.18, ease: "easeIn" },
   },
 };
-
-/**
- * Scroll-reveal tokens shared by `Reveal` and `Heading`. Animates once, only opacity and a short
- * translate. `amount: "some"` plus a small bottom margin means tall blocks start as soon as they
- * show (a fixed fraction could never be reached by a block taller than the screen).
- */
-export const REVEAL = {
-  distance: 20,
-  transition: { duration: 0.6, ease: EASINGS.easeOut } satisfies Transition,
-  viewport: { once: true, amount: "some", margin: "0px 0px -8% 0px" },
-} as const;
