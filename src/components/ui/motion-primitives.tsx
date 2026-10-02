@@ -160,8 +160,8 @@ export function MotionLink({
 export function MotionList({
   children,
   className,
-  stagger = 0.07,
-  delay = 0.05,
+  stagger = 0.16,
+  delay = 0.1,
 }: {
   children: ReactNode;
   className?: string;
