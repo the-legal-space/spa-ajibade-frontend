@@ -16,6 +16,7 @@ import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+import { getInsightChipHref } from "@/lib/insight-links";
 import {
   FIGMA,
   insightCardCover,
@@ -261,17 +262,6 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   );
 }
 
-function insightChipHref(insight: Pick<Insight, "categories" | "practiceAreas">) {
-  const params = new URLSearchParams();
-  const category = insight.categories[0];
-  const practiceArea = insight.practiceAreas[0]?.slug;
-
-  if (category) params.set("category", category);
-  if (practiceArea) params.set("practiceArea", practiceArea);
-
-  return params.size > 0 ? `/insights?${params.toString()}` : undefined;
-}
-
 export function InsightCard({
   insight,
   className,
@@ -317,7 +307,7 @@ export function InsightCard({
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex min-w-0 gap-1">
           {insight.chips.slice(0, 2).map((c) => {
-            const href = insightChipHref(insight);
+            const href = getInsightChipHref(insight, c);
             return (
               <Chip key={c} title={c} href={href} className="underline underline-offset-2">
                 {c}
