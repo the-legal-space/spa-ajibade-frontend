@@ -25,6 +25,12 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
+/** A real CMS cover, not one of the bundled Figma placeholders used for card thumbnails. */
+function hasOwnCover(i: { coverImage?: { url: string } | null } | undefined) {
+  const url = i?.coverImage?.url;
+  return !!url && !url.startsWith("/figma/");
+}
+
 /** "Responsible Business" listing: the CSR carousel plus every Pro Bono & Community Commitment story. */
 export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   const sp = await searchParams;
@@ -33,8 +39,9 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
     getPage("responsible-business"),
     getInsights({ category: "pro_bono", sort: "newest", page, pageSize: 9 }),
   ]);
-  // The banner shows the first three stories on this page. Each slide uses its story's own cover,
-  // otherwise the page's CMS carousel images in turn, so the banner is never empty.
+  // The banner shows the first three stories on this page. Each slide uses its story's own CMS cover,
+  // otherwise the page's CMS carousel images in turn (bundled placeholder thumbnails don't count),
+  // so the banner is never empty.
   const banner = content.images.filter((img) => img?.url);
   // Up to three slides: a story's details appear on hover; when the CMS has more carousel images
   // than stories, the extra slides are image-only.
@@ -46,9 +53,9 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
       title: i?.title ?? null,
       date: i ? formatLongDate(i.publishedAt) : null,
       image:
-        (i?.coverImage?.url
-          ? i.coverImage
-          : banner[n % Math.max(1, banner.length)]) ?? null,
+        (hasOwnCover(i)
+          ? i?.coverImage
+          : (banner[n % Math.max(1, banner.length)] ?? i?.coverImage)) ?? null,
     };
   });
   const meta = list.meta ?? { page, totalPages: 1 };
