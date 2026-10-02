@@ -1,7 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { apiGet, apiList } from "./client";
+import { ApiNotFoundError, apiGet, apiList } from "./client";
+import { MOCK_CSR_CARDS, mockCsrDetail, mockCsrEnabled, withMockGaps } from "@/lib/mock/csr-stories";
 import {
   InsightCard,
   InsightCategory,
@@ -54,12 +55,42 @@ export const getInsights = cache(
     sort?: "newest" | "oldest";
     page?: number;
     pageSize?: number;
-  }) => apiList("/insights", InsightCard, { query: params, tags: ["insights"] }),
+  }) => {
+    // Pro bono stories only: top the list up with placeholders while the CMS has few (dev/preview only).
+    if (params.category === "pro_bono" && mockCsrEnabled()) return withMockStories(params);
+    return apiList("/insights", InsightCard, { query: params, tags: ["insights"] });
+  },
 );
 
-export const getInsight = cache((slug: string) =>
-  apiGet(`/insights/${encodeURIComponent(slug)}`, InsightDetail, { tags: ["insights", `insight:${slug}`] }),
-);
+async function withMockStories(params: { sort?: "newest" | "oldest"; page?: number; pageSize?: number }) {
+  // The real set is small: fetch it whole, merge the placeholders in, then paginate the result here.
+  const real = await apiList("/insights", InsightCard, { query: { category: "pro_bono", pageSize: 50 }, tags: ["insights"] });
+  const pageSize = params.pageSize ?? 9;
+  const page = params.page ?? 1;
+  const realSlugs = new Set(real.data.map((r) => r.slug));
+  const merged = [...real.data, ...MOCK_CSR_CARDS.filter((m) => !realSlugs.has(m.slug))];
+  merged.sort((a, b) => {
+    const diff = new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
+    return params.sort === "oldest" ? -diff : diff;
+  });
+  const totalPages = Math.max(1, Math.ceil(merged.length / pageSize));
+  return {
+    data: merged.slice((page - 1) * pageSize, page * pageSize),
+    meta: { page, pageSize, total: merged.length, totalPages },
+  };
+}
+
+export const getInsight = cache(async (slug: string) => {
+  const mock = mockCsrEnabled();
+  try {
+    const real = await apiGet(`/insights/${encodeURIComponent(slug)}`, InsightDetail, { tags: ["insights", `insight:${slug}`] });
+    return mock ? withMockGaps(real) : real;
+  } catch (error) {
+    const fallback = mock && error instanceof ApiNotFoundError ? mockCsrDetail(slug) : null;
+    if (fallback) return fallback;
+    throw error;
+  }
+});
 
 export const getOffices = cache(() =>
   apiList("/offices", OfficeSchema, { tags: ["offices"] }).then((r) => r.data),
