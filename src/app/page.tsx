@@ -160,7 +160,7 @@ export default async function HomePage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1 md:gap-4">
                 {whyChooseUs.eyebrow ? (
-                  <MotionP className="text-sm font-medium text-gray">
+                  <MotionP className="text-sm font-medium leading-none text-gray">
                     {whyChooseUs.eyebrow}
                   </MotionP>
                 ) : null}

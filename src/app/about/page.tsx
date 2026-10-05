@@ -15,6 +15,7 @@ import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
 import { buttonClass } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
+import { CountUp } from "@/components/ui/count-up";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("about");
@@ -89,7 +90,9 @@ export default async function AboutPage() {
               <div key={s.value} className="border-b border-r border-mist-200 px-5 py-8">
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
-                  <p className="font-serif text-2xl">{s.value}</p>
+                  <p className="font-serif text-2xl">
+                    <CountUp value={s.value} />
+                  </p>
                   <p className="mt-2 text-sm text-ink-700">{s.caption}</p>
                   <p className="mt-2 font-serif text-xl italic text-stone-400">{s.label}</p>
                 </dd>
