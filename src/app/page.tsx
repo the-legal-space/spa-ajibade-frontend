@@ -193,7 +193,7 @@ export default async function HomePage() {
             </ul>
             </Reveal>
           </div>
-          <Reveal className="relative min-h-[560px] overflow-hidden rounded-[5px]">
+          <Reveal className="relative min-h-[307px] overflow-hidden rounded-[5px] md:min-h-[560px]">
             <Media
               image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))}
               sizes="(min-width:1024px) 50vw, 100vw"
