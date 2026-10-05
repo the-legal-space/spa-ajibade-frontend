@@ -101,12 +101,12 @@ function Badge({ item }: { item: Recognition }) {
   const organization = item.organization || item.directory?.name || "";
   const label = `${organization ? `${organization}: ` : ""}${item.title}${item.year ? ` ${item.year}` : ""}`;
   const inner = item.badge ? (
-    <span className="block h-[100px] w-[88px] bg-white p-2">
+    <span className="block h-25 w-22 bg-white p-2">
       <Media image={item.badge} alt={label} className="object-contain" />
     </span>
   ) : (
     <span
-      className="flex h-[100px] w-[112px] flex-col items-center justify-center bg-white px-2 text-center"
+      className="flex h-25 w-28 flex-col items-center justify-center bg-white px-2 text-center"
       aria-label={label}
     >
       <span className="font-serif text-[13px] leading-tight">

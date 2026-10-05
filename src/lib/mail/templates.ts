@@ -22,7 +22,7 @@ export type DiscussEmailData = {
 export type StaffEmailOptions = {
   /** Google Calendar link (the .ics file is attached separately). */
   calendarUrl?: string;
-  /** Signed link to the page where the recipient types an associate's email to forward this to. */
+  /** Signed link to the page where the recipient types a team member's email to forward this to. */
   forwardUrl?: string;
   /** Set when this copy is itself a forward: who sent it on, and their optional note. */
   forwardedBy?: string;
@@ -169,21 +169,25 @@ export function staffEmail(d: DiscussEmailData, hasLogo = false, opts: StaffEmai
     `<div style="margin:0 0 6px 0;">${button(`mailto:${d.email}?subject=${encodeURIComponent("Your appointment request, SPA Ajibade & Co.")}`, `Reply to ${d.firstName}`)}${
       d.phone ? button(`tel:${d.phone.replace(/[^\d+]/g, "")}`, "Call the client", false) : ""
     }</div>`,
-    sectionTitle("Action required"),
-    opts.calendarUrl || opts.forwardUrl
-      ? `<div style="margin:0 0 6px 0;">${opts.calendarUrl ? button(opts.calendarUrl, "Add to calendar") : ""}${
-          opts.forwardUrl ? button(opts.forwardUrl, "Forward to another associate", false) : ""
-        }</div>
+    // A forwarded copy only keeps the calendar shortcut: the "Action required" explanation and the steps
+    // already went out with the original email, so they are not repeated.
+    ...(opts.forwardedBy
+      ? [
+          opts.calendarUrl
+            ? `<div style="margin:0 0 22px 0;">${button(opts.calendarUrl, "Add to calendar")}</div>`
+            : "",
+        ]
+      : [
+          sectionTitle("Action required"),
+          opts.calendarUrl || opts.forwardUrl
+            ? `<div style="margin:0 0 6px 0;">${opts.calendarUrl ? button(opts.calendarUrl, "Add to calendar") : ""}${
+                opts.forwardUrl ? button(opts.forwardUrl, "Forward to appropriate team member", false) : ""
+              }</div>
       <div style="margin:0 0 18px 0;font-size:12px;color:#737373;">${
         opts.calendarUrl ? "Add to calendar opens Google Calendar; an .ics file is also attached for Outlook and Apple Calendar. " : ""
-      }${opts.forwardUrl ? "Forward opens a page where you type the associate's email address." : ""}</div>`
-      : "",
-    steps([
-      "Review the client's request and confirm availability.",
-      "Assign the appropriate staff member if necessary.",
-      "Contact the client to confirm or reschedule the session.",
-      "Update the booking status in your system if applicable.",
-    ]),
+      }${opts.forwardUrl ? "Forward opens a page where you type the team member's email address." : ""}</div>`
+            : "",
+        ]),
     para("Please ensure this booking is handled promptly to maintain a smooth and professional client experience."),
     `<p style="margin:0 0 26px 0;color:#525252;">Best regards,<br />Spa Ajibade &amp; Co.<br />Booking System</p>`,
   ].join("\n");
@@ -212,14 +216,16 @@ export function staffEmail(d: DiscussEmailData, hasLogo = false, opts: StaffEmai
       "CLIENT REQUEST",
       description,
       "",
-      "ACTION REQUIRED",
-      ...(opts.calendarUrl ? [`- Add to calendar: ${opts.calendarUrl}`] : []),
-      ...(opts.forwardUrl ? [`- Forward to another associate: ${opts.forwardUrl}`] : []),
-      "- Review the client's request and confirm availability.",
-      "- Assign the appropriate staff member if necessary.",
-      "- Contact the client to confirm or reschedule the session.",
-      "- Update the booking status in your system if applicable.",
-      "",
+      ...(opts.forwardedBy
+        ? opts.calendarUrl
+          ? [`Add to calendar: ${opts.calendarUrl}`, ""]
+          : []
+        : [
+            "ACTION REQUIRED",
+            ...(opts.calendarUrl ? [`- Add to calendar: ${opts.calendarUrl}`] : []),
+            ...(opts.forwardUrl ? [`- Forward to appropriate team member: ${opts.forwardUrl}`] : []),
+            "",
+          ]),
       "Best regards,",
       "Spa Ajibade & Co.",
       "Booking System",

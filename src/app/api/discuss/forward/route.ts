@@ -3,7 +3,7 @@ import { mailConfigured, sendForwardEmail, validateForward } from "@/lib/mail/di
 import { verifyForwardToken } from "@/lib/mail/token";
 
 /**
- * POST /api/discuss/forward: "Forward to another associate". The link in the attorney email carries a
+ * POST /api/discuss/forward: "Forward to appropriate team member". The link in the attorney email carries a
  * signed token; this checks it, then sends the same booking email to the address that was typed.
  */
 

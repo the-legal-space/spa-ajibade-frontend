@@ -65,8 +65,7 @@ export const STAFF: StaffMember[] = [
     name: "Olubanke Afolabi-Johnson",
     role: "Chief Operating Officer",
     departments: ["Cross Departmental"],
-    // TEMPORARY (testing): was oafolabijohnson@spaajibade.com. Restore before launch.
-    email: "tobidechamp15@gmail.com",
+    email: "oafolabijohnson@spaajibade.com",
     highlight: true,
   },
   {

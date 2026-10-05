@@ -224,7 +224,7 @@ export function validateForward(body: unknown): { ok: true; data: ForwardInput }
   return Object.keys(errors).length ? { ok: false, errors } : { ok: true, data: { to, fromName, note } };
 }
 
-/** Sends the booking on to another associate (same email, plus a "forwarded by" banner). */
+/** Sends the booking on to the appropriate team member (same email, plus a "forwarded by" banner). */
 export async function sendForwardEmail(p: ForwardPayload, input: ForwardInput): Promise<{ sent: boolean }> {
   const transport = getTransport();
   if (!transport) throw new Error("MAIL_NOT_CONFIGURED");
