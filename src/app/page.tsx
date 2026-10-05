@@ -52,7 +52,7 @@ export default async function HomePage() {
 
       {/* A Firm Built On Integrity */}
       <section
-        className="relative overflow-hidden bg-mist py-16 text-ink md:py-[68px]"
+        className="relative overflow-hidden bg-mist py-6 text-ink md:py-[68px]"
         aria-labelledby="about-firm"
       >
         {/* Figma "About Image": world map at 8% behind the copy. */}
@@ -61,12 +61,12 @@ export default async function HomePage() {
           className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.08]"
           style={{ backgroundImage: `url(${FIGMA.aboutMap})` }}
         />
-        <div className="container-site relative flex flex-col items-start gap-6">
+        <div className="container-site relative flex flex-col items-stretch gap-6 md:items-start">
           <div className="flex flex-col gap-2.5">
             <Heading className="max-w-[666px]">
               <span id="about-firm">{aboutFirm.title}</span>
             </Heading>
-            <div className="space-y-9 text-base leading-8 text-ink md:text-xl md:leading-9">
+            <div className="space-y-9 text-sm leading-7 text-ink md:text-xl md:leading-9">
               {aboutFirm.paragraphs.map((p, i) => (
                 <MotionP
                   key={i}
@@ -78,7 +78,7 @@ export default async function HomePage() {
             </div>
           </div>
           {aboutFirm.cta ? (
-            <Reveal>
+            <Reveal className="max-md:w-full">
               <SmartLink
                 link={aboutFirm.cta}
                 className={buttonClass("outline")}
@@ -96,7 +96,7 @@ export default async function HomePage() {
       {practiceAreas.length > 0 ? (
         <section
           data-header-theme="dark"
-          className="overflow-hidden bg-[#0a0a0b] py-16 text-white md:py-[68px]"
+          className="overflow-hidden bg-[#0a0a0b] py-6 text-white md:py-[68px]"
           aria-labelledby="practice-heading"
         >
           <div className="container-site">
@@ -135,7 +135,7 @@ export default async function HomePage() {
               </Heading>
             </div>
             {page.leadershipSection.cta ? (
-              <Reveal>
+              <Reveal className="max-md:w-full">
                 <SmartLink
                   link={page.leadershipSection.cta}
                   className={buttonClass("outline")}
@@ -216,7 +216,7 @@ export default async function HomePage() {
               </Heading>
             </div>
             {page.insightsSection.cta ? (
-              <Reveal>
+              <Reveal className="hidden md:block">
                 <SmartLink
                   link={page.insightsSection.cta}
                   className={buttonClass("outline")}
@@ -225,7 +225,14 @@ export default async function HomePage() {
             ) : null}
           </div>
           <Reveal className="mt-11">
-            <ScrollRail label="Recent publications">
+            <ScrollRail
+              label="Recent publications"
+              footerStart={
+                page.insightsSection.cta ? (
+                  <SmartLink link={page.insightsSection.cta} className={buttonClass("outline", "w-full")} />
+                ) : null
+              }
+            >
               {page.latestInsights.map((i) => (
                 <div
                   key={i.id}

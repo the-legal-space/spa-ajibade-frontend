@@ -31,8 +31,8 @@ export function Heading({
   balance?: boolean;
 }) {
   const sizes = {
-    display: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
-    h2: "capitalize text-[2.25rem] leading-[1.15] md:text-[3.25rem] md:leading-[62px]",
+    display: "capitalize text-xl leading-[1.4] md:text-[3.25rem] md:leading-[62px]",
+    h2: "capitalize text-xl leading-[1.4] md:text-[3.25rem] md:leading-[62px]",
     h3: "text-2xl leading-tight md:text-[1.75rem]",
   };
   const classes = cn("font-serif font-normal", balance && "text-balance", sizes[size], className);
@@ -61,7 +61,7 @@ export function Section({
   const tones = { mist: "bg-mist text-ink", white: "bg-white text-ink", black: "site-dark-surface text-white" };
   const attrs = tone === "black" ? { "data-header-theme": "dark" } : {};
   return (
-    <section id={id} aria-labelledby={labelledBy} {...attrs} className={cn(tones[tone], "py-16 md:py-[68px]", className)}>
+    <section id={id} aria-labelledby={labelledBy} {...attrs} className={cn(tones[tone], "py-6 md:py-[68px]", className)}>
       <div className="container-site">{children}</div>
     </section>
   );

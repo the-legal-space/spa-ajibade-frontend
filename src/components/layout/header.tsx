@@ -145,7 +145,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               : "border-ink/10 bg-white/85 text-ink backdrop-blur-md",
         )}
       >
-        <div className="container-site flex h-[var(--header-h)] items-center justify-between gap-6">
+        <div className="container-site flex h-(--header-h) items-center justify-between gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
             <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} />
           </Link>
@@ -185,7 +185,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
-              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+              {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
             </motion.button>
           </div>
         </div>

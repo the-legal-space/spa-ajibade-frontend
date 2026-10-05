@@ -62,7 +62,7 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
                 </p>
               ) : null}
               {page.hero.primaryCta || page.hero.secondaryCta ? (
-                <div className="mt-5 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
                   {page.hero.primaryCta ? (
                     <SmartLink link={page.hero.primaryCta} className={buttonClass("light")} />
                   ) : null}

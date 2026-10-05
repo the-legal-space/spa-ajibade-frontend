@@ -53,7 +53,7 @@ export function useSwipe(onNext: () => void, onPrev: () => void) {
 }
 
 /** Horizontal, snap-scrolling row with previous/next controls (Recent Publications). Auto-advances. */
-export function ScrollRail({ children, label }: { children: ReactNode; label: string }) {
+export function ScrollRail({ children, label, footerStart }: { children: ReactNode; label: string; footerStart?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (dir: 1 | -1) => {
     const el = ref.current;
@@ -82,9 +82,12 @@ export function ScrollRail({ children, label }: { children: ReactNode; label: st
       >
         {children}
       </div>
-      <div className="mt-11 flex justify-end gap-4">
-        <CarouselArrow dir="prev" tone="light" onClick={() => scroll(-1)} label="Scroll back" />
-        <CarouselArrow dir="next" tone="light" onClick={() => scroll(1)} label="Scroll forward" />
+      <div className="mt-11 flex items-center justify-between gap-4 md:justify-end">
+        {footerStart ? <div className="min-w-0 flex-1 md:hidden">{footerStart}</div> : null}
+        <div className="flex shrink-0 gap-4">
+          <CarouselArrow dir="prev" tone="light" onClick={() => scroll(-1)} label="Scroll back" />
+          <CarouselArrow dir="next" tone="light" onClick={() => scroll(1)} label="Scroll forward" />
+        </div>
       </div>
     </div>
   );

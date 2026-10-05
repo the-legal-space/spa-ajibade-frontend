@@ -172,7 +172,7 @@ export default async function AboutPage() {
                       View Awards <ArrowUpRight className="size-4" aria-hidden />
                     </>
                   );
-                  const className = buttonClass("light", "min-w-[143px] justify-between");
+                  const className = buttonClass("light", "min-w-[143px] justify-between max-md:w-auto");
 
                   return (
                     <MotionListItem key={a.slug ?? a.url ?? `${a.name}-${index}`} className="flex items-center justify-between gap-5 border-b border-white/15 py-4">

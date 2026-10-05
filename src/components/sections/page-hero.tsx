@@ -56,12 +56,12 @@ export function PageHero({
             {hero.title}
           </Heading>
           {hero.subtitle ? (
-            <MotionP className="mt-5 text-lg leading-8 text-mist md:text-xl md:leading-9">{hero.subtitle}</MotionP>
+            <MotionP className="mt-5 text-sm leading-7 text-mist md:text-xl md:leading-9">{hero.subtitle}</MotionP>
           ) : null}
           <HeroDots className="mt-5" />
           {children}
           {hero.primaryCta || hero.secondaryCta ? (
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
               {hero.primaryCta ? <SmartLink link={hero.primaryCta} className={buttonClass("light")} /> : null}
               {hero.secondaryCta ? <SmartLink link={hero.secondaryCta} className={buttonClass("ghostDark")} /> : null}
             </div>
