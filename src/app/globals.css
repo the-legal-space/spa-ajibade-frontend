@@ -139,3 +139,13 @@
   .hide-scrollbar { scrollbar-width: none; }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
 }
+
+/* iOS Safari zooms the page when a focused field's text is under 16px (search, chat, forms, sort).
+   Kept outside @layer so it beats the text-sm / text-[15px] utilities, and only on phones. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
