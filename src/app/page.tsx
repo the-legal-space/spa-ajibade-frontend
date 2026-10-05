@@ -143,7 +143,7 @@ export default async function HomePage() {
               </Reveal>
             ) : null}
           </div>
-          <MotionList className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-11 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {page.leadership.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} details={cardDetails[p.slug]} />

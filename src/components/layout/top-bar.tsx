@@ -8,7 +8,7 @@ export function TopBar({ settings }: { settings: Site["settings"] }) {
   return (
     <div className="relative z-50 bg-ink text-white">
       <div className="container-site flex flex-col items-start gap-3 py-3 text-[13px] font-medium sm:h-[61px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:py-0 md:text-sm">
-        <p className="truncate">
+        <p className="max-w-full break-words sm:truncate">
           {settings.phone ? (tel ? <a href={tel} className="hover:underline">{settings.phone}</a> : settings.phone) : null}
           {settings.phone && settings.email ? <span className="px-1.5">|</span> : null}
           {settings.email ? (
