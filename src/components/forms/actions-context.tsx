@@ -17,7 +17,7 @@ import { ChatPanel, type ChatFaq } from "./chat-panel";
 type DialogKind = "mandate" | "message" | "chat" | null;
 
 type ActionsValue = {
-  run: (action: string, context?: { practiceArea?: string }) => void;
+  run: (action: string, context?: { practiceArea?: string; attorney?: string }) => void;
   phoneHref: string | null;
   firmName: string;
 };
@@ -55,7 +55,7 @@ export function ActionsProvider({
       const name = action.replace(/^action:/, "");
       switch (name) {
         case "mandate":
-          router.push("/discuss");
+          router.push(context?.attorney ? `/discuss?attorney=${encodeURIComponent(context.attorney)}` : "/discuss");
           break;
         case "call":
           if (phoneHref) window.location.href = phoneHref;

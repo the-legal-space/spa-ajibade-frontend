@@ -142,6 +142,7 @@ export default async function PersonPage({ params }: Props) {
               ) : mandate ? (
                 <SmartLink
                   link={mandate}
+                  attorney={p.slug}
                   className="grid size-[52px] place-items-center rounded-lg bg-mist hover:bg-mist-200"
                 >
                   <Mail className="size-6" aria-hidden />
@@ -195,6 +196,7 @@ export default async function PersonPage({ params }: Props) {
             {mandate ? (
               <SmartLink
                 link={mandate}
+                attorney={p.slug}
                 className={buttonClass("dark", "mt-8")}
               />
             ) : null}

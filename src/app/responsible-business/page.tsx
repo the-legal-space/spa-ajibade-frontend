@@ -7,7 +7,7 @@ import { formatLongDate, readPage } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard } from "@/components/sections/cards";
 import { CsrCarousel } from "@/components/sections/csr-carousel";
-import { Pagination } from "@/components/ui/listing-controls";
+import { ListingResults, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -82,8 +82,9 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
             <CsrCarousel slides={slides} />
           </Reveal>
 
+          <ListingResults>
           {list.data.length > 0 ? (
-            <MotionList className="mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+            <MotionList key={meta.page} className="mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
               {list.data.map((i) => (
                 <MotionListItem key={i.id}>
                   <InsightCard insight={i} />
@@ -102,6 +103,7 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
             base="/responsible-business"
             current={{}}
           />
+          </ListingResults>
         </div>
       </section>
 
