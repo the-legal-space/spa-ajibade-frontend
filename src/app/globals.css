@@ -149,3 +149,16 @@
     font-size: 16px;
   }
 }
+
+/* While a filter / sort / page change is loading (see usePendingFlag), dim the results so a slow
+   connection never looks like the click did nothing. */
+[data-listing-results] {
+  transition: opacity 0.2s ease;
+}
+html[data-listing-pending] {
+  cursor: progress;
+}
+html[data-listing-pending] [data-listing-results] {
+  opacity: 0.45;
+  pointer-events: none;
+}

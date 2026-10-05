@@ -5,6 +5,8 @@
 
 export type StaffMember = {
   id: string;
+  /** The attorney's slug in the CMS, when they have a profile page. */
+  slug?: string;
   name: string;
   role: string;
   departments: string[];
@@ -33,6 +35,7 @@ export const EMPTY_USER_INFO: UserInfo = {
 export const STAFF: StaffMember[] = [
   {
     id: "babatunde",
+    slug: "babatunde-ajibade",
     name: "Dr. Babatunde Ajibade, SAN",
     role: "Managing Partner",
     departments: ["Dispute Resolution", "Corporate Finance", "Real Estate"],
@@ -41,6 +44,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "john",
+    slug: "john-onyido",
     name: "Dr. John Onyido",
     role: "Partner",
     departments: ["Intellectual Property & Technology"],
@@ -49,6 +53,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "kolawole",
+    slug: "kolawole-mayomi",
     name: "Dr. Kolawole Mayomi",
     role: "Partner",
     departments: ["Dispute Resolution"],
@@ -65,6 +70,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "olalere",
+    slug: "peter-olalere",
     name: "Peter Olalere",
     role: "Associate Partner",
     departments: ["Dispute Resolution", "Energy and Natural Resources"],
@@ -73,6 +79,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "magnus",
+    slug: "magnus-ejelonu",
     name: "Magnus Ejelonu",
     role: "Associate Partner",
     departments: ["Energy & Natural Resources"],
@@ -81,6 +88,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "bolaji",
+    slug: "bolaji-gabari",
     name: "Bolaji Gabari",
     role: "Associate Partner",
     departments: ["Corporate Finance"],
@@ -89,6 +97,7 @@ export const STAFF: StaffMember[] = [
   },
   {
     id: "moruf",
+    slug: "moruf-sowunmi",
     name: "Moruf Sowunmi",
     role: "Associate Partner",
     departments: ["Real Estate & Succession"],

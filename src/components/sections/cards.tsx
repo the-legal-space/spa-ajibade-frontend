@@ -154,6 +154,7 @@ export function PersonCard({
               <SmartLink
                 link={MANDATE_LINK}
                 practiceArea={details?.practiceAreas[0]?.slug}
+                attorney={person.slug}
                 className={buttonClass("dark", "w-full")}
               />
               <Link

@@ -11,15 +11,18 @@ import { Honeypot } from "@/components/forms/fields";
 import { useTurnstile } from "@/components/forms/turnstile";
 import {
   EMPTY_USER_INFO,
+  STAFF,
   formatFullDate,
   type StaffMember,
   type UserInfo,
 } from "@/lib/discuss/staff";
 
-export default function DiscussApp() {
+export default function DiscussApp({ preselectedStaffId }: { preselectedStaffId?: string }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [userInfo, setUserInfo] = useState<UserInfo>(EMPTY_USER_INFO);
-  const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(
+    () => STAFF.find((s) => s.id === preselectedStaffId) ?? null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);

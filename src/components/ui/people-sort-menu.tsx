@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { FilterOption } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { TRANSITIONS } from "@/lib/motion";
-import { withParams } from "@/components/ui/listing-controls";
+import { LinkSpinner, withParams } from "@/components/ui/listing-controls";
 
 type SortOption = { value: string; label: string };
 
@@ -44,6 +44,9 @@ export function PeopleSortMenu({
 
   const activeArea = current.practiceArea ?? "";
   const activeSort = current.sort ?? defaultSort;
+
+  // The menu stays open (with its spinner) while the new results load, then closes once the URL has changed.
+  useEffect(() => setOpen(false), [activeArea, activeSort]);
   const row = "block border-b border-mist-200 py-3.5 text-[14px] leading-tight transition-colors last:border-b-0 hover:text-stone";
 
   return (
@@ -75,11 +78,13 @@ export function PeopleSortMenu({
                   <Link
                     href={withParams(base, current, { practiceArea: o.value || undefined, page: undefined })}
                     scroll={false}
-                    onClick={() => setOpen(false)}
                     aria-current={o.value === activeArea ? "true" : undefined}
                     className={cn(row, o.value === activeArea && "font-semibold")}
                   >
-                    {o.label}
+                    <span className="flex items-center justify-between">
+                      {o.label}
+                      <LinkSpinner />
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -92,11 +97,13 @@ export function PeopleSortMenu({
                   <Link
                     href={withParams(base, current, { sort: s.value === defaultSort ? undefined : s.value, page: undefined })}
                     scroll={false}
-                    onClick={() => setOpen(false)}
                     aria-current={s.value === activeSort ? "true" : undefined}
                     className={cn(row, s.value === activeSort && "font-semibold")}
                   >
-                    {s.label}
+                    <span className="flex items-center justify-between">
+                      {s.label}
+                      <LinkSpinner />
+                    </span>
                   </Link>
                 </li>
               ))}
