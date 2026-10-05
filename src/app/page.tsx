@@ -128,7 +128,7 @@ export default async function HomePage() {
               {page.leadershipSection.eyebrow ? (
                 <Eyebrow>{page.leadershipSection.eyebrow}</Eyebrow>
               ) : null}
-              <Heading className="mt-2 max-w-[895px]">
+              <Heading className="mt-1 max-w-[895px] md:mt-2">
                 <span id="leadership-heading">
                   {page.leadershipSection.title}
                 </span>
@@ -158,14 +158,16 @@ export default async function HomePage() {
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 lg:py-[60px]">
           <div className="flex flex-col justify-center gap-5">
             <div className="flex flex-col gap-4">
-              {whyChooseUs.eyebrow ? (
-                <MotionP className="text-sm font-medium text-gray">
-                  {whyChooseUs.eyebrow}
-                </MotionP>
-              ) : null}
-              <Heading className="text-[#f2f1f0]">
-                <span id="why-heading">{whyChooseUs.title}</span>
-              </Heading>
+              <div className="flex flex-col gap-1 md:gap-4">
+                {whyChooseUs.eyebrow ? (
+                  <MotionP className="text-sm font-medium text-gray">
+                    {whyChooseUs.eyebrow}
+                  </MotionP>
+                ) : null}
+                <Heading className="text-[#f2f1f0]">
+                  <span id="why-heading">{whyChooseUs.title}</span>
+                </Heading>
+              </div>
               <MotionP className="text-sm leading-7 text-mist md:text-xl md:leading-9">
                 {whyChooseUs.text}
               </MotionP>
@@ -193,7 +195,7 @@ export default async function HomePage() {
             </ul>
             </Reveal>
           </div>
-          <Reveal className="relative min-h-[560px] overflow-hidden rounded-[5px]">
+          <Reveal className="relative min-h-[307px] overflow-hidden rounded-[5px] md:min-h-[560px]">
             <Media
               image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))}
               sizes="(min-width:1024px) 50vw, 100vw"
@@ -211,7 +213,7 @@ export default async function HomePage() {
               {page.insightsSection.eyebrow ? (
                 <Eyebrow>{page.insightsSection.eyebrow}</Eyebrow>
               ) : null}
-              <Heading className="mt-2">
+              <Heading className="mt-1 md:mt-2">
                 <span id="insights-heading">{page.insightsSection.title}</span>
               </Heading>
             </div>

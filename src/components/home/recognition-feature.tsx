@@ -43,21 +43,23 @@ export function RecognitionFeature({
   while (set.length < 8) set.push(...base);
   return (
     <section
-      className="bg-mist py-6 text-ink md:py-[68px]"
+      className="bg-mist py-6 text-ink md:py-17"
       aria-labelledby="recognition-heading"
     >
       <div className="container-site grid items-center gap-10 lg:grid-cols-[811fr_497fr] lg:gap-11">
-        <div className="flex min-w-0 flex-col items-start gap-6">
-          <Eyebrow>{section.eyebrow || "Recognition"}</Eyebrow>
-          <Heading>
-            <span id="recognition-heading">
-              {section.title ||
-                "Ranked Among Nigeria's Top Firms By Key Global Legal Institutions."}
-            </span>
-          </Heading>
-          <Reveal className="w-full max-w-[601px]">
+        <div className="flex min-w-0 flex-col items-start gap-4 md:gap-6">
+          <div className="flex flex-col items-start gap-1 md:gap-6">
+            <Eyebrow>{section.eyebrow || "Recognition"}</Eyebrow>
+            <Heading>
+              <span id="recognition-heading">
+                {section.title ||
+                  "Ranked Among Nigeria's Top Firms By Key Global Legal Institutions."}
+              </span>
+            </Heading>
+          </div>
+          <Reveal className="w-full max-w-150.25">
           <div
-            className="pause-on-hover relative h-[124px] w-full overflow-hidden"
+            className="pause-on-hover relative h-31 w-full overflow-hidden"
             aria-label="Awards and rankings"
             role="region"
           >
@@ -66,7 +68,7 @@ export function RecognitionFeature({
                 <li
                   key={i}
                   aria-hidden={i >= base.length}
-                  className="mr-[38px] flex h-[124px] w-[122px] shrink-0 items-center justify-center border-[1.24px] border-mist bg-white"
+                  className="mr-9.5 flex h-31 w-30.5 shrink-0 items-center justify-center border-[1.24px] border-mist bg-white"
                 >
                   <BadgeImage
                     badge={b}

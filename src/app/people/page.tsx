@@ -54,7 +54,7 @@ export default async function PeoplePage({ searchParams }: Props) {
 
       <Section tone="mist" labelledBy="directory-heading" id="directory">
         {content.directorySection.eyebrow ? <Eyebrow>{content.directorySection.eyebrow}</Eyebrow> : null}
-        <Heading className="mt-2 max-w-3xl">
+        <Heading className="mt-1 max-w-3xl md:mt-2">
           <span id="directory-heading">{content.directorySection.title}</span>
         </Heading>
 

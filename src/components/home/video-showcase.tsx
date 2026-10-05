@@ -78,7 +78,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
         className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10"
         style={{ backgroundImage: `url(${FIGMA.videoMark})` }}
       />
-      <div className="container-site relative flex flex-col items-center gap-6 pb-6 pt-4 md:gap-11 md:py-[68px]">
+      <div className="container-site relative flex flex-col items-center gap-[16px] pb-6 pt-4 md:gap-11 md:py-[68px]">
         <Reveal className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[12px] border-8 border-[rgba(156,155,155,0.2)] sm:aspect-video md:border-[16px] lg:aspect-auto lg:h-[759px]">
           <video
             ref={preview}
