@@ -15,9 +15,9 @@ export function ContactCallout({ callout }: { callout: Site["contactCallout"] })
       <div className="container-site relative flex min-h-[460px] flex-col items-center justify-center gap-6 py-24 text-center md:min-h-[642px] md:py-[147px]">
         <div className="flex flex-col items-center gap-3">
           <Heading className="max-w-5xl">{callout.title}</Heading>
-          <MotionP className="max-w-[894px] text-lg leading-8 text-mist md:text-2xl md:leading-[44px]">{callout.text}</MotionP>
+          <MotionP className="max-w-[894px] text-sm leading-6 text-mist md:text-2xl md:leading-[44px]">{callout.text}</MotionP>
         </div>
-        <Reveal className="flex flex-wrap justify-center gap-3" delay={0.1}>
+        <Reveal className="flex flex-wrap justify-center gap-3 max-md:w-full" delay={0.1}>
           {callout.primaryCta ? <SmartLink link={callout.primaryCta} className={buttonClass("light")} /> : null}
           {callout.secondaryCta ? <SmartLink link={callout.secondaryCta} className={buttonClass("ghostDark")} /> : null}
         </Reveal>

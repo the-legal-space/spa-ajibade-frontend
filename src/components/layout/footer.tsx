@@ -37,13 +37,13 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
       <div className="container-site relative flex flex-col gap-11 py-14 md:py-[68px]">
         <div className="grid gap-12 md:grid-cols-2 xl:flex xl:items-start xl:justify-between">
           <div className="flex w-full max-w-[437px] flex-col gap-10">
-            {footer.newsletter.enabled ? (
-              <div className="flex max-w-[414px] flex-col gap-6">
-                <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title}</h2>
-                <NewsletterForm firmEmail={settings.email} />
-                <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note}</p>
-              </div>
-            ) : null}
+            {/* Shown as in the Figma even while the CMS "enabled" flag is off; the form just opens the
+                visitor's mail app addressed to the firm, so there is nothing to switch on behind it. */}
+            <div className="flex max-w-[414px] flex-col gap-6">
+              <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title || "Subscribe for legal insights"}</h2>
+              <NewsletterForm firmEmail={settings.email} />
+              <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note || "Your information is kept confidential"}</p>
+            </div>
             <SocialLinks socials={footer.socials} always className="gap-5" iconClassName="size-5" />
           </div>
 
@@ -101,7 +101,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/15 pt-6 text-sm leading-7 text-white md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col items-center gap-3 border-t border-white/15 pt-6 text-center text-sm leading-7 text-white md:flex-row md:justify-between md:text-left">
           <p>{footer.copyright || settings.copyright}</p>
           <p className="flex items-center gap-6">
             {footer.legalLinks.map((link, index) => (

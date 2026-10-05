@@ -1,3 +1,4 @@
+import { withoutDefaultFocus } from "@/lib/utils";
 import type { ApiImage } from "@/lib/api/schemas";
 
 /**
@@ -66,7 +67,9 @@ const INSIGHTS: Record<string, ApiImage> = {
 
 /** CMS photo for a person, or the Figma export when the CMS has none. */
 export function personPhoto(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
-  return cms?.url ? cms : (PEOPLE[slug] ?? null);
+  // The CMS default focal point (centre) crops the top of the head on tall portraits; the Media
+  // callers add `object-top` so headshots keep their headroom unless an editor set a focal point.
+  return cms?.url ? withoutDefaultFocus(cms) : (PEOPLE[slug] ?? null);
 }
 
 /** Small author avatar: CMS photo first, then the Figma avatar or portrait. */

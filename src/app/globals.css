@@ -90,7 +90,7 @@
 
 @layer components {
   .container-site {
-    @apply mx-auto w-full max-w-(--container-site) px-5 md:px-8 xl:px-(--spacing-gutter);
+    @apply mx-auto w-full max-w-site px-5 md:px-8 xl:px-(--spacing-gutter);
   }
 
   /* Rich text coming from the CMS (already sanitised twice: API and here). */

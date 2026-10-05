@@ -10,7 +10,7 @@ export default function NotFound() {
         <p className="mt-4 max-w-xl text-lg leading-8 text-white/80">
           It may have been moved, or it isn&apos;t published yet. Try one of these instead.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex w-full flex-col gap-3 md:w-auto md:flex-row md:flex-wrap">
           <Link href="/" className={buttonClass("light")}>
             Go to the homepage
           </Link>

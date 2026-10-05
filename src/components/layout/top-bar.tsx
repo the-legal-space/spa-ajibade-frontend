@@ -7,7 +7,7 @@ export function TopBar({ settings }: { settings: Site["settings"] }) {
   const tel = telHref(settings.phone);
   return (
     <div className="relative z-50 bg-ink text-white">
-      <div className="container-site flex h-[50px] items-center justify-between gap-4 text-[13px] font-medium md:h-[61px] md:text-sm">
+      <div className="container-site flex flex-col items-start gap-3 py-3 text-[13px] font-medium sm:h-[61px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:py-0 md:text-sm">
         <p className="truncate">
           {settings.phone ? (tel ? <a href={tel} className="hover:underline">{settings.phone}</a> : settings.phone) : null}
           {settings.phone && settings.email ? <span className="px-1.5">|</span> : null}
@@ -17,7 +17,7 @@ export function TopBar({ settings }: { settings: Site["settings"] }) {
             </a>
           ) : null}
         </p>
-        <SocialLinks socials={settings.socials} always className="hidden gap-6 text-[#e4e7ec] sm:flex" iconClassName="size-6" />
+        <SocialLinks socials={settings.socials} always className="text-[#e4e7ec] sm:gap-6" iconClassName="sm:size-6" />
       </div>
     </div>
   );

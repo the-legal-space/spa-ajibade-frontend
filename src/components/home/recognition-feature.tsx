@@ -78,13 +78,13 @@ export function RecognitionFeature({
             </ul>
           </div>
           </Reveal>
-          <Reveal>
+          <Reveal className="max-md:w-full">
             <Link href="/about#recognition" className={buttonClass("dark")}>
               {section.cta?.label || "View Our Recognitions"}
             </Link>
           </Reveal>
         </div>
-        <Reveal className="h-[510px] overflow-hidden rounded-[24px] md:h-[488px]">
+        <Reveal className="h-[360px] overflow-hidden rounded-[24px] md:h-[488px]">
           <Media
             image={cmsOr(section.image, FIGMA.recognition)}
             sizes="(min-width:1024px) 35vw, 100vw"

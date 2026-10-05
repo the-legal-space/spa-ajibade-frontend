@@ -142,7 +142,7 @@ export default async function PracticeAreaPage({ params }: Props) {
                   {coreServices.map((s) => (
                     <MotionListItem
                       key={s.title}
-                      className="flex min-h-[140px] flex-col justify-between rounded-xl bg-mist p-4 transition-shadow duration-200 hover:shadow-xs"
+                      className="flex min-h-35 flex-col justify-between rounded-xl bg-mist p-4 transition-shadow duration-200 hover:shadow-xs"
                     >
                       <PracticeMark />
                       <div className="mt-6">
@@ -187,7 +187,7 @@ export default async function PracticeAreaPage({ params }: Props) {
                 <h2 id="industries-heading" className="font-serif text-xl">Industries we serve</h2>
                 <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   {area.industries.map((industry) => (
-                    <li key={industry.slug} className="flex min-h-[118px] flex-col justify-between rounded-xl bg-mist p-4">
+                    <li key={industry.slug} className="flex min-h-29.5 flex-col justify-between rounded-xl bg-mist p-4">
                       <PracticeMark />
                       <span className="font-serif text-base leading-snug">{industry.name}</span>
                     </li>
@@ -258,7 +258,7 @@ function ContactCard({ person }: { person: PersonSummary }) {
     <div className="group">
       <Link
         href={`/people/${person.slug}`}
-        className="block aspect-[264/280] overflow-hidden rounded-md"
+        className="block aspect-264/280 overflow-hidden rounded-md"
       >
         <Media
           image={personPhoto(person.slug, person.photo)}
@@ -266,7 +266,7 @@ function ContactCard({ person }: { person: PersonSummary }) {
           name={person.displayName}
           alt={`Portrait of ${person.displayName}`}
           sizes="264px"
-          className="transition duration-500 group-hover:scale-[1.03]"
+          className="object-top transition duration-500 group-hover:scale-[1.03]"
         />
       </Link>
       <Link

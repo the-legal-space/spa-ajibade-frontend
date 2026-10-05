@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { OfficeRef, PracticeAreaRef } from "@/lib/api/schemas";
 import { telHref } from "@/lib/utils";
@@ -47,13 +48,14 @@ export function ActionsProvider({
   const [open, setOpen] = useState<DialogKind>(null);
   const [presetArea, setPresetArea] = useState<string | undefined>();
   const phoneHref = telHref(phone);
+  const router = useRouter();
 
   const run = useCallback<ActionsValue["run"]>(
     (action, context) => {
       const name = action.replace(/^action:/, "");
       switch (name) {
         case "mandate":
-          window.open("https://spaajibade.com/book/", "_blank", "noopener,noreferrer");
+          router.push("/discuss");
           break;
         case "call":
           if (phoneHref) window.location.href = phoneHref;
@@ -68,7 +70,7 @@ export function ActionsProvider({
           setOpen("message");
       }
     },
-    [phoneHref],
+    [phoneHref, router],
   );
 
   const closeChat = useCallback(() => setOpen((o) => (o === "chat" ? null : o)), []);

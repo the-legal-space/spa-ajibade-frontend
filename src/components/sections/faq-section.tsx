@@ -46,11 +46,11 @@ export function FaqSection({ section, headingLevel = "h2" }: { section: Site["fa
           >
             <p className="relative text-2xl leading-none">{shq.title}</p>
             <p className="relative mt-1 text-base leading-6 tracking-[-0.02em] text-mist">{shq.text}</p>
-            <div className="relative mt-6 flex flex-wrap gap-3 md:gap-5">
+            <div className="relative mt-6 flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-5">
               {shq.actions.map((a) => {
                 const Icon = actionIcon[a.href];
                 return (
-                  <SmartLink key={a.href} link={a} className="inline-flex h-12 items-center justify-center gap-1.5 rounded-[32px] bg-mist px-4 text-sm leading-7 text-ink transition-colors hover:bg-white">
+                  <SmartLink key={a.href} link={a} className="inline-flex h-12 w-full items-center justify-center gap-1.5 rounded-[32px] md:w-auto bg-mist px-4 text-sm leading-7 text-ink transition-colors hover:bg-white">
                     {Icon ? <Icon className="size-5" strokeWidth={1.5} aria-hidden /> : null}
                     {a.label}
                   </SmartLink>

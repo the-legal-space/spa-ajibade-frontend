@@ -47,13 +47,13 @@ export function PeopleSortMenu({
   const row = "block border-b border-mist-200 py-3.5 text-[14px] leading-tight transition-colors last:border-b-0 hover:text-stone";
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative max-md:w-full">
       <button
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-[42px] cursor-pointer items-center gap-3 rounded-[4px] border border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs transition-colors hover:border-ink"
+        className="inline-flex h-[42px] cursor-pointer items-center gap-3 rounded-[4px] max-md:w-full max-md:justify-center border border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs transition-colors hover:border-ink"
       >
         Sort By
         <ChevronDown className={cn("size-4 text-stone transition-transform", open && "rotate-180")} aria-hidden />

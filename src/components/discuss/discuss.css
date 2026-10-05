@@ -1,0 +1,955 @@
+/* ============================================================
+   SPA AJIBADE & CO. — APPOINTMENT BOOKING
+   booking.css
+   Dark navy theme · Cormorant Garamond + DM Sans
+   Scoped under `.booking-app` so it never leaks into the rest of
+   the holding page (which uses a light Tailwind theme).
+   ============================================================ */
+
+.booking-app {
+  /* Note: --font-dm-sans / --font-cormorant are provided by next/font in
+     app/book/layout.tsx, so they resolve from this element's ancestor. */
+
+  /* Background layers */
+  --bg-page: #000000;
+  --bg-input: #0f0f0f;
+  --bg-input-focus: #161616;
+  --bg-card: #0d0d0d;
+  --bg-card-hover: #151515;
+  --bg-card-active: #1c1c1c;
+
+  /* Borders */
+  --border-subtle: #2b2b2b;
+  --border-focus: #ffffff;
+  --border-card: #2b2b2b;
+  --border-highlight: #c9a84c;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --text-label: #e5e5e5;
+
+  /* Accent */
+  --accent: #ffffff;
+  --on-accent: #000000;
+  --accent-hover: #e5e5e5;
+  --accent-glow: rgba(255, 255, 255, 0.18);
+  --gold: #c9a84c;
+  --gold-light: rgba(201, 168, 76, 0.12);
+
+  /* Input sizing */
+  --input-height: 52px;
+  --input-radius: 8px;
+  --input-padding: 0 16px;
+  --input-font: 15px;
+  --input-bg: var(--bg-input);
+  --input-border: 1px solid var(--border-subtle);
+
+  /* Layout */
+  --max-width: 680px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --fast: 0.15s;
+  --normal: 0.25s;
+  --slow: 0.4s;
+
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 400;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  background-image: radial-gradient(
+    ellipse 80% 60% at 50% -10%,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 70%
+  );
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── APP WRAPPER ────────────────────────────────────────────── */
+.booking-app .booking-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 80px;
+}
+
+/* ── HEADER / LOGO ──────────────────────────────────────────── */
+.booking-app .booking-header {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: 32px 0 28px;
+}
+
+.booking-app .booking-logo-mark {
+  display: inline-block;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.booking-app .booking-logo-img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  object-position: left;
+}
+
+/* ── MAIN ───────────────────────────────────────────────────── */
+.booking-app .booking-main {
+  width: 100%;
+  max-width: var(--max-width);
+}
+
+/* ── ERROR ──────────────────────────────────────────────────── */
+.booking-app .booking-error {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border: 1px solid rgba(229, 72, 77, 0.4);
+  border-radius: 8px;
+  background: rgba(229, 72, 77, 0.08);
+  color: #ff7a7e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── PROGRESS BAR ───────────────────────────────────────────── */
+.booking-app .progress-track {
+  width: 100%;
+  margin-bottom: 36px;
+  padding: 16px 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.booking-app .progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.booking-app .progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.booking-app .step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--normal) var(--ease);
+  position: relative;
+}
+
+.booking-app .step-dot span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--normal) var(--ease);
+}
+
+.booking-app .step-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--normal) var(--ease);
+}
+
+/* Active step */
+.booking-app .progress-step.active .step-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.booking-app .progress-step.active .step-dot span {
+  color: var(--on-accent);
+}
+.booking-app .progress-step.active .step-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Completed step */
+.booking-app .progress-step.completed .step-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.booking-app .progress-step.completed .step-dot span {
+  display: none;
+}
+.booking-app .progress-step.completed .step-dot::after {
+  content: "";
+  width: 12px;
+  height: 6px;
+  border-left: 2px solid var(--on-accent);
+  border-bottom: 2px solid var(--on-accent);
+  transform: rotate(-45deg) translateY(-1px);
+}
+.booking-app .progress-step.completed .step-label {
+  color: var(--text-secondary);
+}
+
+/* Connector line */
+.booking-app .progress-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-subtle);
+  margin: 0 8px;
+  margin-bottom: 18px;
+  transition: background var(--normal) var(--ease);
+}
+.booking-app .progress-line.done {
+  background: var(--accent);
+}
+
+/* ── STEP PANELS ────────────────────────────────────────────── */
+.booking-app .step-panel {
+  display: none;
+}
+.booking-app .step-panel.active {
+  display: block;
+  animation: stepIn var(--normal) var(--ease);
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── STEP HEADINGS ──────────────────────────────────────────── */
+.booking-app .step-heading {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+  letter-spacing: 0.01em;
+}
+
+.booking-app .step-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: -16px 0 24px;
+  font-weight: 300;
+}
+
+.booking-app .step-header-row {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+/* ── FORM ───────────────────────────────────────────────────── */
+.booking-app .form-row {
+  display: flex;
+  gap: 16px;
+}
+.booking-app .form-row.two-col > .form-group {
+  flex: 1 1 0;
+}
+
+.booking-app .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.booking-app .form-group label {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--text-label);
+}
+
+.booking-app .form-group label .optional-tag {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.booking-app .form-group input,
+.booking-app .form-group textarea {
+  width: 100%;
+  height: var(--input-height);
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: var(--input-font);
+  padding: var(--input-padding);
+  outline: none;
+  transition:
+    border-color var(--fast) var(--ease),
+    background var(--fast) var(--ease);
+}
+
+.booking-app .form-group textarea {
+  height: auto;
+  min-height: 110px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.booking-app .form-group input::placeholder,
+.booking-app .form-group textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.booking-app .form-group input:focus,
+.booking-app .form-group textarea:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.booking-app .form-group input.error,
+.booking-app .form-group textarea.error {
+  border-color: #e5484d;
+}
+
+.booking-app .field-error {
+  font-size: 12px;
+  color: #ff7a7e;
+  min-height: 0;
+}
+
+/* Input with icon */
+.booking-app .input-icon-wrap {
+  position: relative;
+}
+.booking-app .input-icon-wrap .input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.booking-app .input-icon-wrap input {
+  padding-left: 44px;
+}
+
+/* ── FORM ACTIONS / BUTTONS ─────────────────────────────────── */
+.booking-app .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.booking-app .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 28px;
+  border: none;
+  border-radius: var(--input-radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background var(--fast) var(--ease),
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease);
+}
+.booking-app .btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+.booking-app .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+.booking-app .btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.booking-app .btn-primary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Back button */
+.booking-app .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--input-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease);
+}
+.booking-app .btn-back:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+.booking-app .btn-back:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+/* ── STAFF GRID (cards) ─────────────────────────────────────── */
+.booking-app .staff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.booking-app .staff-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color var(--fast) var(--ease),
+    background var(--fast) var(--ease);
+}
+.booking-app .staff-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.booking-app .staff-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.booking-app .staff-card.selected {
+  border-color: var(--accent);
+  background: var(--bg-card-active);
+}
+.booking-app .staff-card.highlight {
+  border-color: var(--border-highlight);
+}
+.booking-app .staff-card.highlight:hover {
+  border-color: var(--border-highlight);
+}
+.booking-app .staff-card.highlight.selected {
+  border-color: var(--accent);
+}
+
+.booking-app .staff-card-badge {
+  align-self: flex-start;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-light);
+  border: 1px solid var(--border-highlight);
+  border-radius: 5px;
+  padding: 3px 8px;
+}
+
+.booking-app .staff-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.booking-app .staff-card.highlight .staff-card-avatar {
+  background: var(--gold-light);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.booking-app .staff-card-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.booking-app .staff-card-role {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: -4px;
+}
+
+.booking-app .staff-card-depts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.booking-app .staff-card-dept {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 3px 9px;
+}
+
+/* ── BOOKING SHELL ──────────────────────────────────────────── */
+.booking-app .booking-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  background: var(--bg-input);
+  border: var(--input-border);
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.booking-app .booking-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* LEFT — Staff info */
+.booking-app .booking-info {
+  flex: 0 0 220px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.booking-app .booking-title {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.booking-app .booking-staff {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.booking-app .booking-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a2a2a 0%, #171717 100%);
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.booking-app .booking-staff-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.booking-app .booking-staff-role {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.booking-app .booking-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.booking-app .booking-meta li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.booking-app .booking-meta li svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.booking-app .booking-selected-summary {
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+.booking-app .summary-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.booking-app .summary-value {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+/* MIDDLE — Calendar */
+.booking-app .booking-calendar {
+  flex: 1 1 auto;
+  padding: 28px 28px 32px;
+  min-width: 0;
+}
+
+.booking-app .cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.booking-app .cal-month-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.booking-app .cal-nav {
+  display: flex;
+  gap: 6px;
+}
+.booking-app .cal-nav-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.booking-app .cal-nav-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.booking-app .cal-nav-btn:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.booking-app .cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+.booking-app .cal-weekdays span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.booking-app .cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.booking-app .cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  border-radius: 50%;
+  cursor: default;
+  transition: all var(--fast) var(--ease);
+  position: relative;
+  user-select: none;
+}
+.booking-app .cal-day.empty {
+  pointer-events: none;
+}
+.booking-app .cal-day.past {
+  color: var(--text-muted);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.booking-app .cal-day.today::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.booking-app .cal-day.available {
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+}
+.booking-app .cal-day.available:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+.booking-app .cal-day.available:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.booking-app .cal-day.selected {
+  background: var(--accent) !important;
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.booking-app .cal-day.selected::after {
+  display: none;
+}
+
+/* RIGHT — Time slots */
+.booking-app .booking-slots {
+  flex: 0 0 160px;
+  padding: 28px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.booking-app .slots-date-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.booking-app .slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle) transparent;
+}
+
+.booking-app .slot-btn {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--fast) var(--ease);
+  white-space: nowrap;
+}
+.booking-app .slot-btn:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+}
+.booking-app .slot-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 500;
+}
+.booking-app .slot-btn:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+/* ── SUCCESS ────────────────────────────────────────────────── */
+.booking-app .booking-success {
+  text-align: center;
+  padding: 48px 24px;
+}
+.booking-app .success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.booking-app .booking-success h3 {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+.booking-app .booking-success p {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 360px;
+  margin: 0 auto 28px;
+  line-height: 1.7;
+}
+.booking-app .success-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 44px;
+  border-radius: var(--input-radius);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.booking-app .success-reset:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .booking-app .booking-shell {
+    flex-direction: column;
+  }
+  .booking-app .booking-divider {
+    width: 100%;
+    height: 1px;
+    align-self: auto;
+  }
+  .booking-app .booking-info {
+    flex: none;
+    padding: 24px 20px 20px;
+  }
+  .booking-app .booking-calendar {
+    padding: 24px 12px;
+    width: 100%;
+  }
+  .booking-app .cal-header {
+    padding: 0 8px;
+    margin-bottom: 24px;
+  }
+  .booking-app .cal-grid {
+    gap: 4px;
+  }
+  .booking-app .cal-day {
+    font-size: 15px;
+    min-height: 44px;
+  }
+  .booking-app .booking-slots {
+    flex: none;
+    border-left: none;
+    border-top: 1px solid var(--border-subtle);
+    padding: 16px 20px 20px;
+  }
+  .booking-app .slots-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .booking-app .slot-btn {
+    width: auto;
+    padding: 0 14px;
+    flex-shrink: 0;
+  }
+  .booking-app .form-row.two-col {
+    flex-direction: column;
+    gap: 0;
+  }
+  .booking-app .staff-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ── CONSENT + CONFIRMATION (added for the site) ────────────── */
+.booking-app .consent-group {
+  margin-top: 4px;
+}
+.booking-app .consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.booking-app .consent-label input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #ffffff;
+}
+.booking-app .success-reference {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.booking-app .success-reference strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
