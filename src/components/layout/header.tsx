@@ -112,6 +112,26 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  // Tapping anywhere outside the open mobile menu (or pressing Escape) closes it. The hamburger button
+  // is excluded so its own click can still toggle the menu.
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onPointer = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (mobileMenuRef.current?.contains(t) || menuButtonRef.current?.contains(t)) return;
+      setMobileOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [mobileOpen]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -145,9 +165,9 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               : "border-ink/10 bg-white/85 text-ink backdrop-blur-md",
         )}
       >
-        <div className="container-site flex h-(--header-h) items-center justify-between gap-6">
+        <div className="container-site flex h-(--header-h) items-center justify-between gap-3 md:gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
-            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} />
+            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} className="max-[359px]:h-[26px]" />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
@@ -158,14 +178,14 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3 xl:gap-6">
+          <div className="flex items-center gap-1 min-[360px]:gap-3 xl:gap-6">
             <motion.button
               type="button"
               onClick={() => setSearchOpen(true)}
               whileHover={INTERACTION.iconButton.whileHover}
               whileTap={INTERACTION.iconButton.whileTap}
               transition={TRANSITIONS.hover}
-              className={cn(iconBtn, "max-lg:hidden")}
+              className={iconBtn}
               aria-label="Search the site"
             >
               <Search className="size-6" strokeWidth={1.5} />
@@ -182,6 +202,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
+              ref={menuButtonRef}
               whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
@@ -194,6 +215,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
           {mobileOpen ? (
             <motion.nav
               id="mobile-nav"
+              ref={mobileMenuRef}
               aria-label="Mobile"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1, transition: { height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.2 } } }}

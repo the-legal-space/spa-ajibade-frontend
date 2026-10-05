@@ -43,7 +43,7 @@ export function RecognitionFeature({
   while (set.length < 8) set.push(...base);
   return (
     <section
-      className="bg-mist py-16 text-ink md:py-[68px]"
+      className="bg-mist py-6 text-ink md:py-[68px]"
       aria-labelledby="recognition-heading"
     >
       <div className="container-site grid items-center gap-10 lg:grid-cols-[811fr_497fr] lg:gap-11">
