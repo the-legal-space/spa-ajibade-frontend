@@ -116,9 +116,9 @@ export function PersonCard({
         <div
           id={panelId}
           className={cn(
-            "absolute right-4 top-4 z-20 overflow-hidden rounded-xs bg-white text-ink shadow-sm",
+            "peer/panel group/panel absolute right-4 top-4 z-20 overflow-hidden rounded-xs bg-white text-ink shadow-sm",
             "size-9 transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-            "group-hover/card:h-[calc(100%-32px)] group-hover/card:w-[calc(100%-32px)] group-hover/card:rounded-[16px]",
+            "hover:h-[calc(100%-32px)] hover:w-[calc(100%-32px)] hover:rounded-[16px]",
             "group-focus-within/card:h-[calc(100%-32px)] group-focus-within/card:w-[calc(100%-32px)] group-focus-within/card:rounded-[16px]",
             "group-data-open/card:h-[calc(100%-32px)] group-data-open/card:w-[calc(100%-32px)] group-data-open/card:rounded-[16px]",
           )}
@@ -126,7 +126,7 @@ export function PersonCard({
           <div
             className={cn(
               "flex h-full w-[calc(100%)] min-w-60 flex-col p-5 opacity-0 transition-opacity duration-200 md:p-6",
-              "group-hover/card:opacity-100 group-hover/card:delay-200 group-focus-within/card:opacity-100 group-data-open/card:opacity-100 group-data-open/card:delay-200",
+              "group-hover/panel:opacity-100 group-hover/panel:delay-200 group-focus-within/card:opacity-100 group-data-open/card:opacity-100 group-data-open/card:delay-200",
             )}
           >
             <p className="text-lg leading-tight">{person.roleLabel}</p>
@@ -172,11 +172,11 @@ export function PersonCard({
           aria-expanded={open}
           aria-controls={panelId}
           aria-label={`${open ? "Hide" : "Show"} details for ${person.displayName}`}
-          className="absolute right-4 top-4 z-30 grid size-9 place-items-center rounded-xs text-ink md:pointer-events-none md:group-focus-within/card:pointer-events-auto"
+          className="absolute right-4 top-4 z-30 grid size-9 place-items-center rounded-xs text-ink peer-hover/panel:[&>svg]:rotate-45 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:group-focus-within/card:pointer-events-auto"
         >
           <svg
             viewBox="0 0 14 14"
-            className="size-3.5 transition-transform duration-300 group-hover/card:rotate-45 group-focus-within/card:rotate-45 group-data-open/card:rotate-45"
+            className="size-3.5 transition-transform duration-300 group-focus-within/card:rotate-45 group-data-open/card:rotate-45"
             aria-hidden
           >
             <path d="M0 7h14M7 0v14" stroke="currentColor" strokeWidth="1" />
@@ -305,9 +305,9 @@ export function InsightCard({
           </span>
         ) : null}
       </Link>
-      {/* Chips wrap on phones so labels aren't cut off; from sm up they stay on one line and long labels truncate. */}
-      <div className="mt-3 flex max-h-15.5 min-h-15.5 flex-wrap content-start items-center justify-between gap-2 overflow-hidden sm:max-h-none sm:min-h-0 sm:flex-nowrap">
-        <div className="flex min-w-0 flex-wrap gap-1 sm:flex-nowrap">
+      {/* Chips and date stay on one line; long labels truncate rather than wrap. */}
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 gap-1">
           {insight.chips.slice(0, 2).map((c) => {
             const href = getInsightChipHref(insight, c);
             return (

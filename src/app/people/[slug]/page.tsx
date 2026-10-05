@@ -211,7 +211,7 @@ export default async function PersonPage({ params }: Props) {
               {home.insightsSection.eyebrow ? (
                 <Eyebrow>{home.insightsSection.eyebrow}</Eyebrow>
               ) : null}
-              <Heading className="mt-2">
+              <Heading className="mt-1 md:mt-2">
                 <span id="person-insights">Recent Publications</span>
               </Heading>
             </div>

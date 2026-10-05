@@ -103,7 +103,7 @@ export default async function AboutPage() {
       {/* Mission, vision & values */}
       <Section tone="mist" id="mission" labelledBy="mission-heading">
         {missionSection.eyebrow ? <Eyebrow>{missionSection.eyebrow}</Eyebrow> : null}
-        <Heading className="mt-2 max-w-3xl">
+        <Heading className="mt-1 max-w-3xl md:mt-2">
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
@@ -140,7 +140,7 @@ export default async function AboutPage() {
         ) : null}
         <div className="relative">
           {principles.eyebrow ? <Eyebrow>{principles.eyebrow}</Eyebrow> : null}
-          <Heading className="mt-2 max-w-3xl">
+          <Heading className="mt-1 max-w-3xl md:mt-2">
             <span id="principles-heading">{principles.title}</span>
           </Heading>
           <MotionList className="mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
@@ -161,7 +161,7 @@ export default async function AboutPage() {
           <div className="container-site grid items-center gap-10 lg:grid-cols-2">
             <div>
               {awardsList.eyebrow ? <p className="text-xs text-white/70">{awardsList.eyebrow}</p> : null}
-              <Heading className="mt-3">
+              <Heading className="mt-1 md:mt-3">
                 <span id="awards-heading">{awardsList.title}</span>
               </Heading>
               <MotionList className="mt-6 border-t border-white/15">

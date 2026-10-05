@@ -101,11 +101,11 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                   active ? "opacity-100" : "cursor-pointer opacity-30 hover:opacity-50",
                 )}
               >
-                <div className="aspect-443/484 w-full shrink-0 overflow-hidden rounded-3xl md:aspect-auto md:h-full md:w-110.75 md:max-w-[49%]">
+                <div className="aspect-352/256 w-full shrink-0 overflow-hidden rounded-3xl md:aspect-auto md:h-full md:w-110.75 md:max-w-[49%]">
                   <Media image={practiceImage(a.slug, a.image)} alt="" placeholder="dark" sizes="(min-width:768px) 443px, 100vw" />
                 </div>
-                <div className="flex min-w-0 flex-1 flex-col justify-between gap-8 p-5 md:p-8">
-                  <div className="flex flex-col gap-3.5">
+                <div className="flex min-w-0 flex-1 flex-col gap-2 md:justify-between md:gap-8 md:p-8">
+                  <div className="flex flex-col gap-2 md:gap-3.5">
                     <h3 className="font-card text-2xl capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
                     <p className="line-clamp-4 text-sm leading-7 text-cream/88">{a.summary}</p>
                   </div>
