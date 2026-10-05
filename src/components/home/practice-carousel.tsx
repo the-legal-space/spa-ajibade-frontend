@@ -55,7 +55,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
         ref={bar}
         role="tablist"
         aria-label="Practice areas"
-        className="hide-scrollbar relative mx-auto flex h-12 w-max max-w-full items-center gap-2.5 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5"
+        className="hide-scrollbar px-3 relative mx-auto flex h-12 w-max max-w-full items-center gap-2.5 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5"
       >
         {areas.map((a, i) => (
           <motion.button
