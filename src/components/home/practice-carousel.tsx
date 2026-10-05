@@ -106,7 +106,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col justify-between gap-8 p-5 md:p-8">
                   <div className="flex flex-col gap-3.5">
-                    <h3 className="font-card text-[2rem] capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
+                    <h3 className="font-card text-2xl capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
                     <p className="line-clamp-4 text-sm leading-7 text-cream/88">{a.summary}</p>
                   </div>
                   <MotionLink

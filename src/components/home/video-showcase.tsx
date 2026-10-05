@@ -23,8 +23,16 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
   const [paused, setPaused] = useState(false);
   const [open, setOpen] = useState(false);
   const caption = showcase.caption || DEFAULT_CAPTION;
-  // "Fifty-Nine" must not break across lines ("Fifty-" / "Nine"): swap the hyphen for a non-breaking one.
-  const shownCaption = caption.replace(/(fifty)-(nine)/gi, "$1\u2011$2");
+  // "Fifty-Nine" must not break across lines ("Fifty-" / "Nine"): keep it in a no-wrap span.
+  const shownCaption = caption.split(/(fifty-nine)/i).map((part, i) =>
+    /^fifty-nine$/i.test(part) ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
   const embed = showcase.videoUrl ? toEmbedUrl(showcase.videoUrl) : null;
 
   useEffect(() => {
@@ -111,7 +119,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
             )}
           </motion.button>
         </Reveal>
-        <MotionP className="max-w-[666px] text-center font-serif text-xl leading-7 md:text-2xl md:leading-[28px]">{shownCaption}</MotionP>
+        <MotionP className="max-w-[666px] self-start font-serif text-xl capitalize leading-7 md:self-auto md:text-center md:text-2xl md:leading-[28px]">{shownCaption}</MotionP>
       </div>
 
       <AnimatePresence>

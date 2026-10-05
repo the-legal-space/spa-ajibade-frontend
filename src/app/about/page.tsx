@@ -43,7 +43,7 @@ export default async function AboutPage() {
                 {story.quotePerson ? (
                   <figcaption className="mt-3">
                     <div className="aspect-294/357 w-full max-w-87.5 overflow-hidden">
-                      <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} />
+                      <Media image={personPhoto(story.quotePerson.slug, story.quotePerson.photo)} placeholder="portrait" name={story.quotePerson.displayName} alt={`Portrait of ${story.quotePerson.displayName}`} className="object-top" />
                     </div>
                     <Link href={`/people/${story.quotePerson.slug}`} className="mt-3 block text-sm font-medium hover:underline">
                       {story.quotePerson.displayName}
@@ -145,10 +145,10 @@ export default async function AboutPage() {
           </Heading>
           <MotionList className="mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
             {principles.items.map((p) => (
-              <MotionListItem key={p.title} className="border-b border-r border-mist-200 p-8 transition-colors duration-200 hover:bg-mist/40">
+              <MotionListItem key={p.title} className="border-b border-r border-mist-200 p-6 transition-colors md:p-8 duration-200 hover:bg-mist/40">
                 <CmsIcon name={p.icon} className="size-7" />
-                <h3 className="mt-8 font-serif text-2xl text-olive">{p.title}</h3>
-                {p.text ? <p className="mt-2 text-[15px] leading-7 text-ink-800">{p.text}</p> : null}
+                <h3 className="mt-6 font-serif text-xl capitalize text-olive md:mt-8 md:text-2xl">{p.title}</h3>
+                {p.text ? <p className="mt-2 text-sm leading-7 text-ink-800 md:text-[15px]">{p.text}</p> : null}
               </MotionListItem>
             ))}
           </MotionList>

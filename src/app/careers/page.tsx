@@ -49,7 +49,7 @@ export default async function CareersPage() {
                     </p>
                   ) : null}
                   <div
-                    className="prose-firm mt-4 text-base leading-8 md:text-[1.05rem]"
+                    className="prose-firm mt-4 text-sm leading-7 md:text-[1.05rem] md:leading-8"
                     dangerouslySetInnerHTML={{
                       __html: cleanHtml(job.description),
                     }}

@@ -17,7 +17,7 @@ export function TopBar({ settings }: { settings: Site["settings"] }) {
             </a>
           ) : null}
         </p>
-        <SocialLinks socials={settings.socials} always className="gap-6 text-[#e4e7ec]" iconClassName="size-6" />
+        <SocialLinks socials={settings.socials} always className="text-[#e4e7ec] sm:gap-6" iconClassName="sm:size-6" />
       </div>
     </div>
   );

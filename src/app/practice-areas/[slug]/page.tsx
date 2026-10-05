@@ -266,7 +266,7 @@ function ContactCard({ person }: { person: PersonSummary }) {
           name={person.displayName}
           alt={`Portrait of ${person.displayName}`}
           sizes="264px"
-          className="transition duration-500 group-hover:scale-[1.03]"
+          className="object-top transition duration-500 group-hover:scale-[1.03]"
         />
       </Link>
       <Link

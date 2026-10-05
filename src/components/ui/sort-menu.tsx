@@ -17,7 +17,7 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
       whileHover={{ scale: 1.015 }}
       whileTap={{ scale: 0.985 }}
       transition={TRANSITIONS.hover}
-      className="relative inline-flex items-center"
+      className="relative flex w-full items-center md:inline-flex md:w-auto"
     >
       <span className="sr-only">Sort by</span>
       <select
@@ -30,7 +30,7 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
           const qs = next.toString();
           router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
         }}
-        className="h-[42px] cursor-pointer appearance-none rounded-[4px] border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none transition-colors hover:border-ink focus:border-ink shadow-xs"
+        className="h-[42px] w-full cursor-pointer appearance-none rounded-[4px] text-center md:w-auto md:text-left border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none transition-colors hover:border-ink focus:border-ink shadow-xs"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>

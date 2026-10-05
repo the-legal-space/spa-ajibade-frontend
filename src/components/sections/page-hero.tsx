@@ -61,9 +61,9 @@ export function PageHero({
           <HeroDots className="mt-5" />
           {children}
           {hero.primaryCta || hero.secondaryCta ? (
-            <div className="mt-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
-              {hero.primaryCta ? <SmartLink link={hero.primaryCta} className={buttonClass("light")} /> : null}
-              {hero.secondaryCta ? <SmartLink link={hero.secondaryCta} className={buttonClass("ghostDark")} /> : null}
+            <div className={cn("mt-5 flex gap-3 md:flex-row md:flex-wrap", size === "lg" ? "flex-row" : "flex-col")}>
+              {hero.primaryCta ? <SmartLink link={hero.primaryCta} className={buttonClass("light", size === "lg" ? "max-md:w-auto max-md:flex-auto max-md:px-2" : undefined)} /> : null}
+              {hero.secondaryCta ? <SmartLink link={hero.secondaryCta} className={buttonClass("ghostDark", size === "lg" ? "max-md:w-auto max-md:flex-auto max-md:px-2" : undefined)} /> : null}
             </div>
           ) : null}
         </div>

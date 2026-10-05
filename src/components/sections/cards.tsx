@@ -40,7 +40,7 @@ export function PracticeAreaCard({
       whileHover={INTERACTION.card.whileHover}
       whileTap={INTERACTION.card.whileTap}
       transition={TRANSITIONS.hover}
-      className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 transition-shadow duration-300 hover:shadow-md"
+      className="group flex h-full flex-col rounded-(--radius-card) bg-white p-3.5 transition-shadow duration-300 hover:shadow-md"
     >
       <div className="aspect-331/240 overflow-hidden rounded-xl">
         <Media
@@ -50,7 +50,7 @@ export function PracticeAreaCard({
         />
       </div>
       <H className="mt-4 font-serif text-xl">{area.title}</H>
-      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-7 text-ink-700">
+      <p className="mt-2 flex-1 text-sm leading-7 text-ink-700 md:line-clamp-2">
         {area.summary}
       </p>
       <MotionLink
@@ -109,6 +109,7 @@ export function PersonCard({
           placeholder="portrait"
           name={person.displayName}
           sizes="(min-width:1024px) 440px, (min-width:640px) 50vw, 100vw"
+          className="object-top"
         />
 
         {/* The "+" square that grows into the panel (top-right anchored, like the Figma smart animate). */}

@@ -165,7 +165,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               whileHover={INTERACTION.iconButton.whileHover}
               whileTap={INTERACTION.iconButton.whileTap}
               transition={TRANSITIONS.hover}
-              className={iconBtn}
+              className={cn(iconBtn, "max-lg:hidden")}
               aria-label="Search the site"
             >
               <Search className="size-6" strokeWidth={1.5} />

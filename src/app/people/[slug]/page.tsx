@@ -99,6 +99,7 @@ export default async function PersonPage({ params }: Props) {
                 alt={`Portrait of ${p.displayName}`}
                 priority
                 sizes="395px"
+                className="object-top"
               />
             </div>
             {p.primaryPracticeArea ? (

@@ -166,7 +166,7 @@ export default async function HomePage() {
               <Heading className="text-[#f2f1f0]">
                 <span id="why-heading">{whyChooseUs.title}</span>
               </Heading>
-              <MotionP className="text-lg leading-8 text-mist md:text-xl md:leading-9">
+              <MotionP className="text-sm leading-7 text-mist md:text-xl md:leading-9">
                 {whyChooseUs.text}
               </MotionP>
             </div>
@@ -175,7 +175,7 @@ export default async function HomePage() {
               {whyChooseUs.points.map((pt) => (
                 <li
                   key={pt.title}
-                  className="flex min-h-16 items-center gap-3 py-5"
+                  className="flex items-center gap-3 py-3 md:min-h-16 md:py-5"
                 >
                   <CmsIcon name={pt.icon} className="size-5 shrink-0" />
                   <div>
