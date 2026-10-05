@@ -171,7 +171,10 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               <Search className="size-6" strokeWidth={1.5} />
             </motion.button>
             {cta ? (
-              <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "hidden px-3 py-2.5 sm:inline-flex")} />
+              // Wrapper does the hiding: buttonClass's own inline-flex would override a `hidden` on the link.
+              <div className="hidden lg:block">
+                <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "px-3 py-2.5")} />
+              </div>
             ) : null}
             <motion.button
               type="button"
@@ -201,11 +204,6 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
                 {nav.map((item) => (
                   <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
                 ))}
-                {cta ? (
-                  <li className="pt-4 sm:hidden">
-                    <SmartLink link={cta} className={buttonClass("light", "w-full")} />
-                  </li>
-                ) : null}
               </ul>
             </motion.nav>
           ) : null}
