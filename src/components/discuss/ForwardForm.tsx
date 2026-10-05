@@ -34,7 +34,7 @@ export default function ForwardForm() {
     return (
       <section className="booking-success">
         <h3>This link isn&apos;t valid</h3>
-        <p>Please use the &ldquo;Forward to another associate&rdquo; button in the booking email you received.</p>
+        <p>Please use the &ldquo;Forward to appropriate team member&rdquo; button in the booking email you received.</p>
       </section>
     );
   }
@@ -85,7 +85,7 @@ export default function ForwardForm() {
 
   return (
     <section className="step-panel active" id="forward" aria-labelledby="forward-title">
-      <h2 className="step-heading" id="forward-title">Forward to another associate</h2>
+      <h2 className="step-heading" id="forward-title">Forward to appropriate team member</h2>
 
       <div className="booking-selected-summary" style={{ marginBottom: 24 }}>
         <div className="summary-label">Appointment request</div>
@@ -104,7 +104,7 @@ export default function ForwardForm() {
 
       <form onSubmit={submit} noValidate>
         <div className="form-group">
-          <label htmlFor="fwd-to">Associate&apos;s email address</label>
+          <label htmlFor="fwd-to">Team member&apos;s email address</label>
           <input
             id="fwd-to"
             type="email"
@@ -125,7 +125,7 @@ export default function ForwardForm() {
         </div>
         <div className="form-group">
           <label htmlFor="fwd-note">
-            Note to the associate <span className="optional-tag">(optional)</span>
+            Note to the team member <span className="optional-tag">(optional)</span>
           </label>
           <textarea id="fwd-note" rows={4} value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
         </div>

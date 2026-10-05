@@ -1,7 +1,7 @@
 import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 /**
- * Signed, expiring link tokens for the "forward to another associate" action. The booking details
+ * Signed, expiring link tokens for the "forward to appropriate team member" action. The booking details
  * travel inside the token (nothing is stored), and the signature means only someone who received
  * the email can use the link; changing any detail invalidates it.
  *
