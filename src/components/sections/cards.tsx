@@ -303,9 +303,9 @@ export function InsightCard({
           </span>
         ) : null}
       </Link>
-      {/* Chips stay on one line: long labels ("Dispute Resolution and Arbitration") truncate. */}
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 gap-1">
+      {/* Chips wrap on phones so labels aren't cut off; from sm up they stay on one line and long labels truncate. */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap">
+        <div className="flex min-w-0 flex-wrap gap-1 sm:flex-nowrap">
           {insight.chips.slice(0, 2).map((c) => {
             const href = getInsightChipHref(insight, c);
             return (

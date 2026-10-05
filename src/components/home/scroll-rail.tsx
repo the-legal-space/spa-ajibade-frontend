@@ -78,7 +78,7 @@ export function ScrollRail({ children, label }: { children: ReactNode; label: st
         role="region"
         aria-label={label}
         tabIndex={0}
-        className="hide-scrollbar -mx-5 flex snap-x snap-proximity gap-5 overflow-x-auto overscroll-x-contain scroll-smooth px-5 md:mx-0 md:px-0"
+        className="hide-scrollbar -mx-5 flex snap-x snap-proximity gap-5 overflow-x-auto overscroll-x-contain scroll-smooth scroll-px-5 px-5 md:mx-0 md:scroll-px-0 md:px-0"
       >
         {children}
       </div>
