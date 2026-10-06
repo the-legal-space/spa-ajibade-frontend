@@ -43,10 +43,10 @@ export function RecognitionFeature({
   while (set.length < 8) set.push(...base);
   return (
     <section
-      className="bg-mist py-6 text-ink md:py-17"
+      className="bg-mist py-8 text-ink md:py-17"
       aria-labelledby="recognition-heading"
     >
-      <div className="container-site grid items-center gap-10 lg:grid-cols-[811fr_497fr] lg:gap-11">
+      <div className="container-site grid items-center gap-10 max-md:gap-4 lg:grid-cols-[811fr_497fr] lg:gap-11">
         <div className="flex min-w-0 flex-col items-start gap-4 md:gap-6">
           <div className="flex flex-col items-start gap-1 md:gap-6">
             <Eyebrow>{section.eyebrow || "Recognition"}</Eyebrow>

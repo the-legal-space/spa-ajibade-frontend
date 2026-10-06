@@ -55,7 +55,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
         ref={bar}
         role="tablist"
         aria-label="Practice areas"
-        className="hide-scrollbar px-3 relative mx-auto flex h-12 w-max max-w-full items-center gap-2.5 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5"
+        className="hide-scrollbar px-3 relative mx-auto flex h-12 w-max max-w-full items-center gap-2 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5 md:gap-2.5"
       >
         {areas.map((a, i) => (
           <motion.button
@@ -80,7 +80,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
 
       <div
         {...swipe}
-        className="relative mt-11 overflow-hidden [--cw:calc(100vw-40px)] [--gap:16px] md:[--cw:min(910px,calc(100vw-64px))] lg:[--gap:68px]"
+        className="relative mt-2 overflow-hidden [--cw:calc(100vw-40px)] [--gap:16px] md:mt-11 md:[--cw:min(910px,calc(100vw-64px))] lg:[--gap:68px]"
       >
         <div
           className="relative left-1/2 flex w-max gap-(--gap) transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
@@ -106,7 +106,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 md:justify-between md:gap-8 md:p-8">
                   <div className="flex flex-col gap-2 md:gap-3.5">
-                    <h3 className="font-card text-2xl capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
+                    <h3 className="truncate font-card text-2xl capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
                     <p className="line-clamp-4 text-sm leading-7 text-cream/88">{a.summary}</p>
                   </div>
                   <MotionLink

@@ -31,8 +31,8 @@ export function FaqSection({ section, headingLevel = "h2" }: { section: Site["fa
 
   return (
     <Section tone="white" id="faq" labelledBy="faq-heading">
-      <div className="grid gap-8 lg:grid-cols-[552fr_780fr] lg:gap-5">
-        <div className="flex flex-col justify-between gap-8">
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-[552fr_780fr] lg:gap-5">
+        <div className="flex flex-col justify-between gap-1">
           <div>
             {section.eyebrow ? <Eyebrow>{section.eyebrow}</Eyebrow> : null}
             <Heading as={headingLevel} className="mt-1 md:mt-2">
