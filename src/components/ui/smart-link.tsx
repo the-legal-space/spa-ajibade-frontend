@@ -19,11 +19,14 @@ export function SmartLink({
   className,
   children,
   practiceArea,
+  attorney,
 }: {
   link: ApiLink;
   className?: string;
   children?: ReactNode;
   practiceArea?: string;
+  /** Attorney slug: "Discuss a Mandate" opens the booking page with this person pre-selected. */
+  attorney?: string;
 }) {
   const { run } = useActions();
   const content = children ?? link.label;
@@ -38,7 +41,7 @@ export function SmartLink({
         whileHover={interaction.whileHover}
         whileTap={interaction.whileTap}
         transition={TRANSITIONS.hover}
-        onClick={() => run(link.href, { practiceArea })}
+        onClick={() => run(link.href, { practiceArea, attorney })}
       >
         {content}
       </motion.button>
@@ -79,11 +82,14 @@ export function ActionButton({
   className,
   children,
   practiceArea,
+  attorney,
 }: {
   action: string;
   className?: string;
   children: ReactNode;
   practiceArea?: string;
+  /** Attorney slug: "Discuss a Mandate" opens the booking page with this person pre-selected. */
+  attorney?: string;
 }) {
   const { run } = useActions();
   const isPill = className?.includes("rounded-full");
@@ -96,7 +102,7 @@ export function ActionButton({
       whileHover={interaction.whileHover}
       whileTap={interaction.whileTap}
       transition={TRANSITIONS.hover}
-      onClick={() => run(action, { practiceArea })}
+      onClick={() => run(action, { practiceArea, attorney })}
     >
       {children}
     </motion.button>

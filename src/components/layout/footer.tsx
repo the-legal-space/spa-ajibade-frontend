@@ -34,21 +34,21 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
       {/* Figma "Footer Background Mark": white crossed mark with the 10% opacity baked into the PNG. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/footer-mark.png')] bg-cover bg-center bg-no-repeat" />
 
-      <div className="container-site relative flex flex-col gap-11 py-14 md:py-[68px]">
-        <div className="grid gap-12 md:grid-cols-2 xl:flex xl:items-start xl:justify-between">
-          <div className="flex w-full max-w-[437px] flex-col gap-10">
-            {footer.newsletter.enabled ? (
-              <div className="flex max-w-[414px] flex-col gap-6">
-                <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title}</h2>
-                <NewsletterForm firmEmail={settings.email} />
-                <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note}</p>
-              </div>
-            ) : null}
+      <div className="container-site relative flex flex-col gap-11 py-6 md:py-[68px]">
+        <div className="grid gap-12 md:grid-cols-2 lg:flex lg:items-start lg:justify-between lg:gap-10">
+          <div className="flex w-full max-w-[437px] flex-col gap-10 lg:max-w-[360px] xl:max-w-[437px]">
+            {/* Shown as in the Figma even while the CMS "enabled" flag is off; the form just opens the
+                visitor's mail app addressed to the firm, so there is nothing to switch on behind it. */}
+            <div className="flex max-w-[414px] flex-col gap-6">
+              <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title || "Subscribe for legal insights"}</h2>
+              <NewsletterForm firmEmail={settings.email} />
+              <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note || "Your information is kept confidential"}</p>
+            </div>
             <SocialLinks socials={footer.socials} always className="gap-5" iconClassName="size-5" />
           </div>
 
-          <div className="grid gap-12 sm:grid-cols-2 md:col-span-2 lg:grid-cols-[auto_auto_auto] xl:flex xl:gap-[68px]">
-            <FooterColumn title="Quick Links">
+          <div className="grid gap-12 sm:grid-cols-2 md:col-span-2 lg:flex lg:gap-10 xl:gap-[68px]">
+            <FooterColumn title="Quick Links" className="lg:whitespace-nowrap">
               {links.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-sm leading-7 text-white transition-opacity duration-200 hover:opacity-75">
@@ -71,7 +71,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
               ))}
             </FooterColumn>
 
-            <FooterColumn title="Offices" gap="gap-4">
+            <FooterColumn title="Offices" gap="gap-4" className="lg:max-w-[300px]">
               {officeDetails.map((o) => (
                 <li key={o.id} className="flex flex-col gap-2 text-xs leading-5">
                   <p>
@@ -101,9 +101,9 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/15 pt-6 text-sm leading-7 text-white md:flex-row md:items-center md:justify-between">
-          <p>{footer.copyright || settings.copyright}</p>
-          <p className="flex items-center gap-6">
+        <div className="flex flex-col items-center gap-3 border-t border-white/15 pt-6 text-center text-sm leading-7 text-white md:flex-row md:justify-between md:text-left">
+          <p className="md:order-1">{footer.copyright || settings.copyright}</p>
+          <p className="flex items-center gap-6 max-md:order-first md:order-2">
             {footer.legalLinks.map((link, index) => (
               <Fragment key={link.href}>
                 {index > 0 ? <span aria-hidden className="size-1.5 rounded-full bg-white" /> : null}
@@ -127,9 +127,9 @@ function legalHref(href: string) {
   return key === "terms" || key === "privacy" ? `/${key}` : href;
 }
 
-function FooterColumn({ title, children, gap = "gap-2" }: { title: string; children: React.ReactNode; gap?: string }) {
+function FooterColumn({ title, children, gap = "gap-2", className = "" }: { title: string; children: React.ReactNode; gap?: string; className?: string }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className={`flex flex-col gap-4 ${className}`}>
       <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{title}</h2>
       <ul className={`flex flex-col ${gap}`}>{children}</ul>
     </div>

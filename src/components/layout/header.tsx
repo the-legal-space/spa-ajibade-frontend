@@ -112,6 +112,26 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  // Tapping anywhere outside the open mobile menu (or pressing Escape) closes it. The hamburger button
+  // is excluded so its own click can still toggle the menu.
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onPointer = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (mobileMenuRef.current?.contains(t) || menuButtonRef.current?.contains(t)) return;
+      setMobileOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [mobileOpen]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -145,9 +165,9 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               : "border-ink/10 bg-white/85 text-ink backdrop-blur-md",
         )}
       >
-        <div className="container-site flex h-[var(--header-h)] items-center justify-between gap-6">
+        <div className="container-site flex h-(--header-h) items-center justify-between gap-3 md:gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
-            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} />
+            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} className="max-[359px]:h-[26px]" />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
@@ -158,7 +178,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3 xl:gap-6">
+          <div className="flex items-center gap-1 min-[360px]:gap-3 xl:gap-6">
             <motion.button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -171,18 +191,22 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               <Search className="size-6" strokeWidth={1.5} />
             </motion.button>
             {cta ? (
-              <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "hidden px-3 py-2.5 sm:inline-flex")} />
+              // Wrapper does the hiding: buttonClass's own inline-flex would override a `hidden` on the link.
+              <div className="hidden lg:block">
+                <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "px-3 py-2.5")} />
+              </div>
             ) : null}
             <motion.button
               type="button"
-              className={cn(iconBtn, "lg:hidden")}
+              className={cn(iconBtn, "lg:hidden max-lg:hover:bg-transparent")}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
+              ref={menuButtonRef}
               whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
-              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+              {mobileOpen ? <X className="size-6 max-lg:translate-x-3" /> : <Menu className="size-6 max-lg:translate-x-3" />}
             </motion.button>
           </div>
         </div>
@@ -191,21 +215,17 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
           {mobileOpen ? (
             <motion.nav
               id="mobile-nav"
+              ref={mobileMenuRef}
               aria-label="Mobile"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1, transition: { height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.2 } } }}
               exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.2, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.15 } } }}
               className="max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-white/10 bg-ink text-white lg:hidden"
             >
-              <ul className="container-site flex flex-col py-4">
+              <ul className="container-site flex flex-col py-4 max-lg:px-0">
                 {nav.map((item) => (
                   <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
                 ))}
-                {cta ? (
-                  <li className="pt-4 sm:hidden">
-                    <SmartLink link={cta} className={buttonClass("light", "w-full")} />
-                  </li>
-                ) : null}
               </ul>
             </motion.nav>
           ) : null}
@@ -303,7 +323,7 @@ function MobileNavItem({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <li className="border-b border-white/10">
       <div className="flex items-center justify-between">
-        <Link href={item.href} className={cn("block py-3.5 text-base", active ? "text-white" : "text-white/75")}>
+        <Link href={item.href} className={cn("block py-3.5 text-base max-lg:px-4", active ? "text-white" : "text-white/75")}>
           {item.label}
         </Link>
         {item.children.length > 0 ? (

@@ -55,7 +55,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
         ref={bar}
         role="tablist"
         aria-label="Practice areas"
-        className="hide-scrollbar relative mx-auto flex h-12 w-max max-w-full items-center gap-2.5 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5"
+        className="hide-scrollbar px-3 relative mx-auto flex h-12 w-max max-w-full items-center gap-2 overflow-x-auto rounded-[60px] bg-cream/16 py-0.5 md:gap-2.5"
       >
         {areas.map((a, i) => (
           <motion.button
@@ -69,7 +69,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
             whileTap={{ scale: 0.95 }}
             transition={TRANSITIONS.hover}
             className={cn(
-              "flex h-11 shrink-0 items-center whitespace-nowrap rounded-[32px] px-5 text-sm leading-7 text-cream transition-colors duration-300",
+              "flex h-11 shrink-0 items-center whitespace-nowrap rounded-4xl px-5 text-sm leading-7 text-cream transition-colors duration-300",
               i === index ? "bg-cream/16 font-semibold" : "hover:bg-cream/8",
             )}
           >
@@ -80,7 +80,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
 
       <div
         {...swipe}
-        className="relative mt-11 overflow-hidden [--cw:calc(100vw_-_40px)] [--gap:16px] md:[--cw:min(910px,calc(100vw_-_64px))] lg:[--gap:68px]"
+        className="relative mt-2 overflow-hidden [--cw:calc(100vw-40px)] [--gap:16px] md:mt-11 md:[--cw:min(910px,calc(100vw-64px))] lg:[--gap:68px]"
       >
         <div
           className="relative left-1/2 flex w-max gap-(--gap) transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
@@ -97,16 +97,16 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                 aria-hidden={!active}
                 onClick={active ? undefined : () => go(i)}
                 className={cn(
-                  "flex w-(--cw) shrink-0 flex-col gap-2 rounded-[32px] bg-cream/8 p-2 transition-opacity duration-700 md:h-[500px] md:flex-row",
+                  "flex w-(--cw) shrink-0 flex-col gap-2 rounded-4xl bg-cream/8 p-2 transition-opacity duration-700 md:h-125 md:flex-row",
                   active ? "opacity-100" : "cursor-pointer opacity-30 hover:opacity-50",
                 )}
               >
-                <div className="aspect-[443/484] w-full shrink-0 overflow-hidden rounded-[24px] md:aspect-auto md:h-full md:w-[443px] md:max-w-[49%]">
+                <div className="aspect-352/256 w-full shrink-0 overflow-hidden rounded-3xl md:aspect-auto md:h-full md:w-110.75 md:max-w-[49%]">
                   <Media image={practiceImage(a.slug, a.image)} alt="" placeholder="dark" sizes="(min-width:768px) 443px, 100vw" />
                 </div>
-                <div className="flex min-w-0 flex-1 flex-col justify-between gap-8 p-5 md:p-8">
-                  <div className="flex flex-col gap-3.5">
-                    <h3 className="font-card text-[2rem] capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
+                <div className="flex min-w-0 flex-1 flex-col gap-2 md:justify-between md:gap-8 md:p-8">
+                  <div className="flex flex-col gap-2 md:gap-3.5">
+                    <h3 className="truncate font-card text-2xl capitalize leading-[1.1] text-cream md:text-[40px] md:leading-[44px]">{a.title}</h3>
                     <p className="line-clamp-4 text-sm leading-7 text-cream/88">{a.summary}</p>
                   </div>
                   <MotionLink
@@ -115,7 +115,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
                     whileHover={INTERACTION.button.whileHover}
                     whileTap={INTERACTION.button.whileTap}
                     transition={TRANSITIONS.hover}
-                    className="inline-flex w-max items-center gap-2.5 rounded-[4px] border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium leading-none text-white backdrop-blur-[15px] hover:bg-white/15"
+                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-full border border-white/20 md:w-max md:justify-start md:rounded-sm bg-white/5 px-5 py-3 text-sm font-medium leading-none text-white backdrop-blur-[15px] hover:bg-white/15"
                   >
                     Learn More <ArrowRight className="size-5" strokeWidth={1.5} aria-hidden />
                   </MotionLink>
@@ -126,18 +126,18 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
         </div>
       </div>
 
-      <div className="mt-11 flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-4 flex flex-col items-stretch gap-4 md:mt-11 md:flex-row md:flex-wrap md:items-center md:justify-between">
         {cta ? (
           <SmartLink
             link={cta}
-            className="inline-flex items-center gap-2.5 rounded-[4px] border-2 border-ink bg-mist p-4 text-sm font-medium leading-none text-ink backdrop-blur-[15px] hover:bg-white"
+            className="inline-flex items-center justify-center gap-2.5 rounded-sm md:justify-start border-2 border-ink bg-mist p-4 text-sm font-medium leading-none text-ink backdrop-blur-[15px] hover:bg-white"
           >
             {cta.label} <ArrowUpRight className="size-5" strokeWidth={1.5} aria-hidden />
           </SmartLink>
         ) : (
           <span />
         )}
-        <div className="flex gap-4">
+        <div className="flex justify-between gap-4 md:justify-start">
           <CarouselArrow dir="prev" onClick={() => go(index - 1)} label="Previous practice area" />
           <CarouselArrow dir="next" onClick={() => go(index + 1)} label="Next practice area" />
         </div>

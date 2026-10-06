@@ -40,9 +40,9 @@ export function PracticeAreaCard({
       whileHover={INTERACTION.card.whileHover}
       whileTap={INTERACTION.card.whileTap}
       transition={TRANSITIONS.hover}
-      className="group flex h-full flex-col rounded-[var(--radius-card)] bg-white p-3.5 transition-shadow duration-300 hover:shadow-md"
+      className="group flex h-full flex-col rounded-(--radius-card) bg-white p-3.5 transition-shadow duration-300 hover:shadow-md"
     >
-      <div className="aspect-[331/240] overflow-hidden rounded-xl">
+      <div className="aspect-331/240 overflow-hidden rounded-xl">
         <Media
           image={practiceImage(area.slug, area.image)}
           alt=""
@@ -50,7 +50,7 @@ export function PracticeAreaCard({
         />
       </div>
       <H className="mt-4 font-serif text-xl">{area.title}</H>
-      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-7 text-ink-700">
+      <p className="mt-2 flex-1 text-sm leading-7 text-ink-700 md:line-clamp-2">
         {area.summary}
       </p>
       <MotionLink
@@ -58,7 +58,7 @@ export function PracticeAreaCard({
         whileHover={INTERACTION.button.whileHover}
         whileTap={INTERACTION.button.whileTap}
         transition={TRANSITIONS.hover}
-        className={buttonClass("dark", "mt-4 w-full rounded-[12px]! py-2.5")}
+        className={buttonClass("dark", "mt-4 w-full rounded-xl! py-2.5")}
         aria-label={`Learn more about ${area.title}`}
       >
         Learn More <ArrowRight className="size-4" aria-hidden />
@@ -100,7 +100,7 @@ export function PersonCard({
       transition={TRANSITIONS.hover}
       data-open={open || undefined}
       onMouseLeave={() => setOpen(false)}
-      className="group/card relative flex flex-col gap-1.5 rounded-[24px] bg-white p-2 transition-shadow duration-300 hover:shadow-md"
+      className="group/card relative flex flex-col gap-1.5 rounded-3xl bg-white p-2 transition-shadow duration-300 hover:shadow-md"
     >
       <div className="relative aspect-square overflow-hidden rounded-[16px] bg-card-blue">
         <Media
@@ -109,23 +109,24 @@ export function PersonCard({
           placeholder="portrait"
           name={person.displayName}
           sizes="(min-width:1024px) 440px, (min-width:640px) 50vw, 100vw"
+          className="object-top"
         />
 
         {/* The "+" square that grows into the panel (top-right anchored, like the Figma smart animate). */}
         <div
           id={panelId}
           className={cn(
-            "absolute right-4 top-4 z-20 overflow-hidden rounded-[2px] bg-white text-ink shadow-sm",
+            "peer/panel group/panel absolute right-4 top-4 z-20 overflow-hidden rounded-xs bg-white text-ink shadow-sm",
             "size-9 transition-[width,height,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-            "group-hover/card:h-[calc(100%-32px)] group-hover/card:w-[calc(100%-32px)] group-hover/card:rounded-[16px]",
+            "hover:h-[calc(100%-32px)] hover:w-[calc(100%-32px)] hover:rounded-[16px]",
             "group-focus-within/card:h-[calc(100%-32px)] group-focus-within/card:w-[calc(100%-32px)] group-focus-within/card:rounded-[16px]",
-            "group-data-[open]/card:h-[calc(100%-32px)] group-data-[open]/card:w-[calc(100%-32px)] group-data-[open]/card:rounded-[16px]",
+            "group-data-open/card:h-[calc(100%-32px)] group-data-open/card:w-[calc(100%-32px)] group-data-open/card:rounded-[16px]",
           )}
         >
           <div
             className={cn(
-              "flex h-full w-[calc(100%)] min-w-[240px] flex-col p-5 opacity-0 transition-opacity duration-200 md:p-6",
-              "group-hover/card:opacity-100 group-hover/card:delay-200 group-focus-within/card:opacity-100 group-data-[open]/card:opacity-100 group-data-[open]/card:delay-200",
+              "flex h-full w-[calc(100%)] min-w-60 flex-col p-5 opacity-0 transition-opacity duration-200 md:p-6",
+              "group-hover/panel:opacity-100 group-hover/panel:delay-200 group-focus-within/card:opacity-100 group-data-open/card:opacity-100 group-data-open/card:delay-200",
             )}
           >
             <p className="text-lg leading-tight">{person.roleLabel}</p>
@@ -136,7 +137,7 @@ export function PersonCard({
                     <Link
                       href={`/practice-areas/${a.slug}`}
                       tabIndex={-1}
-                      className="inline-block max-w-full truncate rounded-[4px] border-[0.5px] border-gray bg-mist px-2 py-1.5 text-[11px] leading-none hover:border-ink"
+                      className="inline-block max-w-full truncate rounded-sm border-[0.5px] border-gray bg-mist px-2 py-1.5 text-[11px] leading-none hover:border-ink"
                     >
                       {a.title}
                     </Link>
@@ -153,6 +154,7 @@ export function PersonCard({
               <SmartLink
                 link={MANDATE_LINK}
                 practiceArea={details?.practiceAreas[0]?.slug}
+                attorney={person.slug}
                 className={buttonClass("dark", "w-full")}
               />
               <Link
@@ -170,18 +172,18 @@ export function PersonCard({
           aria-expanded={open}
           aria-controls={panelId}
           aria-label={`${open ? "Hide" : "Show"} details for ${person.displayName}`}
-          className="absolute right-4 top-4 z-30 grid size-9 place-items-center rounded-[2px] text-ink md:pointer-events-none md:group-focus-within/card:pointer-events-auto"
+          className="absolute right-4 top-4 z-30 grid size-9 place-items-center rounded-xs text-ink peer-hover/panel:[&>svg]:rotate-45 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:group-focus-within/card:pointer-events-auto"
         >
           <svg
             viewBox="0 0 14 14"
-            className="size-3.5 transition-transform duration-300 group-hover/card:rotate-45 group-focus-within/card:rotate-45 group-data-[open]/card:rotate-45"
+            className="size-3.5 transition-transform duration-300 group-focus-within/card:rotate-45 group-data-open/card:rotate-45"
             aria-hidden
           >
             <path d="M0 7h14M7 0v14" stroke="currentColor" strokeWidth="1" />
           </svg>
         </button>
       </div>
-      <div className="flex min-h-[84px] items-center justify-between gap-3 rounded-[16px] bg-ink p-4 text-white">
+      <div className="flex min-h-21 items-center justify-between gap-3 rounded-[16px] bg-ink p-4 text-white">
         <div className="min-w-0">
           <h3 className="truncate text-lg font-medium leading-tight md:text-xl">
             <Link href={href} className="hover:underline">
@@ -222,7 +224,7 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
         href={`/people/${p.slug}`}
         className="group/author flex min-w-0 items-center gap-2"
       >
-        <span className="size-[30px] shrink-0 overflow-hidden rounded-full bg-card-blue">
+        <span className="size-7.5 shrink-0 overflow-hidden rounded-full bg-card-blue">
           {avatar ? (
             <Media image={avatar} alt="" sizes="30px" />
           ) : (
@@ -250,7 +252,7 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
         alt=""
         width={30}
         height={30}
-        className="size-[30px] shrink-0 rounded-full"
+        className="size-7.5 shrink-0 rounded-full"
       />
       <span className="flex min-w-0 flex-col gap-0.5 leading-none">
         <span className="block truncate text-xs text-ink">{author.name}</span>
@@ -281,7 +283,7 @@ export function InsightCard({
     >
       <Link
         href={href}
-        className="relative block aspect-[437/271] overflow-hidden rounded-[4px]"
+        className="relative block aspect-437/271 overflow-hidden rounded-sm"
         tabIndex={-1}
         aria-hidden
       >
@@ -303,13 +305,18 @@ export function InsightCard({
           </span>
         ) : null}
       </Link>
-      {/* Chips stay on one line: long labels ("Dispute Resolution and Arbitration") truncate. */}
+      {/* Chips and date stay on one line; long labels truncate rather than wrap. */}
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex min-w-0 gap-1">
           {insight.chips.slice(0, 2).map((c) => {
             const href = getInsightChipHref(insight, c);
             return (
-              <Chip key={c} title={c} href={href} className="underline underline-offset-2">
+              <Chip
+                key={c}
+                title={c}
+                href={href}
+                className="underline underline-offset-2"
+              >
                 {c}
               </Chip>
             );
@@ -333,7 +340,7 @@ export function InsightCard({
           whileHover={INTERACTION.button.whileHover}
           whileTap={INTERACTION.button.whileTap}
           transition={TRANSITIONS.hover}
-          className="inline-flex shrink-0 origin-right items-center gap-1 rounded-[4px] border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
+          className="inline-flex shrink-0 origin-right items-center gap-1 rounded-sm border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
         >
           {isVideo ? "Watch Video" : insight.cta?.label || "Read More"}{" "}
           <ArrowUpRight className="size-3.5" aria-hidden />

@@ -25,7 +25,7 @@ export function FaqAccordion({
   const [open, setOpen] = useState<string | null>(items[defaultOpen]?.id ?? items[0]?.id ?? null);
 
   return (
-    <ul className="flex flex-col gap-4 lg:gap-5">
+    <ul className="flex flex-col gap-2 md:gap-4 lg:gap-5">
       {items.map((item, index) => {
         const isOpen = open === item.id;
         const panelId = `faq-panel-${item.id}`;
@@ -47,7 +47,7 @@ export function FaqAccordion({
                 onClick={() => setOpen(isOpen ? (items[(index + 1) % items.length]?.id ?? item.id) : item.id)}
                 className={cn("group flex w-full items-center justify-between gap-5 p-5 text-left transition-[padding] duration-300 md:p-6", isOpen && "pb-2 md:pb-2")}
               >
-                <span className="font-serif text-xl leading-7 text-[#0a0a0b] transition-colors group-hover:text-ink-700 md:text-2xl md:leading-[28px]">
+                <span className="font-serif text-xl capitalize leading-7 text-[#0a0a0b] transition-colors group-hover:text-ink-700 md:text-2xl md:leading-[28px]">
                   {item.question}
                 </span>
                 <motion.span

@@ -20,5 +20,7 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 export function buttonClass(variant: ButtonVariant = "dark", className?: string) {
-  return cn(base, variants[variant], className);
+  // Full width on phones unless the caller sets its own width (e.g. an inline "View Awards" button).
+  const ownWidth = /(^|\s)(max-md:)?w-/.test(className ?? "");
+  return cn(base, variants[variant], !ownWidth && "max-md:w-full", className);
 }

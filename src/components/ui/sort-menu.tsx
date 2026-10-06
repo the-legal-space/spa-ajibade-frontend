@@ -1,9 +1,11 @@
 "use client";
 
+import { useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { TRANSITIONS } from "@/lib/motion";
+import { usePendingFlag } from "@/components/ui/listing-controls";
 
 /** "Sort By" dropdown that writes ?sort= into the URL (and resets to page 1). */
 export function SortMenu({ options, defaultValue }: { options: { value: string; label: string }[]; defaultValue: string }) {
@@ -11,13 +13,15 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
   const pathname = usePathname();
   const params = useSearchParams();
   const current = params.get("sort") ?? defaultValue;
+  const [pending, startTransition] = useTransition();
+  usePendingFlag(pending);
 
   return (
     <motion.label
       whileHover={{ scale: 1.015 }}
       whileTap={{ scale: 0.985 }}
       transition={TRANSITIONS.hover}
-      className="relative inline-flex items-center"
+      className="relative flex w-full items-center md:inline-flex md:w-auto"
     >
       <span className="sr-only">Sort by</span>
       <select
@@ -28,9 +32,9 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
           else next.set("sort", e.target.value);
           next.delete("page");
           const qs = next.toString();
-          router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+          startTransition(() => router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false }));
         }}
-        className="h-[42px] cursor-pointer appearance-none rounded-[4px] border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none transition-colors hover:border-ink focus:border-ink shadow-xs"
+        className="h-[42px] w-full cursor-pointer appearance-none rounded-[4px] text-center md:w-auto md:text-left border border-mist-300 bg-white pl-4 pr-10 text-[13px] text-ink outline-none transition-colors hover:border-ink focus:border-ink shadow-xs"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -38,7 +42,11 @@ export function SortMenu({ options, defaultValue }: { options: { value: string; 
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-3 size-4 text-stone" aria-hidden />
+      {pending ? (
+        <Loader2 role="status" aria-label="Loading" className="pointer-events-none absolute right-3 size-4 animate-spin text-stone" />
+      ) : (
+        <ChevronDown className="pointer-events-none absolute right-3 size-4 text-stone" aria-hidden />
+      )}
     </motion.label>
   );
 }

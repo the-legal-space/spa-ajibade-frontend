@@ -9,7 +9,7 @@ import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard } from "@/components/sections/cards";
 import { FeaturedInsights } from "@/components/sections/featured-insights";
 import { Heading, Section } from "@/components/ui/primitives";
-import { FilterMenu, FilterTabs, Pagination } from "@/components/ui/listing-controls";
+import { FilterMenu, FilterTabs, ListingResults, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -58,10 +58,11 @@ export default async function InsightsPage({ searchParams }: Props) {
           </Suspense>
         </Reveal>
 
+        <ListingResults>
         {list.data.length > 0 ? (
-          <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <MotionList key={`${category}|${practiceArea}|${sort}|${page}`} className="mt-2 md:mt-10 grid min-w-0 gap-x-4 gap-y-4 md:gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {list.data.map((i) => (
-              <MotionListItem key={i.id}>
+              <MotionListItem key={i.id} className="min-w-0">
                 <InsightCard insight={i} />
               </MotionListItem>
             ))}
@@ -71,6 +72,7 @@ export default async function InsightsPage({ searchParams }: Props) {
         )}
 
         <Pagination page={meta.page} totalPages={meta.totalPages} base="/insights" current={current} />
+        </ListingResults>
       </Section>
 
       <PageEnd />

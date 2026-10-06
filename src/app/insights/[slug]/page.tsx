@@ -93,8 +93,8 @@ export default async function InsightPage({ params }: Props) {
 
   return (
     <>
-      <article className="bg-white">
-        <div className="container-site py-10 md:py-12">
+      <article className="min-w-0 overflow-hidden bg-white">
+        <div className="container-site min-w-0 py-10 md:py-12">
           <Link
             href={i.backLink.href}
             className="inline-flex items-center gap-1.5 text-[13px] hover:underline"
@@ -126,7 +126,7 @@ export default async function InsightPage({ params }: Props) {
             size="h2"
             reveal={false}
             balance={false}
-            className="mt-5 block w-full max-w-none text-[2.5rem] leading-[1.08] md:text-[3.5rem] md:leading-[1.05]"
+            className="mt-5 block w-full max-w-full break-words text-[2.5rem] leading-[1.08] md:text-[3.5rem] md:leading-[1.05]"
           >
             {i.title}
           </Heading>
@@ -156,7 +156,7 @@ export default async function InsightPage({ params }: Props) {
           ) : null}
           {body ? (
             <div
-              className="prose-firm mt-8 text-[15px] leading-8"
+              className="prose-firm mt-8 min-w-0 max-w-full overflow-wrap-anywhere text-[15px] leading-8"
               dangerouslySetInnerHTML={{ __html: body }}
             />
           ) : null}

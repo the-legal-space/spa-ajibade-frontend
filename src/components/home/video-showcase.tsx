@@ -23,6 +23,16 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
   const [paused, setPaused] = useState(false);
   const [open, setOpen] = useState(false);
   const caption = showcase.caption || DEFAULT_CAPTION;
+  // "Fifty-Nine" must not break across lines ("Fifty-" / "Nine"): keep it in a no-wrap span.
+  const shownCaption = caption.split(/(fifty-nine)/i).map((part, i) =>
+    /^fifty-nine$/i.test(part) ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
   const embed = showcase.videoUrl ? toEmbedUrl(showcase.videoUrl) : null;
 
   useEffect(() => {
@@ -68,7 +78,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
         className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10"
         style={{ backgroundImage: `url(${FIGMA.videoMark})` }}
       />
-      <div className="container-site relative flex flex-col items-center gap-8 py-12 md:gap-11 md:py-[68px]">
+      <div className="container-site relative flex flex-col items-center gap-[0] pb-2 pt-4 md:gap-11 md:py-[68px]">
         <Reveal className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[12px] border-8 border-[rgba(156,155,155,0.2)] sm:aspect-video md:border-[16px] lg:aspect-auto lg:h-[759px]">
           <video
             ref={preview}
@@ -109,7 +119,11 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
             )}
           </motion.button>
         </Reveal>
-        <MotionP className="max-w-[666px] text-center font-serif text-xl leading-7 md:text-2xl md:leading-[28px]">{caption}</MotionP>
+        <MotionP className="max-w-[666px] self-center text-center font-serif text-[18px] capitalize leading-7 md:self-auto md:text-[18px] md:leading-[28px]">
+          <span aria-hidden="true">“</span>
+          {shownCaption}
+          <span aria-hidden="true">”</span>
+        </MotionP>
       </div>
 
       <AnimatePresence>

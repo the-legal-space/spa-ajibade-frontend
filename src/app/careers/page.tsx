@@ -36,7 +36,7 @@ export default async function CareersPage() {
         </Heading>
 
         {page.jobs.length > 0 ? (
-          <MotionList className="mt-10 space-y-8">
+          <MotionList className="mt-2 md:mt-10 space-y-4 md:space-y-8">
             {page.jobs.map((job) => (
               <MotionListItem key={job.id}>
                 <article
@@ -49,7 +49,7 @@ export default async function CareersPage() {
                     </p>
                   ) : null}
                   <div
-                    className="prose-firm mt-4 text-base leading-8 md:text-[1.05rem]"
+                    className="prose-firm mt-4 text-sm leading-7 md:text-[1.05rem] md:leading-8"
                     dangerouslySetInnerHTML={{
                       __html: cleanHtml(job.description),
                     }}

@@ -1,13 +1,44 @@
 "use client";
 
-import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import Link, { useLinkStatus } from "next/link";
+import { useEffect, type ReactNode } from "react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import type { FilterOption } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 
 const MotionLink = motion.create(Link);
+
+/**
+ * Filters, sorting and paging are server round trips, so on a slow connection a click can look like
+ * nothing happened. While one is in flight this flags the page (<html data-listing-pending>), which
+ * dims every <ListingResults> and shows a progress cursor; the clicked control shows its own spinner.
+ */
+export function usePendingFlag(pending: boolean) {
+  useEffect(() => {
+    if (!pending) return;
+    const root = document.documentElement;
+    root.setAttribute("data-listing-pending", "");
+    return () => root.removeAttribute("data-listing-pending");
+  }, [pending]);
+}
+
+/** Spinner for the link it is rendered inside: visible only while that link's navigation is loading. */
+export function LinkSpinner({ className }: { className?: string }) {
+  const { pending } = useLinkStatus();
+  usePendingFlag(pending);
+  return pending ? <Loader2 role="status" aria-label="Loading" className={cn("ml-1.5 size-3.5 shrink-0 animate-spin", className)} /> : null;
+}
+
+/** Wraps a filtered list (cards, empty state, pagination) so it can dim while new results load. */
+export function ListingResults({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div data-listing-results className={className}>
+      {children}
+    </div>
+  );
+}
 
 /** Builds a URL keeping existing params, applying overrides, and dropping empty values. */
 export function withParams(base: string, current: Record<string, string | undefined>, overrides: Record<string, string | number | undefined>) {
@@ -52,6 +83,7 @@ export function FilterTabs({
                 )}
               >
                 {o.label}
+                <LinkSpinner />
               </MotionLink>
             </li>
           );
@@ -97,7 +129,10 @@ export function FilterMenu({
                   option.value === active ? "font-medium text-ink" : "text-ink-700",
                 )}
               >
-                {option.label}
+                <span className="flex items-center justify-between">
+                  {option.label}
+                  <LinkSpinner />
+                </span>
               </Link>
             </li>
           ))}
@@ -123,7 +158,7 @@ export function Pagination({
   const next = page < totalPages ? withParams(base, current, { page: page + 1 }) : null;
   const btn = "inline-flex h-9 items-center rounded-[4px] border-[0.5px] border-mist-300 bg-white px-3 text-[13px] transition-colors";
   return (
-    <nav aria-label="Pagination" className="mt-10 flex items-center justify-between rounded-[4px] border border-mist-300 bg-white px-5 py-3.5 shadow-xs">
+    <nav aria-label="Pagination" className="mt-2 md:mt-10 flex items-center justify-between rounded-[4px] border border-mist-300 bg-white px-5 py-3.5 shadow-xs">
       <p className="text-[13px] text-ink-700">
         Page {page} of {totalPages}
       </p>
@@ -139,6 +174,7 @@ export function Pagination({
             rel="prev"
           >
             Previous
+            <LinkSpinner />
           </MotionLink>
         ) : (
           <span className={cn(btn, "opacity-40")} aria-disabled>
@@ -156,6 +192,7 @@ export function Pagination({
             rel="next"
           >
             Next
+            <LinkSpinner />
           </MotionLink>
         ) : (
           <span className={cn(btn, "opacity-40")} aria-disabled>
