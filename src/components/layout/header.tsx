@@ -198,7 +198,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             ) : null}
             <motion.button
               type="button"
-              className={cn(iconBtn, "lg:hidden")}
+              className={cn(iconBtn, "lg:hidden max-lg:hover:bg-transparent")}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
@@ -206,7 +206,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
-              {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+              {mobileOpen ? <X className="size-6 max-lg:translate-x-3" /> : <Menu className="size-6 max-lg:translate-x-3" />}
             </motion.button>
           </div>
         </div>
@@ -222,7 +222,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.2, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.15 } } }}
               className="max-h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-white/10 bg-ink text-white lg:hidden"
             >
-              <ul className="container-site flex flex-col py-4">
+              <ul className="container-site flex flex-col py-4 max-lg:px-0">
                 {nav.map((item) => (
                   <MobileNavItem key={item.href + item.label} item={item} active={isActive(pathname, item.href)} />
                 ))}
@@ -323,7 +323,7 @@ function MobileNavItem({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <li className="border-b border-white/10">
       <div className="flex items-center justify-between">
-        <Link href={item.href} className={cn("block py-3.5 text-base", active ? "text-white" : "text-white/75")}>
+        <Link href={item.href} className={cn("block py-3.5 text-base max-lg:px-4", active ? "text-white" : "text-white/75")}>
           {item.label}
         </Link>
         {item.children.length > 0 ? (

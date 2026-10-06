@@ -49,14 +49,14 @@ export function PageHero({
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.8)_0.66%,rgba(0,0,0,0)_100%)]" aria-hidden />
       </div>
 
-      <div className={cn("container-site relative flex flex-col justify-center pt-[var(--header-h)]", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
-        <div className="max-w-[776px] py-16">
+      <div className={cn("container-site relative flex flex-col justify-center pt-[var(--header-h)] max-md:px-4", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
+        <div className="max-w-[776px] py-8 md:py-16">
           {top ? <div className="mb-3 text-[13px] text-white/85">{top}</div> : null}
           <Heading as="h1" size="display" reveal={false}>
             {hero.title}
           </Heading>
           {hero.subtitle ? (
-            <MotionP className="mt-5 text-sm leading-7 text-mist md:text-xl md:leading-9">{hero.subtitle}</MotionP>
+            <MotionP className="mt-1 text-sm leading-7 text-mist md:mt-5 md:text-xl md:leading-9">{hero.subtitle}</MotionP>
           ) : null}
           <HeroDots className="mt-5" />
           {children}

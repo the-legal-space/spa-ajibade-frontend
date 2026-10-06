@@ -31,13 +31,13 @@ export default async function AboutPage() {
 
       {/* Our story */}
       <Section tone="white" id="our-story" labelledBy="story-heading">
-        <div className="grid gap-12 lg:grid-cols-[2fr_3fr]">
+        <div className="grid gap-4 md:gap-12 lg:grid-cols-[2fr_3fr]">
           <div className="flex flex-col">
             {story.eyebrow ? <Eyebrow>{story.eyebrow}</Eyebrow> : null}
             {story.quote ? (
-              <Reveal className="mt-12 lg:mt-24">
+              <Reveal className="mt-1 md:mt-12 lg:mt-24">
               <figure>
-                <blockquote className="max-w-sm font-serif text-2xl leading-snug md:text-[1.75rem]">
+                <blockquote className="max-w-sm font-serif text-l leading-snug md:text-[1.75rem]">
                   {story.quote} <span className="text-5xl leading-none text-mist-300" aria-hidden>&rdquo;</span>
                 </blockquote>
                 {story.quotePerson ? (
@@ -59,7 +59,7 @@ export default async function AboutPage() {
             <Heading className="text-olive">
               <span id="story-heading">{story.title}</span>
             </Heading>
-            <hr className="my-8 border-mist-200" />
+            <hr className="my-1 md:my-8 border-mist-200" />
             <Reveal className="space-y-6 text-[15px] leading-8 text-ink-800">
               {story.paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
@@ -84,7 +84,7 @@ export default async function AboutPage() {
             <span id="stats-heading">{stats.title}</span>
           </Heading>
           <Reveal>
-          <dl className="mt-8 grid border-l border-t border-mist-200 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="mt-2 md:mt-8 grid border-l border-t border-mist-200 sm:grid-cols-2 lg:grid-cols-4">
             {stats.items.map((s) => (
               <div key={s.value} className="border-b border-r border-mist-200 px-5 py-8">
                 <dt className="sr-only">{s.label}</dt>
@@ -106,7 +106,7 @@ export default async function AboutPage() {
         <Heading className="mt-1 max-w-3xl md:mt-2">
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
-        <div className="mt-10 grid gap-4 lg:grid-cols-2">
+        <div className="mt-2 grid gap-4 lg:grid-cols-2">
           <Reveal className="relative aspect-544/520 overflow-hidden rounded-md lg:aspect-auto">
             {/* Favour the top of the photo (the raised hand and staff): only 20% of whatever has to
                 be cropped comes off the top, so the taller the frame gets as the accordion opens,
@@ -143,7 +143,7 @@ export default async function AboutPage() {
           <Heading className="mt-1 max-w-3xl md:mt-2">
             <span id="principles-heading">{principles.title}</span>
           </Heading>
-          <MotionList className="mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-2 md:mt-10 grid border-l border-t border-mist-200 bg-white sm:grid-cols-2 lg:grid-cols-3">
             {principles.items.map((p) => (
               <MotionListItem key={p.title} className="border-b border-r border-mist-200 p-6 transition-colors md:p-8 duration-200 hover:bg-mist/40">
                 <CmsIcon name={p.icon} className="size-7" />
@@ -157,14 +157,14 @@ export default async function AboutPage() {
 
       {/* Awards */}
       {awardsList.items.length > 0 ? (
-        <section id="recognition" className="bg-ink py-6 text-white md:py-[68px]" aria-labelledby="awards-heading">
+        <section id="recognition" className="bg-ink py-8 text-white md:py-[68px]" aria-labelledby="awards-heading">
           <div className="container-site grid items-center gap-10 lg:grid-cols-2">
             <div>
               {awardsList.eyebrow ? <p className="text-xs text-white/70">{awardsList.eyebrow}</p> : null}
               <Heading className="mt-1 md:mt-3">
                 <span id="awards-heading">{awardsList.title}</span>
               </Heading>
-              <MotionList className="mt-6 border-t border-white/15">
+              <MotionList className="mt-2 md:mt-6 border-t border-white/15">
                 {awardsList.items.map((a, index) => {
                   const href = a.url ?? (a.slug ? `/recognitions/${a.slug}` : null);
                   const button = (
@@ -176,7 +176,7 @@ export default async function AboutPage() {
 
                   return (
                     <MotionListItem key={a.slug ?? a.url ?? `${a.name}-${index}`} className="flex items-center justify-between gap-5 border-b border-white/15 py-4">
-                      <span className="text-xl">{a.name}</span>
+                      <span className="text-base">{a.name}</span>
                       {href ? (
                         /^https?:\/\//i.test(href) ? (
                           <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{button}</a>

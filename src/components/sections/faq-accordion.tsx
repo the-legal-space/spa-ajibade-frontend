@@ -25,7 +25,7 @@ export function FaqAccordion({
   const [open, setOpen] = useState<string | null>(items[defaultOpen]?.id ?? items[0]?.id ?? null);
 
   return (
-    <ul className="flex flex-col gap-4 lg:gap-5">
+    <ul className="flex flex-col gap-2 md:gap-4 lg:gap-5">
       {items.map((item, index) => {
         const isOpen = open === item.id;
         const panelId = `faq-panel-${item.id}`;

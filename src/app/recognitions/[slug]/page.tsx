@@ -51,13 +51,13 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
             <div className="absolute inset-0 bg-black/55" aria-hidden />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.22)_100%)]" aria-hidden />
           </div>
-          <div className="container-site relative flex min-h-[400px] items-center pt-[var(--header-h)] md:min-h-[493px]">
-            <div className="max-w-[776px] py-12">
+          <div className="container-site relative flex min-h-[400px] items-center pt-[var(--header-h)] max-md:px-4 md:min-h-[493px]">
+            <div className="max-w-[776px] py-8 md:py-12">
               <Heading as="h1" size="display" reveal={false}>
                 {page.hero.title}
               </Heading>
               {page.hero.subtitle ? (
-                <p className="mt-5 text-lg leading-8 text-mist md:text-xl md:leading-9">
+                <p className="mt-1 text-lg leading-8 text-mist md:mt-5 md:text-xl md:leading-9">
                   {page.hero.subtitle}
                 </p>
               ) : null}

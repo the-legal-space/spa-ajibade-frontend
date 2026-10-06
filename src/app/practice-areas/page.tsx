@@ -56,7 +56,7 @@ export default async function PracticeAreasPage() {
           <Heading className="mt-1 max-w-[1200px] font-serif md:mt-2">
             <span id="grid-heading">{page.gridSection.title}</span>
           </Heading>
-          <MotionList className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-2 md:mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {page.practiceAreas.map((a) => (
               <MotionListItem key={a.id}>
                 <PracticeAreaCard area={a} />
