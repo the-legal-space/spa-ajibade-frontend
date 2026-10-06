@@ -60,9 +60,9 @@ export default async function InsightsPage({ searchParams }: Props) {
 
         <ListingResults>
         {list.data.length > 0 ? (
-          <MotionList key={`${category}|${practiceArea}|${sort}|${page}`} className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <MotionList key={`${category}|${practiceArea}|${sort}|${page}`} className="mt-2 md:mt-10 grid min-w-0 gap-x-4 gap-y-4 md:gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {list.data.map((i) => (
-              <MotionListItem key={i.id}>
+              <MotionListItem key={i.id} className="min-w-0">
                 <InsightCard insight={i} />
               </MotionListItem>
             ))}

@@ -158,7 +158,7 @@ export function Pagination({
   const next = page < totalPages ? withParams(base, current, { page: page + 1 }) : null;
   const btn = "inline-flex h-9 items-center rounded-[4px] border-[0.5px] border-mist-300 bg-white px-3 text-[13px] transition-colors";
   return (
-    <nav aria-label="Pagination" className="mt-10 flex items-center justify-between rounded-[4px] border border-mist-300 bg-white px-5 py-3.5 shadow-xs">
+    <nav aria-label="Pagination" className="mt-2 md:mt-10 flex items-center justify-between rounded-[4px] border border-mist-300 bg-white px-5 py-3.5 shadow-xs">
       <p className="text-[13px] text-ink-700">
         Page {page} of {totalPages}
       </p>

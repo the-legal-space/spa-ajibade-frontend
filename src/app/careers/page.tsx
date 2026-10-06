@@ -36,7 +36,7 @@ export default async function CareersPage() {
         </Heading>
 
         {page.jobs.length > 0 ? (
-          <MotionList className="mt-10 space-y-8">
+          <MotionList className="mt-2 md:mt-10 space-y-4 md:space-y-8">
             {page.jobs.map((job) => (
               <MotionListItem key={job.id}>
                 <article

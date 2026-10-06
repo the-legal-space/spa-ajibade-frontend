@@ -58,7 +58,7 @@ export default async function PeoplePage({ searchParams }: Props) {
           <span id="directory-heading">{content.directorySection.title}</span>
         </Heading>
 
-        <Reveal className="relative z-[35] mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Reveal className="relative z-[35] mt-2 md:mt-8 flex flex-col gap-2 md:gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
           <PeopleSortMenu
             practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
@@ -71,7 +71,7 @@ export default async function PeoplePage({ searchParams }: Props) {
 
         <ListingResults>
         {people.data.length > 0 ? (
-          <MotionList key={`${role}|${practiceArea}|${sort}|${page}`} className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList key={`${role}|${practiceArea}|${sort}|${page}`} className="mt-2 md:mt-8 grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {people.data.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} details={cardDetails[p.slug]} />
