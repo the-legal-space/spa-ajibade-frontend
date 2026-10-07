@@ -168,3 +168,31 @@ html[data-listing-pending] [data-listing-results] {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(300%); }
 }
+
+/* Browsers paint autofilled fields a light blue/white that ignores our dark styling (white text on a white
+   block). Keep dark fields dark: the footer subscribe field and the booking/forward forms. The inset shadow
+   covers the autofill colour; the long transition stops it flashing back. */
+footer input:-webkit-autofill,
+footer input:-webkit-autofill:hover,
+footer input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #000000 inset;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+.booking-app input:-webkit-autofill,
+.booking-app input:-webkit-autofill:hover,
+.booking-app input:-webkit-autofill:focus,
+.booking-app textarea:-webkit-autofill,
+.booking-app select:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #0f0f0f inset;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+footer input:autofill,
+.booking-app input:autofill {
+  /* Firefox */
+  background-color: transparent;
+  color: #ffffff;
+}
