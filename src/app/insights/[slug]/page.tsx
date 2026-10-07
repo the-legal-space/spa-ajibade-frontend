@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { getInsight, getSite } from "@/lib/api/endpoints";
+import { getInsight, getInsights, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
 import { cn, formatMonthYear, initials } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
+import { InsightCard } from "@/components/sections/cards";
+import { ScrollRail } from "@/components/home/scroll-rail";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { VideoEmbed } from "@/components/sections/video-embed";
@@ -55,10 +57,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Article page, following the "READ MORE" frame (white header, full-width cover, body, author). */
 export default async function InsightPage({ params }: Props) {
   const { slug } = await params;
-  const [i, site] = await Promise.all([load(slug), getSite()]);
+  const [i, site, recentInsights] = await Promise.all([
+    load(slug),
+    getSite(),
+    getInsights({ sort: "newest", page: 1, pageSize: 50 }),
+  ]);
   const body = cleanHtml(i.body);
   const date = formatMonthYear(i.publishedAt);
   const readMore = i.cta;
+  const relatedInsights = recentInsights.data
+    .filter((insight) => insight.slug !== i.slug)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
   const author =
     i.author.type === "person"
       ? {
@@ -205,6 +215,36 @@ export default async function InsightPage({ params }: Props) {
           </div>
         </div>
       </article>
+
+      {relatedInsights.length > 0 ? (
+        <section
+          className="overflow-hidden bg-mist py-8 text-ink md:py-[68px]"
+          aria-labelledby="related-insights-heading"
+        >
+          <div className="container-site">
+            <div className="flex flex-wrap items-start justify-between gap-6">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-[0.18em] text-stone">
+                  More from the firm
+                </p>
+                <Heading className="mt-1 md:mt-2">
+                  <span id="related-insights-heading">Recent Publications</span>
+                </Heading>
+              </div>
+            </div>
+            <ScrollRail label="Recent publications">
+              {relatedInsights.map((insight) => (
+                <div
+                  key={insight.id}
+                  className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]"
+                >
+                  <InsightCard insight={insight} />
+                </div>
+              ))}
+            </ScrollRail>
+          </div>
+        </section>
+      ) : null}
 
       <PageEnd />
       <script
