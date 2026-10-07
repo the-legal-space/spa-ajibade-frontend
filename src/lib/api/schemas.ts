@@ -106,6 +106,7 @@ export const PersonRole = z.enum([
   "senior_associate",
   "associate",
   "trainee_associate",
+  "nysc_associate",
 ]);
 export type PersonRole = z.infer<typeof PersonRole>;
 
