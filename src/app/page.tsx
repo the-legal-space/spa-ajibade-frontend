@@ -143,7 +143,7 @@ export default async function HomePage() {
               </Reveal>
             ) : null}
           </div>
-          <MotionList className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {page.leadership.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} details={cardDetails[p.slug]} />
@@ -181,7 +181,7 @@ export default async function HomePage() {
                 >
                   <CmsIcon name={pt.icon} className="size-5 shrink-0" />
                   <div>
-                    <MotionP className="text-base font-medium leading-7">
+                    <MotionP className="text-base text-[12px] leading-7">
                       {pt.title}
                     </MotionP>
                     {pt.text ? (
@@ -217,14 +217,6 @@ export default async function HomePage() {
                 <span id="insights-heading">{page.insightsSection.title}</span>
               </Heading>
             </div>
-            {page.insightsSection.cta ? (
-              <Reveal className="hidden md:block">
-                <SmartLink
-                  link={page.insightsSection.cta}
-                  className={buttonClass("outline")}
-                />
-              </Reveal>
-            ) : null}
           </div>
           <Reveal className="mt-2 md:mt-11">
             <ScrollRail

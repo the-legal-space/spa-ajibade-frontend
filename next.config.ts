@@ -8,6 +8,16 @@ const apiOrigin = (() => {
   }
 })();
 
+// The booking mail endpoint may live on another host when the front end is deployed statically.
+const mailOrigin = (() => {
+  try {
+    const u = process.env.NEXT_PUBLIC_MAIL_API_URL;
+    return u && /^https?:\/\//.test(u) ? new URL(u).origin : "";
+  } catch {
+    return "";
+  }
+})();
+
 const isDev = process.env.NODE_ENV !== "production";
 
 // Images come from the API as absolute URLs on a storage host we do not know yet,
@@ -20,7 +30,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self'",
-  `connect-src 'self' ${apiOrigin}${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' ${apiOrigin}${mailOrigin ? ` ${mailOrigin}` : ""}${isDev ? " ws: wss:" : ""}`,
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://challenges.cloudflare.com",
   "media-src 'self' https:",
   "object-src 'none'",

@@ -5,7 +5,7 @@ import DiscussProgress from "./DiscussProgress";
 import StepUserInfo from "./StepUserInfo";
 import StepStaffSelect from "./StepStaffSelect";
 import StepTimeSelect from "./StepTimeSelect";
-import { CONSENT_TEXT_VERSION } from "@/lib/env";
+import { CONSENT_TEXT_VERSION, MAIL_API_URL } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Honeypot } from "@/components/forms/fields";
 import { useTurnstile } from "@/components/forms/turnstile";
@@ -30,8 +30,9 @@ export default function DiscussApp({ preselectedStaffId }: { preselectedStaffId?
   const [website, setWebsite] = useState("");
   const turnstile = useTurnstile();
 
-  // The request goes to the firm's own enquiries endpoint (the same one the site's other forms use),
-  // with the chosen attorney and time written into the summary the firm reads.
+  // One confirmation, two deliveries: the mail endpoint emails the chosen attorney's team and sends the
+  // client a confirmation; the enquiry is also recorded in the firm's dashboard (same endpoint the other
+  // forms use). The request succeeds if either one went through, so the firm always hears about it.
   const handleConfirm = async (date: Date, slot: string) => {
     if (!selectedStaff) return;
     if (!turnstile.ready) {
@@ -42,33 +43,65 @@ export default function DiscussApp({ preselectedStaffId }: { preselectedStaffId?
     setSubmitting(true);
     setError(null);
 
-    const summary = [
-      `Appointment request with ${selectedStaff.name} (${selectedStaff.role}).`,
-      `Preferred time: ${formatFullDate(date)}, ${slot}.`,
-      "",
-      userInfo.message || "No specific description provided.",
-    ].join("\n");
+    const fullDate = formatFullDate(date);
+    const description = userInfo.message || "No specific description provided.";
 
-    const body: Record<string, unknown> = {
-      fullName: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
-      email: userInfo.email,
-      summary,
-      consent: true,
-      consentTextVersion: CONSENT_TEXT_VERSION,
-      turnstileToken: turnstile.token,
-      website,
+    const sendMail = async (): Promise<{ ok: true; reference: string } | { ok: false; message: string }> => {
+      try {
+        const res = await fetch(MAIL_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            staffId: selectedStaff.id,
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            email: userInfo.email,
+            phone: userInfo.phone,
+            date: fullDate,
+            time: slot,
+            description,
+            consent: true,
+            website,
+          }),
+        });
+        const json = await res.json().catch(() => null);
+        if (res.ok && json?.ok) return { ok: true, reference: String(json.reference ?? "") };
+        return { ok: false, message: typeof json?.message === "string" ? json.message : "We couldn't send your request." };
+      } catch {
+        return { ok: false, message: "We couldn't reach the server. Check your connection and try again." };
+      }
     };
-    if (userInfo.phone) body.phone = userInfo.phone;
 
-    const result = await submitForm("/enquiries", body);
+    const recordEnquiry = () => {
+      const summary = [
+        `Appointment request with ${selectedStaff.name} (${selectedStaff.role}).`,
+        `Preferred time: ${fullDate}, ${slot}.`,
+        "",
+        description,
+      ].join("\n");
+      const body: Record<string, unknown> = {
+        fullName: `${userInfo.firstName} ${userInfo.lastName}`.trim(),
+        email: userInfo.email,
+        summary,
+        consent: true,
+        consentTextVersion: CONSENT_TEXT_VERSION,
+        turnstileToken: turnstile.token,
+        website,
+      };
+      if (userInfo.phone) body.phone = userInfo.phone;
+      return submitForm("/enquiries", body);
+    };
+
+    const [mail, enquiry] = await Promise.all([sendMail(), recordEnquiry()]);
     setSubmitting(false);
-    if (result.ok) {
-      setReference(result.reference);
+
+    if (mail.ok || enquiry.ok) {
+      setReference(mail.ok ? mail.reference : enquiry.ok ? enquiry.reference : "");
       setSubmitted(true);
       return;
     }
     turnstile.reset();
-    setError(result.message);
+    setError(mail.message || (enquiry.ok ? "" : enquiry.message));
   };
 
   const reset = () => {
@@ -105,7 +138,7 @@ export default function DiscussApp({ preselectedStaffId }: { preselectedStaffId?
             {"Your request to meet with "}
             {selectedStaff?.name}
             {
-              " has been sent to the firm. You'll receive a confirmation once the time is accepted."
+              " has been sent to the firm. A confirmation email is on its way to you, and the firm will be in touch to confirm the time."
             }
           </p>
           {reference ? (
