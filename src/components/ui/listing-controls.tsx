@@ -110,8 +110,8 @@ export function FilterMenu({
   const active = current[param] ?? "";
 
   return (
-    <details className="group relative z-20 shrink-0 self-end lg:self-auto">
-      <summary className="flex h-[34px] min-w-[120px] cursor-pointer list-none items-center justify-between gap-3 rounded-[4px] border-[0.5px] border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs marker:hidden hover:border-ink">
+    <details className="group relative z-20 max-md:w-full shrink-0 self-end lg:self-auto">
+      <summary className="flex h-[42px] min-w-[120px] cursor-pointer list-none items-center justify-between gap-0 rounded-[4px] border border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs marker:hidden hover:border-ink max-md:w-full max-md:justify-center">
         Sort By
         <ChevronDown className="size-4 text-stone transition-transform group-open:rotate-180" aria-hidden />
       </summary>

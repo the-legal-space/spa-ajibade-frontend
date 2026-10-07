@@ -42,7 +42,7 @@ export default async function PracticeAreasPage() {
       <section
         id="practice-areas"
         aria-labelledby="grid-heading"
-        className="relative overflow-hidden bg-mist py-16 text-ink md:py-[68px]"
+        className="relative overflow-hidden bg-mist py-8 text-ink md:py-[68px]"
       >
         <div
           aria-hidden
@@ -56,7 +56,7 @@ export default async function PracticeAreasPage() {
           <Heading className="mt-1 max-w-[1200px] font-serif md:mt-2">
             <span id="grid-heading">{page.gridSection.title}</span>
           </Heading>
-          <MotionList className="mt-2 md:mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList className="mt-4 md:mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {page.practiceAreas.map((a) => (
               <MotionListItem key={a.id}>
                 <PracticeAreaCard area={a} />
@@ -83,7 +83,7 @@ export default async function PracticeAreasPage() {
                 <Heading>
                   <span id="csr-heading">{csr.title}</span>
                 </Heading>
-                <p className="mt-4 text-lg leading-8 text-white/85">
+                <p className="mt-4 text-[12px] leading-8 text-white/85">
                   {csr.text}
                 </p>
                 <HeroDots className="mt-5" />

@@ -146,10 +146,11 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
   // Detail pages (people / insights) always use white bg + dark text.
   // Other pages: white text over dark sections (hero, dark bands), dark text over light content.
   const wantsWhiteText = !light && overDark;
+  const isDarkHeader = mobileOpen || wantsWhiteText;
 
   const iconBtn = cn(
     "grid size-10 place-items-center rounded-full transition-colors",
-    wantsWhiteText ? "hover:bg-white/10" : "hover:bg-mist",
+    isDarkHeader ? "hover:bg-white/10" : "hover:bg-mist",
   );
 
   return (
@@ -158,16 +159,18 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
         data-header-self
         className={cn(
           "sticky top-0 z-40 border-b transition-[color,background-color,border-color] duration-300",
-          light
-            ? "border-ink/10 bg-white text-ink"
-            : wantsWhiteText
-              ? "border-[rgba(242,242,242,0.2)] bg-white/5 text-white backdrop-blur-[2px]"
-              : "border-ink/10 bg-white/85 text-ink backdrop-blur-md",
+          mobileOpen
+            ? "border-white/10 bg-ink text-white"
+            : light
+              ? "border-ink/10 bg-white text-ink"
+              : wantsWhiteText
+                ? "border-[rgba(242,242,242,0.2)] bg-white/5 text-white"
+                : "border-ink/10 bg-white/85 text-ink",
         )}
       >
         <div className="container-site flex h-(--header-h) items-center justify-between gap-3 md:gap-6">
           <Link href="/" aria-label={`${firmName} home`} className="shrink-0">
-            <Logo firmName={firmName} descriptor={descriptor} tone={wantsWhiteText ? "light" : "dark"} className="max-[359px]:h-[26px]" />
+            <Logo firmName={firmName} descriptor={descriptor} tone={isDarkHeader ? "light" : "dark"} className="max-[359px]:h-[26px]" />
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
@@ -178,7 +181,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             </ul>
           </nav>
 
-          <div className="flex items-center gap-1 min-[360px]:gap-3 xl:gap-6">
+          <div className="flex items-center gap-6">
             <motion.button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -193,7 +196,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             {cta ? (
               // Wrapper does the hiding: buttonClass's own inline-flex would override a `hidden` on the link.
               <div className="hidden lg:block">
-                <SmartLink link={cta} className={buttonClass(wantsWhiteText ? "light" : "dark", "px-3 py-2.5")} />
+                <SmartLink link={cta} className={buttonClass(isDarkHeader ? "light" : "dark", "px-3 py-2.5")} />
               </div>
             ) : null}
             <motion.button
