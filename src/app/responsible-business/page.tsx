@@ -37,7 +37,7 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   const page = readPage(sp.page);
   const [content, list] = await Promise.all([
     getPage("responsible-business"),
-    getInsights({ category: "pro_bono", sort: "newest", page, pageSize: 9 }),
+    getInsights({ category: "pro_bono", sort: "newest", page, pageSize: 15 }),
   ]);
   // The banner shows the first three stories on this page. Each slide uses its story's own CMS cover,
   // otherwise the page's CMS carousel images in turn (bundled placeholder thumbnails don't count),

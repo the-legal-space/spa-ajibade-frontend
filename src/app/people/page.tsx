@@ -38,7 +38,7 @@ export default async function PeoplePage({ searchParams }: Props) {
   const sort = SORTS.find((s) => s.value === sortRaw)?.value ?? "seniority";
   const page = readPage(sp.page);
 
-  const [content, people] = await Promise.all([getPage("people"), getPeople({ role, practiceArea, sort, page, pageSize: 9 })]);
+  const [content, people] = await Promise.all([getPage("people"), getPeople({ role, practiceArea, sort, page, pageSize: 15 })]);
   const current = { role, practiceArea, sort: sort === "seniority" ? undefined : sort };
   const meta = people.meta ?? { page, totalPages: 1 };
   const cardDetails = await getCardDetails(people.data);
