@@ -32,7 +32,7 @@ export function Heading({
 }) {
   const sizes = {
     display: "capitalize text-xl leading-[1.4] md:text-[3.25rem] md:leading-[62px]",
-    h2: "capitalize text-2xl leading-[1.4] md:text-[3.25rem] md:leading-[62px]",
+    h2: "capitalize text-2xl leading-[1.4] md:text-[2.75rem] md:leading-[62px]",
     h3: "text-2xl leading-tight md:text-[1.75rem]",
   };
   const classes = cn("font-serif font-normal", balance && "text-balance", sizes[size], className);
