@@ -26,7 +26,7 @@ export function ContactCallout({ callout }: { callout: Site["contactCallout"] })
                 )
               : callout.title}
           </Heading>
-          <MotionP className="max-w-[894px] text-sm leading-6 text-mist md:text-2xl md:leading-[44px]">{callout.text}</MotionP>
+          <MotionP className="max-w-[894px] text-sm leading-6 text-mist md:text-xl md:leading-[44px]">{callout.text}</MotionP>
         </div>
         <Reveal className="flex flex-wrap justify-center gap-3 max-md:w-full" delay={0.1}>
           {callout.primaryCta ? <SmartLink link={callout.primaryCta} className={buttonClass("light")} /> : null}

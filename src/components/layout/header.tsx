@@ -181,7 +181,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             </ul>
           </nav>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
             <motion.button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -209,7 +209,7 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
               whileTap={INTERACTION.iconButton.whileTap}
               onClick={() => setMobileOpen((o) => !o)}
             >
-              {mobileOpen ? <X className="size-6 max-lg:translate-x-3" /> : <Menu className="size-6 max-lg:translate-x-3" />}
+              {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
             </motion.button>
           </div>
         </div>
