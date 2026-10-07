@@ -172,7 +172,11 @@ export default async function PracticeAreaPage({ params }: Props) {
                 {area.approach.points.length > 0 ? (
                   <ul className="mt-3">
                     {area.approach.points.map((point, index) => (
-                      <li key={`${point}-${index}`} className="flex items-center gap-2 border-b border-mist-200 py-3 text-sm leading-6 text-ink-800">
+                      <li
+                        key={`${point}-${index}`}
+                        // No line under the last point: the next section already draws one above itself.
+                        className={`flex items-center gap-2 py-3 text-sm leading-6 text-ink-800 ${index < area.approach!.points.length - 1 ? "border-b border-mist-200" : ""}`}
+                      >
                         <PracticeMark />
                         <span>{point}</span>
                       </li>

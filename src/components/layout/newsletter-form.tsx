@@ -1,34 +1,78 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { CONSENT_TEXT_VERSION } from "@/lib/env";
+import { submitForm } from "@/lib/submit";
+import { Honeypot } from "@/components/forms/fields";
+import { useTurnstile } from "@/components/forms/turnstile";
 
 /**
- * Figma footer newsletter field (underlined email input with an arrow).
- * The content API has no subscription endpoint yet, so a valid address opens a pre-filled
- * email to the firm asking to be added. Swap `subscribe` for an API call once one exists.
+ * Footer newsletter field (underlined email input with an arrow).
+ *
+ * The content API has no subscribe endpoint yet, so the address is sent to the backend through the
+ * "Message the firm" endpoint (POST /messages), which stores it in the firm's dashboard inbox. When a real
+ * endpoint exists (e.g. POST /subscribers), only `sendToBackend` below needs to change.
  */
-export function NewsletterForm({ firmEmail }: { firmEmail: string | null }) {
+export function NewsletterForm() {
   const [email, setEmail] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
   const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const turnstile = useTurnstile();
 
-  function subscribe(e: FormEvent) {
+  function sendToBackend(address: string) {
+    return submitForm("/messages", {
+      fullName: "Newsletter subscriber",
+      email: address,
+      subject: "Newsletter subscription",
+      message: `Please add ${address} to the SPA Ajibade & Co. legal insights mailing list.`,
+      consent: true,
+      consentTextVersion: CONSENT_TEXT_VERSION,
+      turnstileToken: turnstile.token,
+      website,
+    });
+  }
+
+  async function subscribe(e: FormEvent) {
     e.preventDefault();
     const value = email.trim();
     if (!/^\S+@\S+\.\S+$/.test(value)) {
       setError("Please enter a valid email address.");
       return;
     }
+    if (!turnstile.ready) {
+      setError("Please complete the security check.");
+      return;
+    }
     setError(null);
-    if (!firmEmail) return;
-    const subject = encodeURIComponent("Subscribe me to legal insights");
-    const body = encodeURIComponent(`Please add ${value} to the SPA Ajibade & Co. legal insights mailing list.`);
-    window.location.href = `mailto:${firmEmail}?subject=${subject}&body=${body}`;
+    setSending(true);
+    const result = await sendToBackend(value);
+    setSending(false);
+    if (result.ok) {
+      setDone(true);
+      setEmail("");
+      return;
+    }
+    turnstile.reset();
+    setError(result.kind === "validation" ? "Please enter a valid email address." : result.message);
+  }
+
+  if (done) {
+    return (
+      <div role="status" className="flex items-center gap-3 border-b border-white/25 py-3 text-base leading-9 text-white">
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-black">
+          <Check className="size-4" strokeWidth={2.5} aria-hidden />
+        </span>
+        Thank you, you&apos;re on the list.
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={subscribe} noValidate className="w-full">
-      <div className="flex items-center border-b border-[#4c4c44]">
+    <form onSubmit={subscribe} noValidate className="relative w-full">
+      <div className="flex items-center gap-2 border-b border-white/25 transition-colors duration-200 focus-within:border-white">
         <label htmlFor="newsletter-email" className="sr-only">
           Email
         </label>
@@ -37,18 +81,28 @@ export function NewsletterForm({ firmEmail }: { firmEmail: string | null }) {
           type="email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="Email"
           aria-invalid={!!error}
           aria-describedby={error ? "newsletter-error" : undefined}
-          className="min-w-0 flex-1 bg-transparent py-3 pr-3 text-base leading-9 text-white outline-none placeholder:text-gray"
+          className="min-w-0 flex-1 bg-transparent py-3 text-base leading-9 text-white outline-none placeholder:text-gray"
         />
-        <button type="submit" className="py-3 pl-3 text-white transition-transform hover:translate-x-0.5" aria-label="Subscribe">
-          <ArrowRight className="size-5" strokeWidth={1.5} />
+        <button
+          type="submit"
+          disabled={sending}
+          className="mb-1.5 grid size-9 shrink-0 place-items-center rounded-full border border-white/30 text-white transition-colors duration-200 hover:border-white hover:bg-white hover:text-black focus-visible:border-white focus-visible:bg-white focus-visible:text-black disabled:opacity-60"
+          aria-label="Subscribe"
+        >
+          {sending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <ArrowRight className="size-4" strokeWidth={1.75} />}
         </button>
       </div>
+      <Honeypot value={website} onChange={setWebsite} />
+      {turnstile.widget}
       {error ? (
-        <p id="newsletter-error" className="mt-2 text-xs text-red-300">
+        <p id="newsletter-error" role="alert" className="mt-2 text-xs text-red-300">
           {error}
         </p>
       ) : null}
