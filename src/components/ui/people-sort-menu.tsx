@@ -56,7 +56,7 @@ export function PeopleSortMenu({
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-[42px] cursor-pointer items-center gap-3 rounded-[4px] max-md:w-full max-md:justify-center border border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs transition-colors hover:border-ink"
+        className="inline-flex h-[42px] cursor-pointer items-center gap-0 rounded-[4px] max-md:w-full max-md:justify-center border border-mist-300 bg-white px-4 text-[13px] text-ink shadow-xs transition-colors hover:border-ink"
       >
         Sort By
         <ChevronDown className={cn("size-4 text-stone transition-transform", open && "rotate-180")} aria-hidden />

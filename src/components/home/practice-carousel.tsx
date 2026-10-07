@@ -80,7 +80,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
 
       <div
         {...swipe}
-        className="relative mt-2 overflow-hidden [--cw:calc(100vw-40px)] [--gap:16px] md:mt-11 md:[--cw:min(910px,calc(100vw-64px))] lg:[--gap:68px]"
+        className="relative mt-4 overflow-hidden [--cw:calc(100vw-40px)] [--gap:16px] md:mt-11 md:[--cw:min(910px,calc(100vw-64px))] lg:[--gap:68px]"
       >
         <div
           className="relative left-1/2 flex w-max gap-(--gap) transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
