@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Fraunces, Inter, Source_Serif_4 } from "next/font/google";
-import { connection } from "next/server";
 import { getOffices, getPracticeAreas, getSite } from "@/lib/api/endpoints";
 import { SITE_URL } from "@/lib/env";
 import { TopBar } from "@/components/layout/top-bar";
@@ -11,6 +11,7 @@ import { MotionProvider } from "@/components/ui/motion-provider";
 import { designNav } from "@/lib/nav";
 import { cleanHtml } from "@/lib/sanitize";
 import { isPending } from "@/lib/utils";
+import { NavProgress } from "@/components/layout/nav-progress";
 import "./globals.css";
 
 // Load Fraunces as a true variable font including the optical-size axis, so large headings use
@@ -68,8 +69,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Render per request; the API responses themselves are cached (see lib/api/client.ts).
-  await connection();
+  // Pages without filters are built ahead of time and refreshed in the background (the API responses are
+  // cached for 5 minutes, and the backend's change webhook refreshes them sooner: lib/api/client.ts), so a
+  // page change is served instantly instead of waiting on the content API every time.
   const [site, offices, practiceAreas] = await Promise.all([
     getSite(),
     getOffices(),
@@ -129,6 +131,9 @@ export default async function RootLayout({
         <noscript>
           <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
         </noscript>
+        <Suspense fallback={null}>
+          <NavProgress />
+        </Suspense>
         <MotionProvider>
         <ActionsProvider
           firmName={site.settings.firmName}
