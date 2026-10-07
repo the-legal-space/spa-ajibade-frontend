@@ -17,7 +17,6 @@ const DROPDOWNS: Record<string, NavItem["children"]> = {
     { label: "Articles", href: "/insights?category=articles#listing", kind: "internal" },
     { label: "Insights", href: "/insights?category=insights#listing", kind: "internal" },
     { label: "Regulatory Updates", href: "/insights?category=regulatory_updates#listing", kind: "internal" },
-    { label: "News Updates", href: "/insights?category=news_updates#listing", kind: "internal" },
     { label: "Events", href: "/insights?category=webinar_resources#listing", kind: "internal" },
   ],
 };
