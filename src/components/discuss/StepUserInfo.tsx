@@ -39,7 +39,9 @@ export default function StepUserInfo({ initial, onNext }: StepUserInfoProps) {
     if (!form.email.trim()) nextErrors.email = "Email address is required.";
     else if (!isValidEmail(form.email))
       nextErrors.email = "Please enter a valid email address.";
-    if (form.phone.trim() && !/^[\d\s+()-]{7,20}$/.test(form.phone.trim()))
+    if (!form.message.trim()) nextErrors.message = "Please tell us briefly what you need help with.";
+    if (!form.phone.trim()) nextErrors.phone = "Phone number is required.";
+    else if (!/^[\d\s+()-]{7,20}$/.test(form.phone.trim()))
       nextErrors.phone = "Use digits, spaces, + ( ) or -, between 7 and 20 characters.";
     if (!form.consent) nextErrors.consent = "Please tick the box so we can respond to you.";
 
@@ -144,7 +146,7 @@ export default function StepUserInfo({ initial, onNext }: StepUserInfoProps) {
 
         <div className="form-group">
           <label htmlFor="phone">
-            Phone Number <span className="optional-tag">(optional)</span>
+            Phone Number
           </label>
           <div className="input-icon-wrap">
             <svg
@@ -166,6 +168,8 @@ export default function StepUserInfo({ initial, onNext }: StepUserInfoProps) {
               id="phone"
               name="phone"
               autoComplete="tel"
+              required
+              aria-required="true"
               value={form.phone}
               onChange={handleChange("phone")}
               aria-invalid={Boolean(errors.phone)}
@@ -179,14 +183,16 @@ export default function StepUserInfo({ initial, onNext }: StepUserInfoProps) {
 
         <div className="form-group">
           <label htmlFor="message">
-            Brief description of what you need legal assistance with{" "}
-            <span className="optional-tag">(optional)</span>
+            Brief description of what you need legal assistance with
           </label>
           <textarea
             id="message"
             name="message"
             rows={5}
             maxLength={1800}
+            required
+            aria-required="true"
+            aria-invalid={Boolean(errors.message)}
             value={form.message}
             onChange={handleChange("message")}
             className={errors.message ? "error" : ""}
