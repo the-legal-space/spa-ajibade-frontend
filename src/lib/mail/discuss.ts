@@ -51,10 +51,12 @@ export function validateDiscuss(body: unknown): Validation {
   if (data.firstName.length < 1 || data.firstName.length > 60) errors.firstName = "First name is required.";
   if (data.lastName.length < 1 || data.lastName.length > 60) errors.lastName = "Last name is required.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) || data.email.length > 254) errors.email = "Please enter a valid email address.";
-  if (data.phone && !/^[\d\s+()-]{7,20}$/.test(data.phone)) errors.phone = "Please enter a valid phone number.";
+  if (!data.phone) errors.phone = "Phone number is required.";
+  else if (!/^[\d\s+()-]{7,20}$/.test(data.phone)) errors.phone = "Please enter a valid phone number.";
   if (data.date.length < 6 || data.date.length > 60) errors.date = "Please choose a date.";
   if (!/^\d{1,2}:\d{2} (AM|PM)$/.test(data.time)) errors.time = "Please choose a time.";
-  if (data.description.length > 2000) errors.description = "Please keep the description under 2000 characters.";
+  if (!data.description) errors.description = "Please tell us briefly what you need help with.";
+  else if (data.description.length > 2000) errors.description = "Please keep the description under 2000 characters.";
   if (b.consent !== true) errors.consent = "Consent is required.";
   return Object.keys(errors).length ? { ok: false, errors } : { ok: true, data };
 }
