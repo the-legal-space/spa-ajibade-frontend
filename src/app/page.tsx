@@ -181,7 +181,7 @@ export default async function HomePage() {
                 >
                   <CmsIcon name={pt.icon} className="size-5 shrink-0" />
                   <div>
-                    <MotionP className="text-base text-[12px] leading-7">
+                    <MotionP className="text-[12px] font-medium leading-7 md:text-base md:font-normal">
                       {pt.title}
                     </MotionP>
                     {pt.text ? (
@@ -217,6 +217,11 @@ export default async function HomePage() {
                 <span id="insights-heading">{page.insightsSection.title}</span>
               </Heading>
             </div>
+            {page.insightsSection.cta ? (
+              <Reveal className="max-md:hidden">
+                <SmartLink link={page.insightsSection.cta} className={buttonClass("outline")} />
+              </Reveal>
+            ) : null}
           </div>
           <Reveal className="mt-2 md:mt-11">
             <ScrollRail
