@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap");
 
 /*
  * Design tokens, taken from the SPA AJIBADE & Co. Figma file.
@@ -6,7 +7,8 @@
  * Frame width 1440, 44px side padding, 8px spacing grid.
  */
 @theme {
-  --font-serif: var(--font-fraunces), "Times New Roman", serif;
+  --font-serif: var(--font-fraunces), "Fraunces", Georgia, serif;
+  --font-fraunces: var(--font-fraunces), "Fraunces", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-card: var(--font-source-serif), Georgia, serif;
 

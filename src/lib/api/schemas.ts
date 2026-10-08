@@ -164,7 +164,7 @@ export const OfficeRef = z.object({
 });
 export type OfficeRef = z.infer<typeof OfficeRef>;
 export const FooterOffice = z.object({ id: ObjectId, slug: Slug, name: z.string(), address: z.string(), phone: nullableString, email: nullableString });
-export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean() });
+export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean().optional().default(true) });
 
 export const InsightAuthor = z.discriminatedUnion("type", [
   z.object({ type: z.literal("person"), person: PersonSummary }),

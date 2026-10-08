@@ -44,12 +44,14 @@ function buildPath(path: string, query?: Query) {
   return qs ? `${path}?${qs}` : path;
 }
 
-async function request(path: string, tags: string[]): Promise<unknown> {
+async function request(path: string, tags: string[], bypassCache = false): Promise<unknown> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {
       headers: { Accept: "application/json" },
-      next: { revalidate: REVALIDATE_SECONDS, tags: [ALL_CONTENT_TAG, ...tags] },
+      ...(bypassCache
+        ? { cache: "no-store" as const }
+        : { next: { revalidate: REVALIDATE_SECONDS, tags: [ALL_CONTENT_TAG, ...tags] } }),
     });
   } catch (cause) {
     throw new ApiError(`Could not reach the content API (${(cause as Error).message})`, 503, path);
@@ -66,10 +68,14 @@ export async function apiGet<T extends z.ZodTypeAny>(
   opts: { query?: Query; tags?: string[] } = {},
 ): Promise<z.infer<T>> {
   const fullPath = buildPath(path, opts.query);
-  const json = await request(fullPath, opts.tags ?? []);
-  const parsed = z.object({ data: schema }).safeParse(json);
+  const responseSchema = z.object({ data: schema });
+  const tags = opts.tags ?? [];
+  let parsed = responseSchema.safeParse(await request(fullPath, tags));
   if (!parsed.success) {
-    console.error(`[api] Unexpected response shape for ${fullPath}`, parsed.error.flatten());
+    parsed = responseSchema.safeParse(await request(fullPath, tags, true));
+  }
+  if (!parsed.success) {
+    console.error(`[api] Unexpected response shape for ${fullPath}`, parsed.error.issues);
     throw new ApiError(`Unexpected response shape for ${fullPath}`, 502, fullPath);
   }
   return parsed.data.data;
