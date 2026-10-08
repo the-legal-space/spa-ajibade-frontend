@@ -7,14 +7,15 @@ import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
-import { cn, formatMonthYear, initials } from "@/lib/utils";
+import { cn, formatMonthYear } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard } from "@/components/sections/cards";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
+import { AuthorAvatar, authorView } from "@/components/ui/author";
 import { VideoEmbed } from "@/components/sections/video-embed";
-import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
+import { insightCover } from "@/lib/figma-assets";
 import { getInsightChipHref } from "@/lib/insight-links";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -69,30 +70,19 @@ export default async function InsightPage({ params }: Props) {
     .filter((insight) => insight.slug !== i.slug)
     .sort(() => Math.random() - 0.5)
     .slice(0, 5);
-  const author =
-    i.author.type === "person"
-      ? {
-          name: i.author.person.displayName,
-          label: i.author.person.roleLabel,
-          href: `/people/${i.author.person.slug}`,
-          photo: personAvatar(i.author.person.slug, i.author.person.photo),
-        }
-      : {
-          name: i.author.name,
-          label: i.author.label,
-          href: null,
-          photo: { url: FIGMA.firmAvatar, alt: "", width: 60, height: 60 },
-        };
+  // The author first, then each co-author in the order given (co-authors only come on the detail response).
+  const authors = [i.author, ...i.coAuthors].map(authorView);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: i.title,
     datePublished: i.publishedAt ?? undefined,
-    author: {
-      "@type": i.author.type === "person" ? "Person" : "Organization",
-      name: author.name,
-    },
+    author: authors.map((a) => ({
+      "@type": a.kind === "firm" ? "Organization" : "Person",
+      name: a.name,
+      ...(a.href ? { url: `${SITE_URL}${a.href}` } : {}),
+    })),
     publisher: {
       "@type": "Organization",
       name: site.settings.firmName,
@@ -182,36 +172,27 @@ export default async function InsightPage({ params }: Props) {
             </a>
           ) : null}
 
-          <div className="mt-6 flex items-center gap-3">
-            <span
-              className={cn(
-                "size-11 shrink-0 overflow-hidden rounded-full",
-                author.href && "bg-card-blue",
-              )}
-            >
-              {author.photo ? (
-                <Media image={author.photo} alt="" sizes="44px" />
-              ) : (
-                <span className="grid size-full place-items-center bg-[#56697a] text-xs text-white">
-                  {initials(author.name)}
-                </span>
-              )}
-            </span>
-            <span className="leading-tight">
-              {author.href ? (
-                <Link
-                  href={author.href}
-                  className="block text-[13px] hover:underline"
-                >
-                  {author.name}
+          <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
+            {authors.map((a, n) => {
+              const inner = (
+                <>
+                  <AuthorAvatar view={a} className="size-11" sizes="44px" />
+                  <span className="leading-tight">
+                    <span className={cn("block text-[13px]", a.href && "group-hover/author:underline")}>{a.name}</span>
+                    <span className="block text-[11px] text-stone">{a.label}</span>
+                  </span>
+                </>
+              );
+              return a.href ? (
+                <Link key={`${a.name}-${n}`} href={a.href} className="group/author flex items-center gap-3">
+                  {inner}
                 </Link>
               ) : (
-                <span className="block text-[13px]">{author.name}</span>
-              )}
-              <span className="block text-[11px] text-stone">
-                {author.label}
-              </span>
-            </span>
+                <div key={`${a.name}-${n}`} className="flex items-center gap-3">
+                  {inner}
+                </div>
+              );
+            })}
           </div>
         </div>
       </article>

@@ -42,7 +42,13 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
             <div className="flex max-w-[414px] flex-col gap-6">
               <h2 className="font-serif text-xl font-light leading-7 text-[#e2e2e2]">{footer.newsletter.title || "Subscribe for legal insights"}</h2>
               <NewsletterForm />
-              <p className="text-sm leading-7 text-[#e2e2e2]">{footer.newsletter.note || "Your information is kept confidential"}</p>
+              <p className="text-sm leading-7 text-[#e2e2e2]">
+                {footer.newsletter.note || "Your information is kept confidential"}
+                <span aria-hidden> &middot; </span>
+                <Link href="/unsubscribe" className="underline underline-offset-2 hover:opacity-75">
+                  Unsubscribe
+                </Link>
+              </p>
             </div>
             <SocialLinks socials={footer.socials} always className="gap-5" iconClassName="size-5" />
           </div>

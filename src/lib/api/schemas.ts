@@ -164,10 +164,15 @@ export const OfficeRef = z.object({
 });
 export type OfficeRef = z.infer<typeof OfficeRef>;
 export const FooterOffice = z.object({ id: ObjectId, slug: Slug, name: z.string(), address: z.string(), phone: nullableString, email: nullableString });
-export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean() });
+// The API used to send `enabled`; it was removed when the real subscribe endpoint shipped. The form is always shown.
+export const SiteNewsletter = z.object({ title: z.string(), note: z.string() });
 
 export const InsightAuthor = z.discriminatedUnion("type", [
+  // An attorney with a profile on the site.
   z.object({ type: z.literal("person"), person: PersonSummary }),
+  // A named writer with no profile (former staff, guest authors). The photo can be missing.
+  z.object({ type: z.literal("writer"), name: z.string(), label: z.string(), photo: NullableImage }),
+  // The firm itself.
   z.object({ type: z.literal("firm"), name: z.string(), label: z.string() }),
 ]);
 export type InsightAuthor = z.infer<typeof InsightAuthor>;
@@ -196,6 +201,8 @@ export const InsightDetail = InsightCard.extend({
   body: nullableString,
   videoUrl: nullableString,
   related: z.array(InsightCard),
+  // Co-authors, in display order (only on the detail response; cards show the main author alone).
+  coAuthors: z.array(InsightAuthor).default([]),
 });
 export type InsightDetail = z.infer<typeof InsightDetail>;
 
