@@ -167,7 +167,11 @@ export const FooterOffice = z.object({ id: ObjectId, slug: Slug, name: z.string(
 export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean().optional().default(true) });
 
 export const InsightAuthor = z.discriminatedUnion("type", [
+  // An attorney with a profile on the site.
   z.object({ type: z.literal("person"), person: PersonSummary }),
+  // A named writer with no profile (former staff, guest authors). The photo can be missing.
+  z.object({ type: z.literal("writer"), name: z.string(), label: z.string(), photo: NullableImage }),
+  // The firm itself.
   z.object({ type: z.literal("firm"), name: z.string(), label: z.string() }),
 ]);
 export type InsightAuthor = z.infer<typeof InsightAuthor>;
@@ -196,6 +200,8 @@ export const InsightDetail = InsightCard.extend({
   body: nullableString,
   videoUrl: nullableString,
   related: z.array(InsightCard),
+  // Co-authors, in display order (only on the detail response; cards show the main author alone).
+  coAuthors: z.array(InsightAuthor).default([]),
 });
 export type InsightDetail = z.infer<typeof InsightDetail>;
 

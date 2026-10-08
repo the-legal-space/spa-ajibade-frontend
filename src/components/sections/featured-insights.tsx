@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import type { InsightCard } from "@/lib/api/schemas";
-import { cn, formatMonthYear, initials } from "@/lib/utils";
+import { cn, formatMonthYear } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { AuthorAvatar, authorView } from "@/components/ui/author";
 import { useAutoplay, useSwipe } from "@/components/home/scroll-rail";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
-import { FIGMA, insightCover, personAvatar } from "@/lib/figma-assets";
+import { insightCover } from "@/lib/figma-assets";
 import { getInsightChipHref } from "@/lib/insight-links";
 
 const MotionLink = motion.create(Link);
@@ -39,9 +39,7 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
           >
             {items.map((item, n) => {
               const date = formatMonthYear(item.publishedAt);
-              const authorAvatar = item.author.type === "person"
-                ? personAvatar(item.author.person.slug, item.author.person.photo)
-                : null;
+              const author = authorView(item.author);
               return (
                 <article
                   key={item.id}
@@ -72,33 +70,24 @@ export function FeaturedInsights({ items }: { items: InsightCard[] }) {
                     </h2>
                     {item.excerpt ? <p className="mt-3 line-clamp-3 text-[13px] leading-6 text-white/75">{item.excerpt}</p> : null}
                     <div className="mt-5 flex items-center justify-between gap-4 overflow-visible">
-                      {item.author.type === "person" ? (
-                        <Link
-                          href={`/people/${item.author.person.slug}`}
-                          tabIndex={n === i ? undefined : -1}
-                          className="group/author flex min-w-0 items-center gap-2 text-xs"
-                        >
-                          <span className="size-9 shrink-0 overflow-hidden rounded-full bg-[#56697a]">
-                            {authorAvatar ? (
-                              <Media image={authorAvatar} alt="" sizes="36px" />
-                            ) : (
-                              <span className="grid size-full place-items-center text-[10px]">{initials(item.author.person.displayName)}</span>
-                            )}
-                          </span>
-                          <span className="min-w-0 leading-tight">
-                            <span className="block truncate group-hover/author:underline">{item.author.person.displayName}</span>
-                            <span className="block truncate text-[10px] text-white/60">{item.author.person.roleLabel}</span>
-                          </span>
-                        </Link>
-                      ) : (
-                        <span className="flex min-w-0 items-center gap-2 text-xs">
-                          <Image src={FIGMA.firmAvatar} alt="" width={36} height={36} className="size-9 shrink-0 rounded-full" />
-                          <span className="min-w-0 leading-tight">
-                            <span className="block truncate">{item.author.name}</span>
-                            <span className="block truncate text-[10px] text-white/60">{item.author.label}</span>
-                          </span>
-                        </span>
-                      )}
+                      {(() => {
+                        const inner = (
+                          <>
+                            <AuthorAvatar view={author} className="size-9" sizes="36px" />
+                            <span className="min-w-0 leading-tight">
+                              <span className={cn("block truncate", author.href && "group-hover/author:underline")}>{author.name}</span>
+                              <span className="block truncate text-[10px] text-white/60">{author.label}</span>
+                            </span>
+                          </>
+                        );
+                        return author.href ? (
+                          <Link href={author.href} tabIndex={n === i ? undefined : -1} className="group/author flex min-w-0 items-center gap-2 text-xs">
+                            {inner}
+                          </Link>
+                        ) : (
+                          <span className="flex min-w-0 items-center gap-2 text-xs">{inner}</span>
+                        );
+                      })()}
                       <MotionLink
                         href={`/insights/${item.slug}`}
                         tabIndex={n === i ? undefined : -1}

@@ -144,6 +144,7 @@ export function mockCsrDetail(slug: string): InsightDetail | null {
     body: s.body,
     videoUrl: null,
     related,
+    coAuthors: [],
   };
 }
 
