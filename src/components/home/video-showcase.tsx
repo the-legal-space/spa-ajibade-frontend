@@ -120,7 +120,10 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
             )}
           </motion.button>
         </Reveal>
-        <MotionP className="w-full mt-4 self-center text-center font-[var(--font-fraunces)] text-[18px] capitalize leading-7 md:self-auto md:text-[36px] md:leading-[52px]">
+        <MotionP
+          style={{ fontFamily: "var(--font-fraunces), 'Fraunces', Georgia, serif" }}
+          className="w-full mt-4 self-center text-center font-serif text-[18px] capitalize leading-7 md:self-auto md:text-[36px] md:leading-[52px]"
+        >
           <span aria-hidden="true">“</span>
           {shownCaption}
           <span aria-hidden="true">”</span>
