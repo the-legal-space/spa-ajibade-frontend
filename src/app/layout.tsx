@@ -129,7 +129,7 @@ export default async function RootLayout({
         </a>
         {/* Scroll-reveal content starts hidden for the animation; without JS it must still show. */}
         <noscript>
-          <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}.word-inner{transform:none!important}[style*="clip-path"]{clip-path:none!important}`}</style>
         </noscript>
         <Suspense fallback={null}>
           <NavProgress />

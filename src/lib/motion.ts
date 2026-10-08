@@ -106,10 +106,11 @@ export const staggerContainerVariants: Variants = {
 };
 
 export const staggerItemVariants: Variants = {
-  hidden: { opacity: 0, y: REVEAL.distance },
+  hidden: { opacity: 0, y: REVEAL.distance, scale: 0.96 },
   show: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: REVEAL.transition,
   },
 };
