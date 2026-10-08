@@ -14,6 +14,7 @@ import { ScrollRail } from "@/components/home/scroll-rail";
 import { Chip, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
 import { AuthorAvatar, authorView } from "@/components/ui/author";
+import { ReadingProgress } from "@/components/ui/reading-progress";
 import { VideoEmbed } from "@/components/sections/video-embed";
 import { insightCover } from "@/lib/figma-assets";
 import { getInsightChipHref } from "@/lib/insight-links";
@@ -93,6 +94,7 @@ export default async function InsightPage({ params }: Props) {
 
   return (
     <>
+      <ReadingProgress />
       <article className="min-w-0 overflow-hidden bg-white">
         <div className="container-site min-w-0 py-10 md:py-12">
           <Link

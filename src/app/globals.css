@@ -196,3 +196,26 @@ footer input:autofill,
   background-color: transparent;
   color: #ffffff;
 }
+
+/* Hero photo settles from a slight zoom on load (the scroll zoom is separate, in HeroBackdrop). */
+@keyframes hero-kenburns {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+.hero-kenburns {
+  animation: hero-kenburns 2.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Every page fades in on navigation (app/template.tsx). Opacity only, so sticky and fixed
+   elements inside pages are never affected by a transform. */
+@keyframes page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.page-in {
+  animation: page-in 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-kenburns, .page-in { animation: none !important; }
+}

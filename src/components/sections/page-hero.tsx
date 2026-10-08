@@ -4,7 +4,7 @@ import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { Heading } from "@/components/ui/primitives";
-import { MotionP } from "@/components/ui/motion-p";
+import { HeroBackdrop, HeroContent, HeroItem, HeroTitle } from "@/components/ui/hero-motion";
 import { HeroDots, HeroSlides, HeroSlideshow } from "./hero-slideshow";
 
 /**
@@ -36,7 +36,7 @@ export function PageHero({
   return (
     <HeroSlideshow count={images.length}>
     <section data-header-theme="dark" className={cn("relative -mt-[var(--header-h)] overflow-hidden bg-ink text-white", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
-      <div className="absolute inset-0">
+      <HeroBackdrop className="absolute inset-0">
         {images.length > 1 ? (
           <HeroSlides images={images} imageClassName={imageClassName} />
         ) : images[0] ? (
@@ -47,26 +47,30 @@ export function PageHero({
         {/* Figma overlay: 50% black plus a left-to-right fade from 80% black behind the copy. */}
         <div className="absolute inset-0 bg-black/50" aria-hidden />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.8)_0.66%,rgba(0,0,0,0)_100%)]" aria-hidden />
-      </div>
+      </HeroBackdrop>
 
       <div className={cn("container-site relative flex flex-col justify-center pt-[var(--header-h)] max-md:px-4", size === "lg" ? "min-h-[600px] md:min-h-[666px]" : "min-h-[500px] md:min-h-[601px]")}>
-        <div className="max-w-[776px] py-8 md:py-16">
-          {top ? <div className="mb-3 text-[13px] text-white/85">{top}</div> : null}
+        <HeroContent className="max-w-[776px] py-8 md:py-16">
+          {top ? <HeroItem className="mb-3 text-[13px] text-white/85">{top}</HeroItem> : null}
           <Heading as="h1" size="display" reveal={false}>
-            {hero.title}
+            <HeroTitle text={hero.title} />
           </Heading>
           {hero.subtitle ? (
-            <MotionP className="mt-1 text-sm leading-7 text-mist md:mt-5 md:text-xl md:leading-9">{hero.subtitle}</MotionP>
+            <HeroItem>
+              <p className="mt-1 text-sm leading-7 text-mist md:mt-5 md:text-xl md:leading-9">{hero.subtitle}</p>
+            </HeroItem>
           ) : null}
-          <HeroDots className="mt-5" />
-          {children}
+          <HeroItem>
+            <HeroDots className="mt-5" />
+          </HeroItem>
+          {children ? <HeroItem>{children}</HeroItem> : null}
           {hero.primaryCta || hero.secondaryCta ? (
-            <div className="mt-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
+            <HeroItem className="mt-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
               {hero.primaryCta ? <SmartLink link={hero.primaryCta} className={buttonClass("light")} /> : null}
               {hero.secondaryCta ? <SmartLink link={hero.secondaryCta} className={buttonClass("ghostDark")} /> : null}
-            </div>
+            </HeroItem>
           ) : null}
-        </div>
+        </HeroContent>
       </div>
     </section>
     </HeroSlideshow>
@@ -78,13 +82,13 @@ export function DetailHero({ eyebrow, title, children }: { eyebrow?: React.React
   return (
     <section data-header-theme="dark" className="relative -mt-[var(--header-h)] overflow-hidden bg-ink pt-[var(--header-h)] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,#2a2a2a_0%,#000_60%)]" aria-hidden />
-      <div className="container-site relative py-16 md:py-20">
-        {eyebrow ? <div className="mb-4 text-sm text-white/70">{eyebrow}</div> : null}
+      <HeroContent className="container-site relative py-16 md:py-20">
+        {eyebrow ? <HeroItem className="mb-4 text-sm text-white/70">{eyebrow}</HeroItem> : null}
         <Heading as="h1" size="display" reveal={false} className="max-w-4xl normal-case">
-          {title}
+          <HeroTitle text={title} />
         </Heading>
-        {children}
-      </div>
+        {children ? <HeroItem>{children}</HeroItem> : null}
+      </HeroContent>
     </section>
   );
 }

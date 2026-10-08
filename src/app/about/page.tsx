@@ -107,7 +107,7 @@ export default async function AboutPage() {
           <span id="mission-heading">{missionSection.title}</span>
         </Heading>
         <div className="mt-2 grid gap-4 lg:grid-cols-2">
-          <Reveal className="relative aspect-544/520 overflow-hidden rounded-md lg:aspect-auto">
+          <Reveal variant="wipe" className="relative aspect-544/520 overflow-hidden rounded-md lg:aspect-auto">
             {/* Favour the top of the photo (the raised hand and staff): only 20% of whatever has to
                 be cropped comes off the top, so the taller the frame gets as the accordion opens,
                 the less is lost there. */}
@@ -191,7 +191,7 @@ export default async function AboutPage() {
                 })}
               </MotionList>
             </div>
-            <Reveal className="hidden aspect-[524/560] overflow-hidden lg:block">
+            <Reveal variant="wipe" className="hidden aspect-[524/560] overflow-hidden lg:block">
               <Media image={awardsList.image} placeholder="dark" />
             </Reveal>
           </div>

@@ -266,7 +266,7 @@ function DesktopNavItem({ item, active, light }: { item: NavItem; active: boolea
     : active
       ? "text-white"
       : "text-gray hover:text-white";
-  const linkClass = cn("inline-flex items-center gap-1 rounded py-2 text-sm font-medium transition-colors", tone);
+  const linkClass = cn("relative inline-flex items-center gap-1 rounded py-2 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100 aria-[current=page]:after:scale-x-100", tone);
 
   if (!hasChildren) {
     return (
