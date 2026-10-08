@@ -164,7 +164,8 @@ export const OfficeRef = z.object({
 });
 export type OfficeRef = z.infer<typeof OfficeRef>;
 export const FooterOffice = z.object({ id: ObjectId, slug: Slug, name: z.string(), address: z.string(), phone: nullableString, email: nullableString });
-export const SiteNewsletter = z.object({ title: z.string(), note: z.string(), enabled: z.boolean() });
+// The API used to send `enabled`; it was removed when the real subscribe endpoint shipped. The form is always shown.
+export const SiteNewsletter = z.object({ title: z.string(), note: z.string() });
 
 export const InsightAuthor = z.discriminatedUnion("type", [
   z.object({ type: z.literal("person"), person: PersonSummary }),

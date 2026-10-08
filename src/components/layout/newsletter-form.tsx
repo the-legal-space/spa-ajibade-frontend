@@ -8,11 +8,9 @@ import { Honeypot } from "@/components/forms/fields";
 import { useTurnstile } from "@/components/forms/turnstile";
 
 /**
- * Footer newsletter field (underlined email input with an arrow).
- *
- * The content API has no subscribe endpoint yet, so the address is sent to the backend through the
- * "Message the firm" endpoint (POST /messages), which stores it in the firm's dashboard inbox. When a real
- * endpoint exists (e.g. POST /subscribers), only `sendToBackend` below needs to change.
+ * Footer newsletter field (underlined email input with an arrow). Posts to POST /newsletter/subscriptions;
+ * the address is on the list as soon as it returns (nothing is emailed). Subscribing an address that is
+ * already on the list succeeds with the same response.
  */
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -23,12 +21,9 @@ export function NewsletterForm() {
   const turnstile = useTurnstile();
 
   function sendToBackend(address: string) {
-    return submitForm("/messages", {
-      fullName: "Newsletter subscriber",
+    return submitForm("/newsletter/subscriptions", {
       email: address,
-      subject: "Newsletter subscription",
-      message: `Please add ${address} to the SPA Ajibade & Co. legal insights mailing list.`,
-      consent: true,
+      consent: true, // submitting the form counts as consent
       consentTextVersion: CONSENT_TEXT_VERSION,
       turnstileToken: turnstile.token,
       website,
@@ -56,7 +51,15 @@ export function NewsletterForm() {
       return;
     }
     turnstile.reset();
-    setError(result.kind === "validation" ? "Please enter a valid email address." : result.message);
+    setError(
+      result.kind === "validation"
+        ? result.fieldErrors.email
+          ? "Please enter a valid email address."
+          : "Please try again."
+        : result.kind === "rate_limited"
+          ? "Too many attempts, please try again shortly."
+          : result.message,
+    );
   }
 
   if (done) {
@@ -65,7 +68,7 @@ export function NewsletterForm() {
         <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-black">
           <Check className="size-4" strokeWidth={2.5} aria-hidden />
         </span>
-        Thank you, you&apos;re on the list.
+        You&apos;re subscribed.
       </div>
     );
   }
