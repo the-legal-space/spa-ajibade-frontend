@@ -9,8 +9,9 @@ import type {
   PersonSummary,
   PracticeAreaCard as PracticeArea,
 } from "@/lib/api/schemas";
-import { cn, formatMonthYear, initials } from "@/lib/utils";
+import { cn, formatMonthYear } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
+import { AuthorAvatar, authorView } from "@/components/ui/author";
 import { Chip } from "@/components/ui/primitives";
 import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
@@ -18,9 +19,7 @@ import { buttonClass } from "@/components/ui/button";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { getInsightChipHref } from "@/lib/insight-links";
 import {
-  FIGMA,
   insightCardCover,
-  personAvatar,
   personPhoto,
   practiceImage,
 } from "@/lib/figma-assets";
@@ -216,51 +215,22 @@ export function PersonCard({
 }
 
 function AuthorLine({ author }: { author: Insight["author"] }) {
-  if (author.type === "person") {
-    const p = author.person;
-    const avatar = personAvatar(p.slug, p.photo);
-    return (
-      <Link
-        href={`/people/${p.slug}`}
-        className="group/author flex min-w-0 items-center gap-2"
-      >
-        <span className="size-7.5 shrink-0 overflow-hidden rounded-full bg-card-blue">
-          {avatar ? (
-            <Media image={avatar} alt="" sizes="30px" />
-          ) : (
-            <span className="grid size-full place-items-center text-[10px] text-white">
-              {initials(p.displayName)}
-            </span>
-          )}
-        </span>
-        <span className="flex min-w-0 flex-col gap-0.5 leading-none">
-          <span className="block truncate text-xs text-ink group-hover/author:underline">
-            {p.displayName}
-          </span>
-          <span className="block truncate text-[10px] text-ink/80">
-            {p.roleLabel}
-          </span>
-        </span>
-      </Link>
-    );
-  }
-  return (
-    <span className="flex min-w-0 items-center gap-2">
-      {/* The firm's own mark from the Figma, the same on every firm-authored card. */}
-      <img
-        src={FIGMA.firmAvatar}
-        alt=""
-        width={30}
-        height={30}
-        className="size-7.5 shrink-0 rounded-full"
-      />
+  const view = authorView(author);
+  const body = (
+    <>
+      <AuthorAvatar view={view} className="size-7.5" sizes="30px" />
       <span className="flex min-w-0 flex-col gap-0.5 leading-none">
-        <span className="block truncate text-xs text-ink">{author.name}</span>
-        <span className="block truncate text-[10px] text-ink/80">
-          {author.label}
-        </span>
+        <span className={cn("block truncate text-xs text-ink", view.href && "group-hover/author:underline")}>{view.name}</span>
+        <span className="block truncate text-[10px] text-ink/80">{view.label}</span>
       </span>
-    </span>
+    </>
+  );
+  return view.href ? (
+    <Link href={view.href} className="group/author flex min-w-0 items-center gap-2">
+      {body}
+    </Link>
+  ) : (
+    <span className="flex min-w-0 items-center gap-2">{body}</span>
   );
 }
 

@@ -48,7 +48,8 @@ export default async function PersonPage({ params }: Props) {
     getSite(),
     getPage("home"),
   ]);
-  const insights = p.recentPublications ?? p.insights ?? [];
+  // The profile shows only the three most recent publications.
+  const insights = (p.recentPublications ?? p.insights ?? []).slice(0, 3);
   const bio = cleanHtml(p.bio);
   const educationIntro = cleanHtml(p.education?.intro);
   const educationEntries = p.education?.entries ?? [];
