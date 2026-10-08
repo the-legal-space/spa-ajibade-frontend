@@ -109,7 +109,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
         </div>
 
         <div className="flex flex-col items-center gap-3 border-t border-white/15 pt-6 text-center text-sm leading-7 text-white md:flex-row md:justify-between md:text-left">
-          <p className="md:order-1">{footer.copyright || settings.copyright} <span className="hover:opacity-75">Built by The Legal Space Services</span></p>
+          <p className="md:order-1">{footer.copyright || settings.copyright} <span className="italic hover:opacity-75">Built by The Legal Space Services</span></p>
           <p className="flex items-center gap-6 max-md:order-first md:order-2">
             {footer.legalLinks.map((link, index) => (
               <Fragment key={link.href}>

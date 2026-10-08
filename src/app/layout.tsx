@@ -142,7 +142,7 @@ export default async function RootLayout({
           offices={offices}
           faqs={chatFaqs}
         >
-          <TopBar settings={site.settings} />
+          <TopBar settings={site.settings} email={offices.find((o) => /lagos/i.test(o.name))?.email} />
           <Header
             nav={filteredNav}
             firmName={site.settings.firmName}
