@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { Fraunces, Inter, Source_Serif_4 } from "next/font/google";
 import { getOffices, getPracticeAreas, getSite } from "@/lib/api/endpoints";
@@ -69,9 +70,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Pages without filters are built ahead of time and refreshed in the background (the API responses are
-  // cached for 5 minutes, and the backend's change webhook refreshes them sooner: lib/api/client.ts), so a
-  // page change is served instantly instead of waiting on the content API every time.
+  // Content is cached, but pages should render per request so builds do not depend on API availability.
+  await connection();
   const [site, offices, practiceAreas] = await Promise.all([
     getSite(),
     getOffices(),
