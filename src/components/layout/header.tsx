@@ -109,6 +109,14 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
   const overDark = useIsOverDark();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Once the page has scrolled, content slides under the header, so it stops being see-through.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
@@ -164,8 +172,11 @@ export function Header({ nav, firmName, descriptor, cta }: { nav: NavItem[]; fir
             : light
               ? "border-ink/10 bg-white text-ink"
               : wantsWhiteText
-                ? "border-[rgba(242,242,242,0.2)] bg-white/5 text-white"
-                : "border-ink/10 bg-white/85 text-ink",
+                ? cn(
+                    "border-[rgba(242,242,242,0.2)] text-white",
+                    scrolled ? "bg-ink" : "bg-white/5",
+                  )
+                : "border-ink/10 bg-white/90 text-ink backdrop-blur-md",
         )}
       >
         <div className="container-site flex h-(--header-h) items-center justify-between gap-3 md:gap-6">

@@ -64,24 +64,23 @@ export default async function HomePage() {
           className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.08]"
           style={{ backgroundImage: `url(${FIGMA.aboutMap})` }}
         />
-        <div className="container-site relative flex flex-col items-stretch gap-2 md:items-start md:gap-11 lg:flex-row lg:items-center">
-          <div className="flex flex-col gap-2.5">
-            <Heading className="max-w-166.5">
-              <span id="about-firm">{aboutFirm.title}</span>
-            </Heading>
-            <div className="space-y-9 text-sm leading-7 text-ink md:text-xl md:leading-9">
-              {aboutFirm.paragraphs.map((p, i) => (
-                <MotionP
-                  key={i}
-                  transition={{ ...REVEAL.transition, delay: i * 0.15 }}
-                >
-                  {p}
-                </MotionP>
-              ))}
-            </div>
+        {/* Heading, full-width copy, then the button last (left-aligned on desktop). */}
+        <div className="container-site relative flex flex-col items-stretch gap-2.5 md:items-start">
+          <Heading className="max-w-166.5">
+            <span id="about-firm">{aboutFirm.title}</span>
+          </Heading>
+          <div className="w-full space-y-9 text-sm leading-7 text-ink md:text-xl md:leading-9">
+            {aboutFirm.paragraphs.map((p, i) => (
+              <MotionP
+                key={i}
+                transition={{ ...REVEAL.transition, delay: i * 0.15 }}
+              >
+                {p}
+              </MotionP>
+            ))}
           </div>
           {aboutFirm.cta ? (
-            <Reveal className="max-md:w-full">
+            <Reveal className="max-md:w-full md:mt-8">
               <SmartLink
                 link={aboutFirm.cta}
                 className={buttonClass("outline")}
