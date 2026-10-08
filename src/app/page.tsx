@@ -30,7 +30,10 @@ export default async function HomePage() {
   const page = await getPage("home");
   const { aboutFirm, whyChooseUs } = page;
   // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
-  const hero = { ...page.hero, image: withoutDefaultFocus(cmsOr(page.hero.image, FIGMA.heroHome)) };
+  const hero = {
+    ...page.hero,
+    image: withoutDefaultFocus(cmsOr(page.hero.image, FIGMA.heroHome)),
+  };
   const cardDetails = await getCardDetails(page.leadership);
   // The Figma carousel shows five focus areas, in this order. Anything else the CMS lists stays
   // on the Practice Areas page. If none of these slugs exist, fall back to the CMS list.
@@ -52,7 +55,7 @@ export default async function HomePage() {
 
       {/* A Firm Built On Integrity */}
       <section
-        className="relative overflow-hidden bg-mist py-8 text-ink md:py-[68px]"
+        className="relative overflow-hidden bg-mist py-8 text-ink md:py-17"
         aria-labelledby="about-firm"
       >
         {/* Figma "About Image": world map at 8% behind the copy. */}
@@ -63,7 +66,7 @@ export default async function HomePage() {
         />
         <div className="container-site relative flex flex-col items-stretch gap-2 md:items-start md:gap-11 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-2.5">
-            <Heading className="max-w-[666px]">
+            <Heading className="max-w-166.5">
               <span id="about-firm">{aboutFirm.title}</span>
             </Heading>
             <div className="space-y-9 text-sm leading-7 text-ink md:text-xl md:leading-9">
@@ -173,31 +176,36 @@ export default async function HomePage() {
               </MotionP>
             </div>
             <Reveal>
-            <ul className="flex max-w-[328px] flex-col gap-2 md:gap-3">
-              {whyChooseUs.points.map((pt) => (
-                <li
-                  key={pt.title}
-                  className="flex items-center gap-3 md:gap-3 py-0 md:min-h-16 md:py-5"
-                >
-                  <CmsIcon name={pt.icon} className="size-5 shrink-0" />
-                  <div>
-                    <MotionP className="text-[12px] font-medium leading-7 md:text-base md:font-normal">
-                      {pt.title}
-                    </MotionP>
-                    {pt.text ? (
-                      <MotionP className="mt-1 text-sm text-white/70">
-                        {pt.text}
+              <ul className="flex max-w-[328px] flex-col gap-2 md:gap-3">
+                {whyChooseUs.points.map((pt) => (
+                  <li
+                    key={pt.title}
+                    className="flex items-center gap-3 md:gap-3 py-0 md:min-h-16 md:py-5"
+                  >
+                    <CmsIcon name={pt.icon} className="size-5 shrink-0" />
+                    <div>
+                      <MotionP className="text-[12px] font-medium leading-7 md:text-base md:font-normal">
+                        {pt.title}
                       </MotionP>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      {pt.text ? (
+                        <MotionP className="mt-1 text-sm text-white/70">
+                          {pt.text}
+                        </MotionP>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </Reveal>
           </div>
-          <Reveal variant="wipe" className="relative min-h-[307px] overflow-hidden rounded-[5px] md:min-h-[560px]">
+          <Reveal
+            variant="wipe"
+            className="relative min-h-[307px] overflow-hidden rounded-[5px] md:min-h-[560px]"
+          >
             <Media
-              image={withoutDefaultFocus(cmsOr(whyChooseUs.image, FIGMA.whyClients))}
+              image={withoutDefaultFocus(
+                cmsOr(whyChooseUs.image, FIGMA.whyClients),
+              )}
               sizes="(min-width:1024px) 50vw, 100vw"
               className="absolute inset-0 object-[50%_21%]"
             />
@@ -219,7 +227,10 @@ export default async function HomePage() {
             </div>
             {page.insightsSection.cta ? (
               <Reveal className="max-md:hidden">
-                <SmartLink link={page.insightsSection.cta} className={buttonClass("outline")} />
+                <SmartLink
+                  link={page.insightsSection.cta}
+                  className={buttonClass("outline")}
+                />
               </Reveal>
             ) : null}
           </div>
@@ -228,7 +239,10 @@ export default async function HomePage() {
               label="Recent publications"
               footerStart={
                 page.insightsSection.cta ? (
-                  <SmartLink link={page.insightsSection.cta} className={buttonClass("outline", "w-full")} />
+                  <SmartLink
+                    link={page.insightsSection.cta}
+                    className={buttonClass("outline", "w-full")}
+                  />
                 ) : null
               }
             >

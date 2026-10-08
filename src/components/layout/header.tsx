@@ -375,7 +375,7 @@ export function ChatButton({ link }: { link: ApiLink | undefined }) {
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ delay: 0.5, ...TRANSITIONS.entrance }}
-      className="fixed bottom-5 right-5 z-30 md:bottom-8 md:right-8"
+      className="fixed bottom-3 right-5 z-30 md:bottom-4 md:right-8"
     >
       <SmartLink
         link={link}
