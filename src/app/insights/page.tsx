@@ -30,7 +30,7 @@ export default async function InsightsPage({ searchParams }: Props) {
 
   const [content, list] = await Promise.all([
     getPage("insights"),
-    getInsights({ category, practiceArea, sort, page, pageSize: 9 }),
+    getInsights({ category, practiceArea, sort, page, pageSize: 15 }),
   ]);
   const current = { category, practiceArea, sort: sort === "newest" ? undefined : sort };
   const meta = list.meta ?? { page, totalPages: 1 };
