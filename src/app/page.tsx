@@ -15,7 +15,7 @@ import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
 import { FIGMA, cmsOr } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
-import { withoutDefaultFocus } from "@/lib/utils";
+import { cn, withoutDefaultFocus } from "@/lib/utils";
 import { REVEAL } from "@/lib/motion";
 import { MotionP } from "@/components/ui/motion-p";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
@@ -145,7 +145,14 @@ export default async function HomePage() {
               </Reveal>
             ) : null}
           </div>
-          <MotionList className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {/* The row is the Management tab: usually 3 people, now sometimes 4. Four cards sit in a single row
+              only once there is room for the hover panel (xl); below that they form a 2 x 2 grid. */}
+          <MotionList
+            className={cn(
+              "mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2",
+              page.leadership.length === 4 ? "xl:grid-cols-4" : "lg:grid-cols-3",
+            )}
+          >
             {page.leadership.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} details={cardDetails[p.slug]} />
