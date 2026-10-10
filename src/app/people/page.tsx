@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Users } from "lucide-react";
 import { getPage, getPeople } from "@/lib/api/endpoints";
-import { PersonRole } from "@/lib/api/schemas";
 import { pageMetadata } from "@/lib/seo";
 import { readPage, readString } from "@/lib/utils";
 import { PageHero } from "@/components/sections/page-hero";
@@ -31,14 +30,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PeoplePage({ searchParams }: Props) {
   const sp = await searchParams;
-  const roleParsed = PersonRole.safeParse(readString(sp.role));
-  const role = roleParsed.success ? roleParsed.data : undefined;
+  const content = await getPage("people");
+  // Tabs are groups the API defines (Management, Partners, ...), not single roles, so any plain value is
+  // passed straight through. There is no "all" tab: with no ?role= the first tab is shown.
+  const requestedRole = readString(sp.role)?.match(/^[a-z_]+$/)?.[0];
+  const role = requestedRole ?? (content.roleFilters[0]?.value || undefined);
   const practiceArea = readString(sp.practiceArea)?.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0];
   const sortRaw = readString(sp.sort);
   const sort = SORTS.find((s) => s.value === sortRaw)?.value ?? "seniority";
   const page = readPage(sp.page);
 
-  const [content, people] = await Promise.all([getPage("people"), getPeople({ role, practiceArea, sort, page, pageSize: 15 })]);
+  const people = await getPeople({ role, practiceArea, sort, page, pageSize: 15 });
   const current = { role, practiceArea, sort: sort === "seniority" ? undefined : sort };
   const meta = people.meta ?? { page, totalPages: 1 };
   const cardDetails = await getCardDetails(people.data);
@@ -59,7 +61,7 @@ export default async function PeoplePage({ searchParams }: Props) {
         </Heading>
 
         <Reveal className="relative z-[35] mt-2 md:mt-8 flex flex-col gap-2 md:gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter attorneys by role" />
+          <FilterTabs options={content.roleFilters} param="role" base="/people" current={current} label="Filter people by role" />
           <PeopleSortMenu
             practiceAreas={[{ value: "", label: "All Practice Areas" }, ...content.practiceAreaFilters]}
             sorts={[...SORTS]}
@@ -81,11 +83,11 @@ export default async function PeoplePage({ searchParams }: Props) {
         ) : (
           <Reveal className="mt-10 flex flex-col items-center rounded-[var(--radius-card)] bg-white px-6 py-16 text-center">
             <Users className="size-10 text-stone" strokeWidth={1.2} aria-hidden />
-            <p className="mt-4 font-serif text-2xl">No attorneys match these filters</p>
+            <p className="mt-4 font-serif text-2xl">No one matches these filters</p>
             <p className="mt-2 max-w-md text-sm leading-6 text-stone">
               {activeFilters.length > 0
-                ? `We don't have anyone listed under ${activeFilters.join(" in ")} yet. Try a different combination, or view everyone.`
-                : "No attorneys are listed here yet. Please check back soon."}
+                ? `We don't have anyone listed under ${activeFilters.join(" in ")} yet. ${practiceArea ? "Try a different combination." : "Please check back soon."}`
+                : "No one is listed here yet. Please check back soon."}
             </p>
             {activeFilters.length > 0 || sort !== "seniority" ? (
               <Link href="/people" scroll={false} className={buttonClass("outline", "mt-6")}>
