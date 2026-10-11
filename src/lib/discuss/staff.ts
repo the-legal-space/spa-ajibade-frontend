@@ -120,7 +120,7 @@ export const WORKING_HOURS: {
 } = {
   workDays: [1, 2, 3, 4, 5],
   startHour: 9,
-  endHour: 17,
+  endHour: 15,
   slotMins: 30,
   lunchStart: 13,
   lunchEnd: 14,
@@ -196,7 +196,8 @@ export function getSlotsForDate(): string[] {
   let hour = startHour;
   let min = 0;
 
-  while (hour < endHour) {
+  // endHour is the time of the last slot (inclusive): 15 means the last booking starts at 3:00 PM.
+  while (hour * 60 + min <= endHour * 60) {
     if (!(hour >= lunchStart && hour < lunchEnd)) {
       const h12 = hour % 12 === 0 ? 12 : hour % 12;
       const ampm = hour < 12 ? "AM" : "PM";
