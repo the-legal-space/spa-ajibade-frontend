@@ -5,6 +5,7 @@ import type { Office, Site } from "@/lib/api/schemas";
 import { telHref } from "@/lib/utils";
 import { SocialLinks } from "@/components/ui/social-icons";
 import { NewsletterForm } from "./newsletter-form";
+import { Reveal } from "@/components/ui/reveal";
 
 /** Office order from the Figma footer. Offices the design doesn't name follow in CMS order. */
 const OFFICE_ORDER = ["lagos", "ibadan", "abuja"];
@@ -34,7 +35,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
       {/* Figma "Footer Background Mark": white crossed mark with the 10% opacity baked into the PNG. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/footer-mark.png')] bg-cover bg-center bg-no-repeat" />
 
-      <div className="container-site relative flex flex-col gap-11 py-6 md:py-[68px]">
+      <Reveal y={28} className="container-site relative flex flex-col gap-11 py-6 md:py-[68px]">
         <div className="grid gap-12 md:grid-cols-2 lg:flex lg:items-start lg:justify-between lg:gap-10">
           <div className="flex w-full max-w-[437px] flex-col gap-10 lg:max-w-[360px] xl:max-w-[437px]">
             {/* Shown as in the Figma even while the CMS "enabled" flag is off; the form just opens the
@@ -108,7 +109,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
         </div>
 
         <div className="flex flex-col items-center gap-3 border-t border-white/15 pt-6 text-center text-sm leading-7 text-white md:flex-row md:justify-between md:text-left">
-          <p className="md:order-1">{footer.copyright || settings.copyright} <span className="hover:opacity-75">Built by The Legal Space Services</span></p>
+          <p className="md:order-1">{footer.copyright || settings.copyright} <span className="italic hover:opacity-75">Built by The Legal Space Services</span></p>
           <p className="flex items-center gap-6 max-md:order-first md:order-2">
             {footer.legalLinks.map((link, index) => (
               <Fragment key={link.href}>
@@ -119,7 +120,7 @@ export function Footer({ site, offices }: { site: Site; offices: Office[] }) {
             
           </p>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 }

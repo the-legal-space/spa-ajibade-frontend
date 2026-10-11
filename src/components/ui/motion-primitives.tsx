@@ -10,7 +10,7 @@ import {
 import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
 import { cn } from "@/lib/utils";
 import { buttonClass, type ButtonVariant } from "./button";
-import { INTERACTION, TRANSITIONS, staggerItemVariants } from "@/lib/motion";
+import { INTERACTION, REVEAL, TRANSITIONS, staggerItemVariants } from "@/lib/motion";
 
 /**
  * Animated 3-dot loading indicator for buttons and inline actions.
@@ -182,7 +182,7 @@ export function MotionList({
       }}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.1 }}
+      viewport={REVEAL.viewport}
       className={className}
     >
       {children}
@@ -201,7 +201,7 @@ export function MotionListItem({
   className?: string;
 }) {
   return (
-    <motion.li variants={staggerItemVariants} className={className}>
+    <motion.li variants={staggerItemVariants} className={cn("min-w-0", className)}>
       {children}
     </motion.li>
   );

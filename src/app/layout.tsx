@@ -129,7 +129,7 @@ export default async function RootLayout({
         </a>
         {/* Scroll-reveal content starts hidden for the animation; without JS it must still show. */}
         <noscript>
-          <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[style*="opacity: 0"]{opacity:1!important;transform:none!important}.word-inner{transform:none!important}[style*="clip-path"]{clip-path:none!important}`}</style>
         </noscript>
         <Suspense fallback={null}>
           <NavProgress />
@@ -142,7 +142,7 @@ export default async function RootLayout({
           offices={offices}
           faqs={chatFaqs}
         >
-          <TopBar settings={site.settings} />
+          <TopBar settings={site.settings} email={offices.find((o) => /lagos/i.test(o.name))?.email} />
           <Header
             nav={filteredNav}
             firmName={site.settings.firmName}

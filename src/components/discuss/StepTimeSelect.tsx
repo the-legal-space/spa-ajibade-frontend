@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { MAIL_AVAILABILITY_URL } from "@/lib/env";
 import {
   getInitials,
   slotsForDay,
@@ -16,19 +17,51 @@ interface StepTimeSelectProps {
   onBack: () => void;
   onConfirm: (date: Date, slot: string) => void;
   submitting: boolean;
+  /** Bumped when the server says the chosen time was just taken: reload what is booked and clear the choice. */
+  refreshKey?: number;
 }
+
+/** yyyy-mm-dd of a calendar day as the visitor sees it (no time zone shifting). */
+const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export default function StepTimeSelect({
   member,
   onBack,
   onConfirm,
   submitting,
+  refreshKey = 0,
 }: StepTimeSelectProps) {
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  // Times already booked with this attorney on the chosen day (the server also refuses a taken time).
+  const [booked, setBooked] = useState<string[]>([]);
+  const [loadingBooked, setLoadingBooked] = useState(false);
+
+  useEffect(() => {
+    setSelectedSlot(null);
+    if (!selectedDate) {
+      setBooked([]);
+      return;
+    }
+    const controller = new AbortController();
+    setLoadingBooked(true);
+    fetch(`${MAIL_AVAILABILITY_URL}?staffId=${encodeURIComponent(member.id)}&date=${isoDay(selectedDate)}`, {
+      signal: controller.signal,
+      cache: "no-store",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => setBooked(Array.isArray(json?.booked) ? json.booked.filter((t: unknown): t is string => typeof t === "string") : []))
+      .catch(() => {
+        if (!controller.signal.aborted) setBooked([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoadingBooked(false);
+      });
+    return () => controller.abort();
+  }, [selectedDate, member.id, refreshKey]);
 
 
   const prevMonth = () => {
@@ -299,19 +332,29 @@ export default function StepTimeSelect({
               <div className="slots-date-label" id="slots-date-label">
                 {formatShortDate(selectedDate)}
               </div>
-              <div className="slots-list" id="slots-list" role="list">
-                {slotsForDay(selectedDate).map((slot) => (
-                  <button
-                    key={slot}
-                    className={`slot-btn${selectedSlot === slot ? " selected" : ""}`}
-                    onClick={() => handleSlotSelect(slot)}
-                    aria-pressed={selectedSlot === slot}
-                    aria-label={`Book at ${slot}`}
-                  >
-                    {slot}
-                  </button>
-                ))}
+              <div className="slots-list" id="slots-list" role="list" aria-busy={loadingBooked}>
+                {slotsForDay(selectedDate).map((slot) => {
+                  const taken = booked.includes(slot);
+                  return (
+                    <button
+                      key={slot}
+                      className={`slot-btn${selectedSlot === slot ? " selected" : ""}${taken ? " booked" : ""}`}
+                      onClick={() => handleSlotSelect(slot)}
+                      aria-pressed={selectedSlot === slot}
+                      aria-label={taken ? `${slot}, already booked` : `Book at ${slot}`}
+                      disabled={taken}
+                      title={taken ? "Already booked" : undefined}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
               </div>
+              {!loadingBooked && slotsForDay(selectedDate).length > 0 && slotsForDay(selectedDate).every((s) => booked.includes(s)) ? (
+                <p className="slots-empty" role="status">
+                  Every time on this day is booked. Please choose another date.
+                </p>
+              ) : null}
             </div>
           </>
         )}

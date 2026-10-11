@@ -102,11 +102,14 @@ export type FilterOption = z.infer<typeof FilterOption>;
 export const PersonRole = z.enum([
   "managing_partner",
   "partner",
+  // Management who are not lawyers (e.g. the COO): their roleLabel is their job title.
+  "executive",
   "associate_partner",
   "senior_associate",
   "associate",
   "trainee_associate",
   "nysc_associate",
+  "consultant",
 ]);
 export type PersonRole = z.infer<typeof PersonRole>;
 
