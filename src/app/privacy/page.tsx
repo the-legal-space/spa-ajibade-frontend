@@ -1,8 +1,7 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import { PageEnd } from "@/components/sections/page-end";
+import { LegalHero } from "@/components/sections/legal-hero";
 import { PrivacyTableOfContents } from "@/components/sections/privacy-toc";
-import { FIGMA } from "@/lib/figma-assets";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -26,27 +25,7 @@ const glossary = [
 export default function PrivacyPage() {
   return (
     <>
-      <section
-        data-header-theme="dark"
-        className="relative -mt-(--header-h) overflow-hidden bg-ink pt-(--header-h) text-white"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.08]"
-          style={{ backgroundImage: `url(${FIGMA.videoMark})` }}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-8 top-1/2 hidden w-[42vw] -translate-y-1/2 opacity-[0.12] md:block"
-        >
-          <Image src="/brand/mark.png" alt="" width={240} height={240} className="h-auto w-full" priority />
-        </div>
-        <div className="container-site relative py-16 md:py-20">
-          <h1 className="max-w-4xl font-serif text-[2.75rem] leading-[1.02] normal-case tracking-[-0.02em] md:text-[4.25rem]">
-            Privacy Policy
-          </h1>
-        </div>
-      </section>
+      <LegalHero title="Privacy Policy" />
       <section className="bg-white py-12 md:py-17">
         <div className="container-site grid gap-12 lg:grid-cols-[220px_minmax(0,760px)] lg:gap-20">
           <PrivacyTableOfContents />
