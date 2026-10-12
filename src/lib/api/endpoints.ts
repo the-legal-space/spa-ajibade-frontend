@@ -11,7 +11,6 @@ import {
   OfficeSchema,
   PageSchemas,
   PersonDetail,
-  PersonRole,
   PersonSummary,
   PracticeAreaCard,
   PracticeAreaDetail,

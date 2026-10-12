@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { LOGO_CID, clientEmail, staffEmail, type DiscussEmailData } from "./templates";
 import { googleCalendarUrl, icsFile, parseSlot } from "./calendar";
-import { createForwardToken, type ForwardPayload } from "./token";
+import type { ForwardPayload } from "./token";
 
 /**
  * "Discuss a Mandate" mail: validation of the submission, the SMTP transport, and the two emails
@@ -15,7 +15,8 @@ import { createForwardToken, type ForwardPayload } from "./token";
  *   SMTP_HOST, SMTP_PORT    default smtp.gmail.com : 465 (SSL). Use any SMTP provider, e.g. Brevo.
  *   MAIL_FROM               "SPA Ajibade & Co." <address>. Defaults to MAIL_USER.
  *   MAIL_BCC                optional extra inbox copied on the attorney email (e.g. the front office)
- *   MAIL_TEST_RECIPIENT     while testing, both emails go here instead of the real attorney/client
+ *   MAIL_TEST_RECIPIENT     while testing, the attorney's email goes here instead of the real attorney (the client
+ *                           confirmation still goes to the address typed in the form)
  *   MAIL_DRY_RUN=1          build and log the emails without sending anything
  */
 
@@ -94,10 +95,8 @@ export function newReference() {
   return `MND-${out}`;
 }
 
-const siteBase = () => (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-
-/** Calendar link + .ics file + signed forward link for one booking. */
-function bookingExtras(data: DiscussEmailData, staffId: string) {
+/** Calendar link + .ics file for one booking. */
+function bookingExtras(data: DiscussEmailData) {
   const slot = parseSlot(data.date, data.time);
   const event = {
     title: `Appointment: ${data.firstName} ${data.lastName} with ${data.staffName}`,
@@ -112,21 +111,9 @@ function bookingExtras(data: DiscussEmailData, staffId: string) {
     location: "Microsoft Teams (details to follow)",
     uid: data.reference,
   };
-  const token = createForwardToken({
-    ref: data.reference,
-    f: data.firstName,
-    l: data.lastName,
-    e: data.email,
-    p: data.phone,
-    d: data.date,
-    t: data.time,
-    s: staffId,
-    m: data.description,
-  });
   return {
     calendarUrl: slot ? googleCalendarUrl(slot, event) : undefined,
     ics: slot ? icsFile(slot, event) : undefined,
-    forwardUrl: `${siteBase()}/forward?t=${token}`,
   };
 }
 
@@ -137,12 +124,11 @@ function mailParts(from: string) {
 }
 
 /** Sends the attorney email and the client confirmation. Throws only if the transport is missing. */
-export async function sendDiscussEmails(input: DiscussInput): Promise<SendResult> {
+export async function sendDiscussEmails(input: DiscussInput, reference: string = newReference()): Promise<SendResult> {
   const transport = getTransport();
   if (!transport) throw new Error("MAIL_NOT_CONFIGURED");
 
   const staff = STAFF.find((s) => s.id === input.staffId)!;
-  const reference = newReference();
   const data: DiscussEmailData = {
     firstName: input.firstName,
     lastName: input.lastName,
@@ -158,19 +144,21 @@ export async function sendDiscussEmails(input: DiscussInput): Promise<SendResult
 
   const user = process.env.MAIL_USER || process.env.EMAIL_USER || "no-reply@localhost";
   const from = process.env.MAIL_FROM || `"SPA Ajibade & Co." <${user}>`;
+  // While testing, only the attorney's email is redirected to this address (so real attorneys are not
+  // emailed). The client's confirmation always goes to the address typed in the form.
   const test = process.env.MAIL_TEST_RECIPIENT;
   const tag = test ? "[TEST] " : "";
 
   // The white wordmark is attached inline (cid:) so it shows without relying on a public image URL,
   // which also keeps this working when the endpoint is hosted apart from the site.
   const { hasLogo, logo } = mailParts(from);
-  const extras = bookingExtras(data, input.staffId);
+  const extras = bookingExtras(data);
   const icsAttachment = extras.ics
     ? [{ filename: "appointment.ics", content: extras.ics, contentType: "text/calendar; charset=utf-8; method=PUBLISH" }]
     : [];
   const attachments = [...logo, ...icsAttachment];
 
-  const toStaff = staffEmail(data, hasLogo, { calendarUrl: extras.calendarUrl, forwardUrl: extras.forwardUrl });
+  const toStaff = staffEmail(data, hasLogo, { calendarUrl: extras.calendarUrl });
   const toClient = clientEmail(data, hasLogo);
 
   const [staffRes, clientRes] = await Promise.allSettled([
@@ -186,8 +174,8 @@ export async function sendDiscussEmails(input: DiscussInput): Promise<SendResult
     }),
     transport.sendMail({
       from,
-      to: test || input.email,
-      subject: tag + toClient.subject,
+      to: input.email,
+      subject: toClient.subject,
       html: toClient.html,
       text: toClient.text,
       attachments: logo, // the client confirmation carries only the logo: no calendar button or .ics
@@ -240,11 +228,10 @@ export async function sendForwardEmail(p: ForwardPayload, input: ForwardInput): 
   const user = process.env.MAIL_USER || process.env.EMAIL_USER || "no-reply@localhost";
   const from = process.env.MAIL_FROM || `"SPA Ajibade & Co." <${user}>`;
   const { hasLogo, logo } = mailParts(from);
-  const extras = bookingExtras(data, p.s);
+  const extras = bookingExtras(data);
   const test = process.env.MAIL_TEST_RECIPIENT;
   const mail = staffEmail(data, hasLogo, {
     calendarUrl: extras.calendarUrl,
-    forwardUrl: extras.forwardUrl,
     forwardedBy: input.fromName || `${staff.name}'s team`,
     note: input.note,
   });

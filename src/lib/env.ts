@@ -14,3 +14,6 @@ export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? 
  * e.g. https://api.spaajibade.com/api/discuss; the server side must then allow this site's origin.
  */
 export const MAIL_API_URL = process.env.NEXT_PUBLIC_MAIL_API_URL || "/api/discuss";
+
+/** Times already booked with an attorney on a day: GET <MAIL_API_URL>/availability?staffId=&date=yyyy-mm-dd. */
+export const MAIL_AVAILABILITY_URL = `${MAIL_API_URL.replace(/\/$/, "")}/availability`;

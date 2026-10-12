@@ -24,8 +24,15 @@ const contents = [
   { label: "Glossary", href: "#glossary" },
 ];
 
+export type TocItem = { label: string; href: string };
+
 export function PrivacyTableOfContents() {
-  const [activeSection, setActiveSection] = useState("#introduction");
+  return <LegalTableOfContents contents={contents} label="Privacy policy contents" />;
+}
+
+/** Sticky "Contents" list for long legal pages; the entry for the section being read is highlighted. */
+export function LegalTableOfContents({ contents, label }: { contents: TocItem[]; label: string }) {
+  const [activeSection, setActiveSection] = useState(contents[0]?.href ?? "");
 
   useEffect(() => {
     const sections = contents
@@ -47,18 +54,19 @@ export function PrivacyTableOfContents() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [contents]);
 
   return (
     <aside className="lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:self-start">
       <p className="font-serif text-xl text-ink">Contents</p>
-      <nav aria-label="Privacy policy contents" className="mt-5 flex flex-col gap-1">
+      <nav aria-label={label} className="mt-5 flex flex-col gap-1">
         {contents.map((item) => {
           const isActive = activeSection === item.href;
           return (
             <a
               key={item.href}
               href={item.href}
+              onClick={() => setActiveSection(item.href)}
               aria-current={isActive ? "true" : undefined}
               className={`rounded-sm px-3 py-2 text-sm leading-5 transition-colors hover:bg-mist hover:text-ink ${
                 isActive ? "bg-mist font-medium text-ink" : "text-stone"

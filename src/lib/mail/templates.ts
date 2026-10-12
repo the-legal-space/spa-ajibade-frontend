@@ -22,8 +22,6 @@ export type DiscussEmailData = {
 export type StaffEmailOptions = {
   /** Google Calendar link (the .ics file is attached separately). */
   calendarUrl?: string;
-  /** Signed link to the page where the recipient types a team member's email to forward this to. */
-  forwardUrl?: string;
   /** Set when this copy is itself a forward: who sent it on, and their optional note. */
   forwardedBy?: string;
   note?: string;
@@ -141,6 +139,44 @@ function steps(items: string[]) {
 const sectionTitle = (t: string) =>
   `<div style="font-family:${SERIF};font-size:18px;color:#000000;margin:6px 0 10px 0;">${e(t)}</div>`;
 
+/**
+ * A mailto: link that opens the reader's own mail app with a ready-made forward (subject and the booking
+ * details filled in, "To" left empty to type the team member). Nothing goes through the website. Kept
+ * under ~2,000 characters, which mail apps and browsers handle reliably, by trimming the client's
+ * description first and dropping the calendar link last.
+ */
+export function forwardMailto(d: DiscussEmailData, calendarUrl?: string): string {
+  const subject = `Fwd: New Appointment Request: ${d.firstName} ${d.lastName}`.replace(/[\r\n]+/g, " ");
+  const build = (description: string, withCalendar: boolean) => {
+    const lines = [
+      "Please see this appointment request submitted through the SPA Ajibade & Co. website.",
+      "",
+      `Client: ${d.firstName} ${d.lastName}`,
+      `Email: ${d.email}`,
+      `Phone: ${d.phone || "Not provided"}`,
+      `Requested with: ${d.staffName} (${d.staffRole})`,
+      `Preferred date: ${d.date}`,
+      `Preferred time: ${d.time}`,
+      `Reference: ${d.reference}`,
+      "",
+      "Client request:",
+      description,
+      ...(withCalendar && calendarUrl ? ["", `Add to calendar: ${calendarUrl}`] : []),
+    ];
+    // CRLF is what mail apps expect inside a mailto: body.
+    return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\r\n"))}`;
+  };
+  const full = (d.description || "No specific description provided.").trim();
+  for (const limit of [full.length, 700, 400, 200]) {
+    const text = full.length > limit ? `${full.slice(0, limit).trimEnd()}…` : full;
+    const withCalendar = build(text, true);
+    if (withCalendar.length <= 1900) return withCalendar;
+    const without = build(text, false);
+    if (without.length <= 1900) return without;
+  }
+  return build(`${full.slice(0, 120).trimEnd()}…`, false);
+}
+
 export function staffEmail(d: DiscussEmailData, hasLogo = false, opts: StaffEmailOptions = {}): { subject: string; html: string; text: string } {
   const description = d.description || "No specific description provided.";
   const phoneLink = d.phone ? `<a href="tel:${e(d.phone.replace(/[^\d+]/g, ""))}" style="color:#111111;">${e(d.phone)}</a>` : "Not provided";
@@ -179,14 +215,14 @@ export function staffEmail(d: DiscussEmailData, hasLogo = false, opts: StaffEmai
         ]
       : [
           sectionTitle("Action required"),
-          opts.calendarUrl || opts.forwardUrl
-            ? `<div style="margin:0 0 6px 0;">${opts.calendarUrl ? button(opts.calendarUrl, "Add to calendar") : ""}${
-                opts.forwardUrl ? button(opts.forwardUrl, "Forward to appropriate team member", false) : ""
-              }</div>
+          `<div style="margin:0 0 6px 0;">${opts.calendarUrl ? button(opts.calendarUrl, "Add to calendar") : ""}${button(
+            forwardMailto(d, opts.calendarUrl),
+            "Forward to appropriate team member",
+            false,
+          )}</div>
       <div style="margin:0 0 18px 0;font-size:12px;color:#737373;">${
         opts.calendarUrl ? "Add to calendar opens Google Calendar; an .ics file is also attached for Outlook and Apple Calendar. " : ""
-      }${opts.forwardUrl ? "Forward opens a page where you type the team member's email address." : ""}</div>`
-            : "",
+      }Forward opens your email app with the details filled in; just type the team member's address.</div>`,
         ]),
     para("Please ensure this booking is handled promptly to maintain a smooth and professional client experience."),
     `<p style="margin:0 0 26px 0;color:#525252;">Best regards,<br />Spa Ajibade &amp; Co.<br />Booking System</p>`,
@@ -223,7 +259,7 @@ export function staffEmail(d: DiscussEmailData, hasLogo = false, opts: StaffEmai
         : [
             "ACTION REQUIRED",
             ...(opts.calendarUrl ? [`- Add to calendar: ${opts.calendarUrl}`] : []),
-            ...(opts.forwardUrl ? [`- Forward to appropriate team member: ${opts.forwardUrl}`] : []),
+            "- Forward to appropriate team member: reply or forward this email to them.",
             "",
           ]),
       "Best regards,",

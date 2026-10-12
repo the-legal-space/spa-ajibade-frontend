@@ -810,6 +810,21 @@
   color: var(--on-accent);
   font-weight: 500;
 }
+.booking-app .slot-btn:disabled,
+.booking-app .slot-btn.booked {
+  opacity: 0.35;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+.booking-app .slots-empty {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
 .booking-app .slot-btn:focus-visible {
   outline: 2px solid var(--accent);
 }
