@@ -83,7 +83,7 @@ export default async function PracticeAreasPage() {
                 <Heading>
                   <span id="csr-heading">{csr.title}</span>
                 </Heading>
-                <p className="mt-4 text-[12px] leading-8 text-white/85">
+                <p className="mt-4 text-base leading-7 text-white/85 md:text-lg md:leading-8">
                   {csr.text}
                 </p>
                 <HeroDots className="mt-5" />
