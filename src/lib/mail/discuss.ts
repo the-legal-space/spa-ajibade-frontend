@@ -15,7 +15,8 @@ import type { ForwardPayload } from "./token";
  *   SMTP_HOST, SMTP_PORT    default smtp.gmail.com : 465 (SSL). Use any SMTP provider, e.g. Brevo.
  *   MAIL_FROM               "SPA Ajibade & Co." <address>. Defaults to MAIL_USER.
  *   MAIL_BCC                optional extra inbox copied on the attorney email (e.g. the front office)
- *   MAIL_TEST_RECIPIENT     while testing, both emails go here instead of the real attorney/client
+ *   MAIL_TEST_RECIPIENT     while testing, the attorney's email goes here instead of the real attorney (the client
+ *                           confirmation still goes to the address typed in the form)
  *   MAIL_DRY_RUN=1          build and log the emails without sending anything
  */
 
@@ -143,6 +144,8 @@ export async function sendDiscussEmails(input: DiscussInput, reference: string =
 
   const user = process.env.MAIL_USER || process.env.EMAIL_USER || "no-reply@localhost";
   const from = process.env.MAIL_FROM || `"SPA Ajibade & Co." <${user}>`;
+  // While testing, only the attorney's email is redirected to this address (so real attorneys are not
+  // emailed). The client's confirmation always goes to the address typed in the form.
   const test = process.env.MAIL_TEST_RECIPIENT;
   const tag = test ? "[TEST] " : "";
 
@@ -171,8 +174,8 @@ export async function sendDiscussEmails(input: DiscussInput, reference: string =
     }),
     transport.sendMail({
       from,
-      to: test || input.email,
-      subject: tag + toClient.subject,
+      to: input.email,
+      subject: toClient.subject,
       html: toClient.html,
       text: toClient.text,
       attachments: logo, // the client confirmation carries only the logo: no calendar button or .ics
