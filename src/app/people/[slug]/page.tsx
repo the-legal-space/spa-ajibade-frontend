@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
-import { getPage, getPerson, getSite } from "@/lib/api/endpoints";
+import { getPage, getPerson, getProfilePublications, getSite } from "@/lib/api/endpoints";
 import { personPhoto } from "@/lib/figma-assets";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
@@ -48,8 +48,8 @@ export default async function PersonPage({ params }: Props) {
     getSite(),
     getPage("home"),
   ]);
-  // The profile shows only the three most recent publications.
-  const insights = (p.recentPublications ?? p.insights ?? []).slice(0, 3);
+  // Three most recent publications, or the attorney's curated list (see lib/curated-publications).
+  const insights = await getProfilePublications(p);
   const bio = cleanHtml(p.bio);
   const educationIntro = cleanHtml(p.education?.intro);
   const educationEntries = p.education?.entries ?? [];
@@ -216,12 +216,20 @@ export default async function PersonPage({ params }: Props) {
                 <span id="person-insights">Recent Publications</span>
               </Heading>
             </div>
-            {home.insightsSection.cta ? (
-              <SmartLink
-                link={home.insightsSection.cta}
-                className={buttonClass("outline")}
-              />
-            ) : null}
+            <div className="flex flex-wrap gap-4 max-md:w-full">
+              <Link
+                href={`/insights?author=${encodeURIComponent(p.slug)}#listing`}
+                className={buttonClass("dark")}
+              >
+                View more
+              </Link>
+              {home.insightsSection.cta ? (
+                <SmartLink
+                  link={home.insightsSection.cta}
+                  className={buttonClass("outline")}
+                />
+              ) : null}
+            </div>
           </div>
           <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {insights.map((i) => (

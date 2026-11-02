@@ -4,13 +4,20 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-/** "June, 2026." as used on the insight cards in the designs. */
+function ordinal(n: number) {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  return `${n}${({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th"}`;
+}
+
+/** "26th April, 2026." as used on the insight cards. */
 export function formatMonthYear(iso: string | null | undefined) {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  const month = d.toLocaleString("en-GB", { month: "long", timeZone: "Africa/Lagos" });
-  return `${month}, ${d.getUTCFullYear()}.`;
+  const parts = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Lagos" }).formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${ordinal(Number(get("day")))} ${get("month")}, ${get("year")}.`;
 }
 
 export function formatLongDate(iso: string | null | undefined) {
