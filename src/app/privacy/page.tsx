@@ -120,7 +120,7 @@ export default function PrivacyPage() {
               7. Lawful bases for processing
             </h2>
             <p className="mt-5">
-              We process personal data only where permitted by the Nigeria Data Protection Act 2023, the Nigeria Data Protection Regulation 2019 and applicable implementation guidance. We may rely on:
+              We process personal data only where permitted by the Nigeria Data Protection Act 2023, and its implementation framework. We may rely on:
             </p>
             <ul className="mt-5 list-disc space-y-2 pl-6">
               <li>Your consent for one or more specific purposes.</li>
@@ -211,7 +211,7 @@ export default function PrivacyPage() {
               15. Regulatory compliance
             </h2>
             <p className="mt-5">
-              We comply with the Nigerian data protection laws and regulations that apply to our activities, including the Constitution, Nigeria Data Protection Act 2023, Nigeria Data Protection Regulation 2019, implementation guidance, cybercrime law, competition and consumer protection law, freedom of information law and the NBA Cybersecurity Guideline.
+              We comply with the Nigerian data protection laws and regulations that apply to our activities, including the Constitution, Nigeria Data Protection Act 2023, General Application and Implementation Directives, 2025, cybercrime law, competition and consumer protection law, freedom of information law and the NBA Cybersecurity Guideline.
             </p>
 
             <h2 id="updates" className="mt-12 font-serif text-3xl leading-tight text-ink md:text-4xl">
@@ -265,9 +265,6 @@ export default function PrivacyPage() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-8 border-t border-mist-200 pt-6 text-sm text-stone">
-              Last updated: 17 October 2024
-            </p>
           </div>
         </div>
       </section>
