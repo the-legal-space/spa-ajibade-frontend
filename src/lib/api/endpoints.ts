@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { z } from "zod";
 import { ApiNotFoundError, apiGet, apiList } from "./client";
+import { CURATED_PUBLICATIONS } from "@/lib/curated-publications";
 import { MOCK_CSR_CARDS, mockCsrDetail, mockCsrEnabled, withMockGaps } from "@/lib/mock/csr-stories";
 import {
   InsightCard,
@@ -54,12 +55,49 @@ export const getInsights = cache(
     sort?: "newest" | "oldest";
     page?: number;
     pageSize?: number;
+    /** Person slug: only insights whose main author is this attorney. */
+    author?: string;
   }) => {
+    if (params.author) return byAuthor({ ...params, author: params.author });
     // Pro bono stories only: top the list up with placeholders while the CMS has few (dev/preview only).
     if (params.category === "pro_bono" && mockCsrEnabled()) return withMockStories(params);
     return apiList("/insights", InsightCard, { query: params, tags: ["insights"] });
   },
 );
+
+/** Every insight matching the filters: the API caps pages at 50, so walk them all. */
+const getAllInsights = cache(async (category?: z.infer<typeof InsightCategory>, practiceArea?: string, sort?: "newest" | "oldest") => {
+  const fetchPage = (page: number) =>
+    apiList("/insights", InsightCard, { query: { category, practiceArea, sort, page, pageSize: 50 }, tags: ["insights"] });
+  const first = await fetchPage(1);
+  const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.totalPages ?? 1) - 1) }, (_, i) => fetchPage(i + 2)));
+  return [first, ...rest].flatMap((r) => r.data);
+});
+
+/** The publications a profile shows: a curated list where one exists, else the API's own (newest first). */
+export async function getProfilePublications(person: PersonDetail) {
+  const curated = CURATED_PUBLICATIONS[person.slug];
+  if (!curated) return (person.recentPublications ?? person.insights ?? []).slice(0, 3);
+  const wanted = new Set(curated.profile);
+  return (await getAllInsights()).filter((i) => wanted.has(i.slug));
+}
+
+async function byAuthor(params: { category?: z.infer<typeof InsightCategory>; practiceArea?: string; sort?: "newest" | "oldest"; page?: number; pageSize?: number; author: string }) {
+  // The API has no author filter yet: filter the full list here, then paginate the result.
+  // Curated attorneys get their hand-picked list; everyone else gets the insights they are the main author of.
+  const curated = CURATED_PUBLICATIONS[params.author];
+  const wanted = curated ? new Set([...curated.profile, ...curated.more]) : null;
+  const mine = (await getAllInsights(params.category, params.practiceArea, params.sort)).filter((i) =>
+    wanted ? wanted.has(i.slug) : i.author.type === "person" && i.author.person.slug === params.author,
+  );
+  const pageSize = params.pageSize ?? 9;
+  const page = params.page ?? 1;
+  const totalPages = Math.max(1, Math.ceil(mine.length / pageSize));
+  return {
+    data: mine.slice((page - 1) * pageSize, page * pageSize),
+    meta: { page, pageSize, total: mine.length, totalPages },
+  };
+}
 
 async function withMockStories(params: { sort?: "newest" | "oldest"; page?: number; pageSize?: number }) {
   // The real set is small: fetch it whole, merge the placeholders in, then paginate the result here.
