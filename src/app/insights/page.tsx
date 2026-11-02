@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getInsights, getPage } from "@/lib/api/endpoints";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { getInsights, getPage, getPerson } from "@/lib/api/endpoints";
 import { InsightCategory } from "@/lib/api/schemas";
 import { pageMetadata } from "@/lib/seo";
 import { readPage, readString } from "@/lib/utils";
@@ -27,12 +29,15 @@ export default async function InsightsPage({ searchParams }: Props) {
   const practiceArea = readString(sp.practiceArea)?.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0];
   const sort = readString(sp.sort) === "oldest" ? "oldest" : "newest";
   const page = readPage(sp.page);
+  const authorSlug = readString(sp.author)?.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0];
+  // "View all" on a profile lands here filtered to that attorney; an unknown slug just shows everything.
+  const author = authorSlug ? await getPerson(authorSlug).catch(() => null) : null;
 
   const [content, list] = await Promise.all([
     getPage("insights"),
-    getInsights({ category, practiceArea, sort, page, pageSize: 15 }),
+    getInsights({ category, practiceArea, sort, page, pageSize: 15, author: author?.slug }),
   ]);
-  const current = { category, practiceArea, sort: sort === "newest" ? undefined : sort };
+  const current = { category, practiceArea, sort: sort === "newest" ? undefined : sort, author: author?.slug };
   const meta = list.meta ?? { page, totalPages: 1 };
 
   return (
@@ -42,8 +47,13 @@ export default async function InsightsPage({ searchParams }: Props) {
       {!content.hero && content.featured.length === 0 ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
 
       <Section tone="mist" labelledBy="listing-heading" id="listing">
+        {author ? (
+          <Link href={`/people/${author.slug}`} className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-stone hover:text-ink">
+            <ArrowLeft className="size-3.5" aria-hidden /> {author.displayName}
+          </Link>
+        ) : null}
         <Heading as="h1" reveal={false}>
-          <span id="listing-heading">{content.listingSection.title}</span>
+          <span id="listing-heading">{author ? `Publications by ${author.displayName}` : content.listingSection.title}</span>
         </Heading>
         <Reveal className="relative z-[35] mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <FilterTabs options={content.categoryFilters} param="category" base="/insights" current={current} label="Filter by category" />
@@ -60,7 +70,7 @@ export default async function InsightsPage({ searchParams }: Props) {
 
         <ListingResults>
         {list.data.length > 0 ? (
-          <MotionList key={`${category}|${practiceArea}|${sort}|${page}`} className="mt-4 md:mt-10 grid min-w-0 gap-x-4 gap-y-4 md:gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <MotionList key={`${category}|${practiceArea}|${sort}|${page}|${author?.slug}`} className="mt-4 md:mt-10 grid min-w-0 gap-x-4 gap-y-4 md:gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {list.data.map((i) => (
               <MotionListItem key={i.id} className="min-w-0">
                 <InsightCard insight={i} />
