@@ -128,7 +128,7 @@ export default async function InsightPage({ params }: Props) {
             size="h2"
             reveal={false}
             balance={false}
-            className="mt-5 block w-full max-w-full break-words text-[2.5rem] leading-[1.08] md:text-[3.5rem] md:leading-[1.05]"
+            className="mt-5 block w-full max-w-full break-words text-[1.5rem] leading-[1.08] md:text-[2.5rem] md:leading-[1.05]"
           >
             {i.title}
           </Heading>

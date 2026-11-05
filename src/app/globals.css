@@ -108,6 +108,7 @@
   .prose-firm a { @apply text-cobalt underline underline-offset-2; }
   .prose-firm blockquote { @apply my-6 border-l-2 border-ink pl-5 font-serif text-xl italic; }
   .prose-firm strong { @apply font-semibold text-ink; }
+  .person-bio :is(strong, b) { @apply font-normal text-ink-800; }
   .prose-invert-firm { @apply text-mist; }
   .prose-invert-firm strong { @apply text-white; }
 

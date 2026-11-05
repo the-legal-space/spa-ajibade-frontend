@@ -31,6 +31,7 @@ export default function PrivacyPage() {
           <PrivacyTableOfContents />
 
           <div className="min-w-0 text-[15px] leading-8 text-ink-800 md:text-base md:leading-8">
+            <p className="mb-8 text-sm text-stone">Last updated: 5th November, 2026.</p>
             <h2 id="introduction" className="font-serif text-3xl leading-tight text-ink md:text-4xl">
               1. Introduction
             </h2>
