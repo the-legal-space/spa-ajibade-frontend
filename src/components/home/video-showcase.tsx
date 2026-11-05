@@ -1,26 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { HomePage } from "@/lib/api/schemas";
 import { FIGMA } from "@/lib/figma-assets";
 import { toEmbedUrl } from "@/components/sections/video-embed";
+import { Media } from "@/components/ui/media";
 import { MotionP } from "@/components/ui/motion-p";
 import { TRANSITIONS } from "@/lib/motion";
 import { Reveal } from "@/components/ui/reveal";
 
 const DEFAULT_CAPTION = "Our Managing Partner on what fifty-nine years of practice has taught us.";
+// Used until the CMS sets videoShowcase.videoUrl.
+const FALLBACK_VIDEO_URL = "https://www.youtube.com/watch?v=IXzzul7wtjg";
 
 /**
  * Home video block from the Figma (frame "Floating Scroll Control"): the firm's crossed mark
- * at 10% behind a framed, muted preview clip with a glass play button and a Fraunces caption.
- * The play button opens the full video when the CMS has a video URL; until then it pauses and
- * resumes the preview, so it never does nothing.
+ * at 10% behind a framed still (the CMS poster) with a glass play button and a Fraunces caption.
+ * Nothing autoplays; the play button opens the video in a lightbox.
  */
 export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"] }) {
-  const preview = useRef<HTMLVideoElement>(null);
-  const [paused, setPaused] = useState(false);
   const [open, setOpen] = useState(false);
   const caption = showcase.caption || DEFAULT_CAPTION;
   // "Fifty-Nine" must not break across lines ("Fifty-" / "Nine"): keep it in a no-wrap span.
@@ -34,16 +34,9 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
       part
     ),
   );
-  const embed = showcase.videoUrl ? toEmbedUrl(showcase.videoUrl) : null;
-
-  useEffect(() => {
-    const v = preview.current;
-    if (!v) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      v.pause();
-      setPaused(true);
-    }
-  }, []);
+  const videoUrl = showcase.videoUrl || FALLBACK_VIDEO_URL;
+  const embed = toEmbedUrl(videoUrl);
+  const poster = showcase.poster;
 
   useEffect(() => {
     if (!open) return;
@@ -51,25 +44,6 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
-
-  const onPlay = () => {
-    if (showcase.videoUrl) {
-      preview.current?.pause();
-      setOpen(true);
-      return;
-    }
-    const v = preview.current;
-    if (!v) return;
-    if (v.paused) {
-      void v.play();
-      setPaused(false);
-    } else {
-      v.pause();
-      setPaused(true);
-    }
-  };
-
-  const label = showcase.videoUrl ? `Play video: ${caption}` : paused ? "Play the preview" : "Pause the preview";
 
   return (
     <section className="relative overflow-hidden bg-white" aria-label="Video">
@@ -81,43 +55,29 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
       />
       <div className="container-site relative flex flex-col items-center gap-[0] pb-2 pt-4 md:gap-11 md:py-[68px]">
         <Reveal className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[12px] border-8 border-[rgba(156,155,155,0.2)] sm:aspect-video md:border-[16px] lg:aspect-auto lg:h-[759px]">
-          <video
-            ref={preview}
-            className="absolute inset-0 size-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={FIGMA.videoPoster}
-            aria-hidden
-            tabIndex={-1}
-          >
-            <source src={FIGMA.videoPreview} type="video/webm" />
-          </video>
+          {/* The poster is a 4:3 flyer in a wide slot: show it whole, over a blurred copy that fills the edges. */}
+          <div aria-hidden className="absolute inset-0 scale-110 blur-2xl">
+            <Media image={poster} alt="" placeholder="dark" sizes="50vw" />
+          </div>
           <div aria-hidden className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0">
+            <Media image={poster} placeholder="dark" sizes="(min-width: 1024px) 1012px, 100vw" className="object-contain" />
+          </div>
           <motion.button
             type="button"
-            onClick={onPlay}
+            onClick={() => setOpen(true)}
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.94 }}
             transition={TRANSITIONS.hover}
             className="relative rounded-[68px] border-[6px] border-white/30 bg-white/20 p-2.5 backdrop-blur-sm md:p-3.5"
-            aria-label={label}
+            aria-label={`Play video: ${caption}`}
           >
-            {paused || showcase.videoUrl ? (
-              <svg viewBox="0 0 44 44" className="size-9 md:size-11" aria-hidden>
-                <path
-                  d="M13.86 6.25C11.66 4.86 8.8 6.44 8.8 9.04v25.92c0 2.6 2.86 4.18 5.06 2.79l20.56-12.96c2.05-1.3 2.05-4.29 0-5.58L13.86 6.25Z"
-                  fill="white"
-                />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 44 44" className="size-9 md:size-11" aria-hidden>
-                <rect x="11" y="8" width="7" height="28" rx="2" fill="white" />
-                <rect x="26" y="8" width="7" height="28" rx="2" fill="white" />
-              </svg>
-            )}
+            <svg viewBox="0 0 44 44" className="size-9 md:size-11" aria-hidden>
+              <path
+                d="M13.86 6.25C11.66 4.86 8.8 6.44 8.8 9.04v25.92c0 2.6 2.86 4.18 5.06 2.79l20.56-12.96c2.05-1.3 2.05-4.29 0-5.58L13.86 6.25Z"
+                fill="white"
+              />
+            </svg>
           </motion.button>
         </Reveal>
         <MotionP
@@ -131,7 +91,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
       </div>
 
       <AnimatePresence>
-        {open && showcase.videoUrl ? (
+        {open ? (
           <motion.div
             className="fixed inset-0 z-[70] grid place-items-center bg-black/85 p-4"
             initial={{ opacity: 0 }}
@@ -146,7 +106,7 @@ export function VideoShowcase({ showcase }: { showcase: HomePage["videoShowcase"
               {embed ? (
                 <iframe src={embed} title={caption} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen className="size-full" />
               ) : (
-                <video src={showcase.videoUrl} controls autoPlay className="size-full" />
+                <video src={videoUrl} controls autoPlay className="size-full" />
               )}
             </div>
             <button
