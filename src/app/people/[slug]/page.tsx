@@ -54,9 +54,6 @@ export default async function PersonPage({ params }: Props) {
   const bio = cleanHtml(p.bio);
   const educationIntro = cleanHtml(p.education?.intro);
   const educationEntries = p.education?.entries ?? [];
-  const secondaryPracticeAreas = p.practiceAreas.filter(
-    (practiceArea) => practiceArea.slug !== p.primaryPracticeArea?.slug,
-  );
   const back = navLabel(site.nav, "/people");
   const mandate = site.contactCallout.primaryCta;
 
@@ -105,31 +102,23 @@ export default async function PersonPage({ params }: Props) {
                 className="object-top"
               />
             </div>
-            {p.primaryPracticeArea ? (
+            {/* One list in API order (the primary area comes first). */}
+            {p.practiceAreas.length > 0 ? (
               <div className="mt-6">
-                <p className="text-xs text-stone">Primary Practice Area</p>
-                <Link
-                  href={`/practice-areas/${p.primaryPracticeArea.slug}`}
-                  className="text-lg hover:underline"
-                >
-                  {p.primaryPracticeArea.title}
-                </Link>
-              </div>
-            ) : null}
-            {secondaryPracticeAreas.length > 0 ? (
-              <div className={p.primaryPracticeArea ? "mt-3" : "mt-6"}>
-                <p className="text-xs text-stone">Secondary Practice Areas</p>
+                <p className="text-xs text-stone">
+                  {p.practiceAreas.length === 1 ? "Practice Area" : "Practice Areas"}
+                </p>
                 <ul className="mt-1 space-y-1 text-lg">
-                  {secondaryPracticeAreas.map((a) => (
-                  <li key={a.slug}>
-                    <Link
-                      href={`/practice-areas/${a.slug}`}
-                      className="hover:underline"
-                    >
-                      {a.title}
-                    </Link>
-                  </li>
-                ))}
+                  {p.practiceAreas.map((a) => (
+                    <li key={a.slug}>
+                      <Link
+                        href={`/practice-areas/${a.slug}`}
+                        className="hover:underline"
+                      >
+                        {a.title}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ) : null}
