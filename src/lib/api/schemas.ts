@@ -244,7 +244,6 @@ export const PersonDetail = PersonSummary.extend({
   email: nullableString.optional(),
   bio: nullableString,
   quote: nullableString,
-  primaryPracticeArea: PracticeAreaLink.nullable().optional(),
   education: z.object({ intro: nullableString, entries: z.array(z.object({ qualification: z.string(), year: z.number().nullable() })) }).optional(),
   memberships: z.array(z.string()).optional(),
   /** Listed publications for the profile accordion, in display order; `insightSlug` links the title when set. */
