@@ -16,7 +16,8 @@ import { Media } from "@/components/ui/media";
 import { SocialIcon } from "@/components/ui/social-icons";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
-import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
+import { ScrollRail } from "@/components/home/scroll-rail";
 import { PersonDetailsAccordion } from "@/components/people/person-details-accordion";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -79,7 +80,8 @@ export default async function PersonPage({ params }: Props) {
     <>
       <section className="bg-white">
         <div className="container-site grid gap-12 py-12 md:py-16 lg:grid-cols-[1fr_1fr] lg:gap-16">
-          <div>
+          {/* Photo and details stay in view while the bio and accordion scroll past on desktop. */}
+          <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:self-start">
             {back ? (
               <Link
                 href="/people"
@@ -185,7 +187,7 @@ export default async function PersonPage({ params }: Props) {
           <div className="lg:pt-10">
             {bio ? (
               <div
-                className="prose-firm text-[15px] leading-7"
+                className="prose-firm person-bio text-[15px] leading-7"
                 dangerouslySetInnerHTML={{ __html: bio }}
               />
             ) : null}
@@ -193,6 +195,7 @@ export default async function PersonPage({ params }: Props) {
               educationIntro={educationIntro}
               educationEntries={educationEntries}
               memberships={p.memberships ?? []}
+              publications={p.publications ?? []}
             />
             {mandate ? (
               <SmartLink
@@ -231,13 +234,18 @@ export default async function PersonPage({ params }: Props) {
               ) : null}
             </div>
           </div>
-          <MotionList className="mt-8 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-            {insights.map((i) => (
-              <MotionListItem key={i.id}>
+          <Reveal className="mt-2 md:mt-11">
+            <ScrollRail label="Recent publications">
+              {insights.map((i) => (
+                <div
+                  key={i.id}
+                  className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[437px]"
+                >
                   <InsightCard insight={i} />
-              </MotionListItem>
-            ))}
-          </MotionList>
+                </div>
+              ))}
+            </ScrollRail>
+          </Reveal>
         </Section>
       ) : null}
 

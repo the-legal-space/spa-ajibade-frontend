@@ -15,8 +15,6 @@ export const FIGMA = {
   heroHome: img("/figma/hero-bg.jpg", 2400, 1600, "Statue of Lady Justice in a law library"),
   aboutMap: "/figma/about-map-bg.png",
   videoMark: "/figma/video-mark-bg.png",
-  videoPoster: "/figma/video-poster.jpg",
-  videoPreview: "/figma/video-preview.webm",
   recognition: img("/figma/recognition.jpg", 1024, 1024, "Lawyer reviewing documents at her desk"),
   whyClients: img("/figma/why-clients.jpg", 1400, 2100, "Lawyer in discussion at his desk"),
   contactCallout: "/figma/contact-callout.jpg",

@@ -31,6 +31,7 @@ export default function PrivacyPage() {
           <PrivacyTableOfContents />
 
           <div className="min-w-0 text-[15px] leading-8 text-ink-800 md:text-base md:leading-8">
+            <p className="mb-8 text-sm text-stone">Last updated: 5th November, 2026.</p>
             <h2 id="introduction" className="font-serif text-3xl leading-tight text-ink md:text-4xl">
               1. Introduction
             </h2>
@@ -120,7 +121,7 @@ export default function PrivacyPage() {
               7. Lawful bases for processing
             </h2>
             <p className="mt-5">
-              We process personal data only where permitted by the Nigeria Data Protection Act 2023, and its implementation framework. We may rely on:
+               We process personal data only where permitted by the Nigeria Data Protection Act 2023, and its implementation framework. We may rely on:
             </p>
             <ul className="mt-5 list-disc space-y-2 pl-6">
               <li>Your consent for one or more specific purposes.</li>

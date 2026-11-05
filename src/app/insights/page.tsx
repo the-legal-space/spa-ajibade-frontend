@@ -42,9 +42,10 @@ export default async function InsightsPage({ searchParams }: Props) {
 
   return (
     <>
-      {content.hero ? <PageHero hero={content.hero} /> : null}
-      {!content.hero && content.featured.length > 0 ? <FeaturedInsights items={content.featured} /> : null}
-      {!content.hero && content.featured.length === 0 ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
+      {/* An attorney's "View more" list shows only their publications: no hero or featured block. */}
+      {!author && content.hero ? <PageHero hero={content.hero} /> : null}
+      {!author && !content.hero && content.featured.length > 0 ? <FeaturedInsights items={content.featured} /> : null}
+      {author || (!content.hero && content.featured.length === 0) ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
 
       <Section tone="mist" labelledBy="listing-heading" id="listing">
         {author ? (
