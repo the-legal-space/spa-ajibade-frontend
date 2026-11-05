@@ -120,7 +120,7 @@ export default function PrivacyPage() {
               7. Lawful bases for processing
             </h2>
             <p className="mt-5">
-              We process personal data only where permitted by the Nigeria Data Protection Act 2023, and its implementation framework. We may rely on:
+               We process personal data only where permitted by the Nigeria Data Protection Act 2023, and its implementation framework. We may rely on:
             </p>
             <ul className="mt-5 list-disc space-y-2 pl-6">
               <li>Your consent for one or more specific purposes.</li>
