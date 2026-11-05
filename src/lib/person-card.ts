@@ -5,7 +5,7 @@ import { cleanHtml } from "@/lib/sanitize";
 import { isPending } from "@/lib/utils";
 
 export type PersonCardDetails = {
-  practiceAreas: { slug: string; title: string }[];
+  primaryPracticeArea: { slug: string; title: string } | null;
   summary: string | null;
 };
 
@@ -29,9 +29,15 @@ export async function getCardDetails(people: PersonSummary[]): Promise<Record<st
       try {
         const d = await getPerson(p.slug);
         const quote = d.quote && !isPending(d.quote) ? `“${d.quote.trim().replace(/^“|”$/g, "")}”` : null;
-        return [p.slug, { practiceAreas: d.practiceAreas.map((a) => ({ slug: a.slug, title: a.title })), summary: excerpt(d.bio) ?? quote }] as const;
+        return [
+          p.slug,
+          {
+            primaryPracticeArea: d.primaryPracticeArea ?? d.practiceAreas[0] ?? null,
+            summary: excerpt(d.bio, 240) ?? quote,
+          },
+        ] as const;
       } catch {
-        return [p.slug, { practiceAreas: [], summary: null }] as const;
+        return [p.slug, { primaryPracticeArea: null, summary: null }] as const;
       }
     }),
   );

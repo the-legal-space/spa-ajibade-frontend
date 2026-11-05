@@ -187,7 +187,7 @@ export default async function PersonPage({ params }: Props) {
           <div className="lg:pt-10">
             {bio ? (
               <div
-                className="prose-firm text-[15px] leading-7"
+                className="prose-firm person-bio text-[15px] leading-7"
                 dangerouslySetInnerHTML={{ __html: bio }}
               />
             ) : null}

@@ -12,9 +12,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/** Shown under the title once the firm confirms it (the source document leaves the date blank). */
-const EFFECTIVE_DATE = "";
-
 // The clause numbers below are the ones in the firm's document: the text refers to them
 // ("clause 3", "clause 7"), so they are written out rather than generated.
 const contents: TocItem[] = [
@@ -92,7 +89,7 @@ export default function TermsPage() {
           <LegalTableOfContents contents={contents} label="Terms of use contents" />
 
           <div className="min-w-0 text-[15px] leading-8 text-ink-800 md:text-base md:leading-8">
-            {EFFECTIVE_DATE ? <p className="mb-8 text-sm text-stone">Effective date: {EFFECTIVE_DATE}</p> : null}
+            <p className="mb-8 text-sm text-stone">Last updated: 5th November, 2026.</p>
 
             <Clause id="about-these-terms" n={1} title="About These Terms" first>
               <P first>
