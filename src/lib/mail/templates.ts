@@ -312,3 +312,94 @@ export function clientEmail(d: DiscussEmailData, hasLogo = false): { subject: st
     ].join("\n"),
   };
 }
+
+/* ---- "Message the firm" ---- */
+
+export type MessageEmailData = {
+  fullName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  reference: string;
+};
+
+const firstNameOf = (fullName: string) => fullName.trim().split(/\s+/)[0] || fullName;
+const multiline = (t: string) => e(t).replace(/\r?\n/g, "<br />");
+
+/** The message as it reaches the office inbox. Replying goes straight to the sender. */
+export function officeMessageEmail(d: MessageEmailData, hasLogo = false): { subject: string; html: string; text: string } {
+  const topic = d.subject || "General enquiry";
+  const body = [
+    eyebrow("Website message"),
+    heading(`New message from ${d.fullName}`),
+    para("A visitor sent this through <strong>Message the firm</strong> on the website. Reply to this email to answer them directly."),
+    table(
+      [
+        row("Name", e(d.fullName)),
+        row("Email", `<a href="mailto:${e(d.email)}" style="color:#111111;">${e(d.email)}</a>`),
+        d.phone ? row("Phone", `<a href="tel:${e(d.phone.replace(/\s+/g, ""))}" style="color:#111111;">${e(d.phone)}</a>`) : "",
+        row("Subject", e(topic)),
+        row("Reference", e(d.reference)),
+      ].join(""),
+    ),
+    sectionTitle("Message"),
+    `<div style="margin:0 0 26px 0;padding:18px 20px;background:#f2f2f2;border-radius:10px;font-size:15px;color:#111111;">${multiline(d.message)}</div>`,
+  ].join("\n");
+
+  return {
+    subject: `Website message: ${topic} (${d.fullName})`,
+    html: layout({ title: "New website message", preheader: `${d.fullName}: ${d.message.slice(0, 90)}`, body, hasLogo }),
+    text: [
+      "NEW WEBSITE MESSAGE (Message the firm)",
+      "",
+      `Name: ${d.fullName}`,
+      `Email: ${d.email}`,
+      d.phone ? `Phone: ${d.phone}` : "",
+      `Subject: ${topic}`,
+      `Reference: ${d.reference}`,
+      "",
+      "MESSAGE",
+      d.message,
+      "",
+      "Reply to this email to answer the sender directly.",
+    ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n"),
+  };
+}
+
+/** Automatic confirmation to the person who sent the message. */
+export function senderMessageEmail(d: MessageEmailData, hasLogo = false): { subject: string; html: string; text: string } {
+  const name = firstNameOf(d.fullName);
+  const body = [
+    eyebrow("Message received"),
+    heading(`Thank you, ${name}.`),
+    para("Thank you for contacting SPA Ajibade &amp; Co. We have received your message and a member of our team will respond as soon as possible."),
+    table([d.subject ? row("Subject", e(d.subject)) : "", row("Reference", e(d.reference))].join("")),
+    sectionTitle("Your message"),
+    `<div style="margin:0 0 26px 0;padding:18px 20px;background:#f2f2f2;border-radius:10px;font-size:15px;color:#111111;">${multiline(d.message)}</div>`,
+    para("If your enquiry is urgent, please contact our Lagos office directly."),
+    `<p style="margin:0 0 26px 0;color:#525252;">Best regards,<br />Spa Ajibade &amp; Co.<br />Legal Practitioners, Arbitrators and Notaries Public</p>`,
+  ].join("\n");
+
+  return {
+    subject: "We have received your message — SPA Ajibade & Co.",
+    html: layout({ title: "We have received your message", preheader: "Thank you for contacting SPA Ajibade & Co.", body, hasLogo }),
+    text: [
+      `Dear ${name},`,
+      "",
+      "Thank you for contacting SPA Ajibade & Co. We have received your message and a member of our team will respond as soon as possible.",
+      "",
+      d.subject ? `Subject: ${d.subject}` : "",
+      `Reference: ${d.reference}`,
+      "",
+      "YOUR MESSAGE",
+      d.message,
+      "",
+      "If your enquiry is urgent, please contact our Lagos office directly.",
+      "",
+      "Best regards,",
+      "Spa Ajibade & Co.",
+      "Legal Practitioners, Arbitrators and Notaries Public",
+    ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n"),
+  };
+}
