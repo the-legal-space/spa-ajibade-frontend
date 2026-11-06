@@ -35,6 +35,14 @@ export const FIGMA = {
   },
 } as const;
 
+// Temporary homepage slide 2 override; remove once the CMS second hero image is updated.
+export const TEMPORARY_HOME_HERO_SECOND_SLIDE = img(
+  "/figma/2ND%20CAROUSEL%20IMAGE%20REPLACEMENT.png",
+  1832,
+  859,
+  "Gavel with scales of justice and law books",
+);
+
 const PEOPLE: Record<string, ApiImage> = {
   "babatunde-ajibade": img("/figma/people/babatunde-ajibade.jpg", 682, 682, "Portrait of Dr. Babatunde Ajibade, SAN"),
   "john-onyido": img("/figma/people/john-onyido.jpg", 900, 900, "Portrait of Dr. John Onyido"),
