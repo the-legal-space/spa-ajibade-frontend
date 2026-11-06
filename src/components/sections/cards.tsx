@@ -67,7 +67,8 @@ export function PracticeAreaCard({
 }
 
 export type PersonCardDetails = {
-  primaryPracticeArea: { slug: string; title: string } | null;
+  /** In API order: the primary area comes first. */
+  practiceAreas: { slug: string; title: string }[];
   summary: string | null;
 };
 
@@ -79,7 +80,7 @@ const MANDATE_LINK = {
 
 /**
  * Figma partner card ("Partner Grid") with the "HOVER ANIMATION" state: hovering (or focusing)
- * the card grows the white "+" square into a panel over the photo with the role, primary practice area,
+ * the card grows the white "+" square into a panel over the photo with the role, practice areas,
  * a short summary and "Discuss a Mandate". On touch screens the "+" toggles the panel.
  * The name still opens the attorney's profile.
  */
@@ -130,17 +131,17 @@ export function PersonCard({
           >
             <p className="text-lg leading-tight">{person.roleLabel}</p>
             <ul className="mt-3 flex min-h-6 flex-wrap gap-1.5">
-              {details?.primaryPracticeArea ? (
-                <li>
+              {(details?.practiceAreas ?? person.practiceAreas).map((area) => (
+                <li key={area.slug} className="max-w-full">
                   <Link
-                    href={`/practice-areas/${details.primaryPracticeArea.slug}`}
+                    href={`/practice-areas/${area.slug}`}
                     tabIndex={-1}
                     className="inline-block max-w-full truncate rounded-sm border-[0.5px] border-gray bg-mist px-2 py-1.5 text-[11px] leading-none hover:border-ink"
                   >
-                    {details.primaryPracticeArea.title}
+                    {area.title}
                   </Link>
                 </li>
-              ) : null}
+              ))}
             </ul>
             {details?.summary ? (
               <p className="mt-3 line-clamp-5 text-[15px] italic leading-7 text-ink">
@@ -150,7 +151,7 @@ export function PersonCard({
             <div className="mt-auto flex flex-col gap-2 pt-4">
               <SmartLink
                 link={MANDATE_LINK}
-                practiceArea={details?.primaryPracticeArea?.slug}
+                practiceArea={(details?.practiceAreas ?? person.practiceAreas)[0]?.slug}
                 attorney={person.slug}
                 className={buttonClass("dark", "w-full")}
               />
