@@ -43,14 +43,22 @@ export const getPracticeArea = cache((slug: string) =>
 export const getPeople = cache(
   async (params: { role?: string; practiceArea?: string; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) => {
     if (params.sort && params.sort !== "seniority") return apiList("/people", PersonSummary, { query: params, tags: ["people"] });
-    // Seniority: re-rank by role here so a role corrected in lib/person-overrides lands in its group
-    // (Associates before Trainee Associates). The sort is stable, so the API's order within a role stays.
+    // Seniority: group by role here so a role corrected in lib/person-overrides lands in its group
+    // (Associates before Trainee Associates). Associate levels are alphabetical within each role; partners and
+    // management keep the API's seniority order (the sort is stable).
     const fetchPage = (page: number) =>
       apiList("/people", PersonSummary, { query: { ...params, page, pageSize: 50 }, tags: ["people"] });
     const first = await fetchPage(1);
     const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.totalPages ?? 1) - 1) }, (_, i) => fetchPage(i + 2)));
-    const rank = (p: PersonSummary) => PersonRole.options.indexOf(p.role);
-    const all = [first, ...rest].flatMap((r) => r.data).sort((a, b) => rank(a) - rank(b));
+    const rank = (p: Pick<PersonSummary, "role">) => PersonRole.options.indexOf(p.role);
+    const sortName = (p: PersonSummary) => p.displayName.replace(/^(Dr|Mr|Mrs|Ms|Prof)\.?\s+/i, "");
+    const all = [first, ...rest]
+      .flatMap((r) => r.data)
+      .sort(
+        (a, b) =>
+          rank(a) - rank(b) ||
+          (rank(a) >= rank({ role: "senior_associate" }) ? sortName(a).localeCompare(sortName(b), "en", { sensitivity: "base" }) : 0),
+      );
     const pageSize = params.pageSize ?? 15;
     const page = params.page ?? 1;
     return {

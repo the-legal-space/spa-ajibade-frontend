@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/env";
+import { API_BASE_URL, FIRM_PHONE } from "@/lib/env";
 import { ApiErrorBody, SubmissionReceipt } from "@/lib/api/schemas";
 
 /**
@@ -49,5 +49,5 @@ export async function submitForm(path: string, body: Record<string, unknown> | F
     return { ok: false, kind: "validation", fieldErrors, message: "Please check the highlighted fields." };
   }
 
-  return { ok: false, kind: "server", message: "Something went wrong on our side. Please try again, or call the firm directly." };
+  return { ok: false, kind: "server", message: `Something went wrong on our side. Please try again, or call the firm on ${FIRM_PHONE}.` };
 }
