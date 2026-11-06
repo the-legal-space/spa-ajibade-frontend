@@ -1,3 +1,4 @@
+import { FIRM_PHONE, FIRM_PHONE_TEL } from "@/lib/env";
 /**
  * Email templates for the "Discuss a Mandate" flow: one to the attorney's team, one confirmation to
  * the client. The wording is ported from the original booking server (Booking/server.js); the look
@@ -281,7 +282,7 @@ export function clientEmail(d: DiscussEmailData, hasLogo = false): { subject: st
       `We contact you at <strong>${e(d.email)}</strong> to confirm, or to suggest another time.`,
       "Once confirmed, you will receive the details of your session.",
     ]),
-    para("If you have any urgent enquiries, please do not hesitate to contact us directly."),
+    para(`If you have any urgent enquiries, please do not hesitate to call us on <a href="${FIRM_PHONE_TEL}" style="color:#111111;">${FIRM_PHONE}</a>.`),
     `<p style="margin:0 0 26px 0;color:#525252;">Best regards,<br />Spa Ajibade &amp; Co.<br />Legal Practitioners, Arbitrators and Notaries Public</p>`,
   ].join("\n");
 
@@ -304,7 +305,7 @@ export function clientEmail(d: DiscussEmailData, hasLogo = false): { subject: st
       `2. We contact you at ${d.email} to confirm, or to suggest another time.`,
       "3. Once confirmed, you will receive the details of your session.",
       "",
-      "If you have any urgent enquiries, please do not hesitate to contact us directly.",
+      `If you have any urgent enquiries, please do not hesitate to call us on ${FIRM_PHONE}.`,
       "",
       "Best regards,",
       "Spa Ajibade & Co.",
@@ -377,7 +378,7 @@ export function senderMessageEmail(d: MessageEmailData, hasLogo = false): { subj
     table([d.subject ? row("Subject", e(d.subject)) : "", row("Reference", e(d.reference))].join("")),
     sectionTitle("Your message"),
     `<div style="margin:0 0 26px 0;padding:18px 20px;background:#f2f2f2;border-radius:10px;font-size:15px;color:#111111;">${multiline(d.message)}</div>`,
-    para("If your enquiry is urgent, please contact our Lagos office directly."),
+    para(`If your enquiry is urgent, please call us on <a href="${FIRM_PHONE_TEL}" style="color:#111111;">${FIRM_PHONE}</a>.`),
     `<p style="margin:0 0 26px 0;color:#525252;">Best regards,<br />Spa Ajibade &amp; Co.<br />Legal Practitioners, Arbitrators and Notaries Public</p>`,
   ].join("\n");
 
@@ -395,7 +396,7 @@ export function senderMessageEmail(d: MessageEmailData, hasLogo = false): { subj
       "YOUR MESSAGE",
       d.message,
       "",
-      "If your enquiry is urgent, please contact our Lagos office directly.",
+      `If your enquiry is urgent, please call us on ${FIRM_PHONE}.`,
       "",
       "Best regards,",
       "Spa Ajibade & Co.",

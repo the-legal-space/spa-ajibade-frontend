@@ -6,6 +6,10 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3
 
 export const CONSENT_TEXT_VERSION = process.env.NEXT_PUBLIC_CONSENT_TEXT_VERSION || "v1-2026-09";
 
+/** The firm's main line ("Call the firm"). The site header and buttons read it from the CMS; emails and messages use this. */
+export const FIRM_PHONE = "+234 811 890 3060";
+export const FIRM_PHONE_TEL = "tel:+2348118903060";
+
 export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 /**
