@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { withPersonOverrides } from "@/lib/person-overrides";
 
 /**
  * Zod schemas for the public SPA Ajibade content API.
@@ -147,7 +148,7 @@ export const PracticeAreaCard = PracticeAreaRef.extend({
 });
 export type PracticeAreaCard = z.infer<typeof PracticeAreaCard>;
 
-export const PersonSummary = z.object({
+const PersonSummaryBase = z.object({
   id: z.string(),
   slug: z.string(),
   displayName: z.string(),
@@ -158,6 +159,7 @@ export const PersonSummary = z.object({
   cardBio: nullableString,
   practiceAreas: z.array(PracticeAreaLink),
 });
+export const PersonSummary = PersonSummaryBase.transform(withPersonOverrides);
 export type PersonSummary = z.infer<typeof PersonSummary>;
 
 export const OfficeRef = z.object({
@@ -235,7 +237,7 @@ export const PracticeAreaDetail = PracticeAreaCard.extend({
 });
 export type PracticeAreaDetail = z.infer<typeof PracticeAreaDetail>;
 
-export const PersonDetail = PersonSummary.extend({
+export const PersonDetail = PersonSummaryBase.extend({
   firstName: z.string(),
   lastName: z.string(),
   honorific: nullableString,
@@ -254,7 +256,7 @@ export const PersonDetail = PersonSummary.extend({
   /** The API now names this list `recentPublications`; both keys are accepted. */
   insights: z.array(InsightCard).optional(),
   recentPublications: z.array(InsightCard).optional(),
-});
+}).transform(withPersonOverrides);
 export type PersonDetail = z.infer<typeof PersonDetail>;
 
 export const OfficeSchema = z.object({

@@ -12,6 +12,7 @@ import {
   OfficeSchema,
   PageSchemas,
   PersonDetail,
+  PersonRole,
   PersonSummary,
   PracticeAreaCard,
   PracticeAreaDetail,
@@ -40,8 +41,23 @@ export const getPracticeArea = cache((slug: string) =>
 );
 
 export const getPeople = cache(
-  (params: { role?: string; practiceArea?: string; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) =>
-    apiList("/people", PersonSummary, { query: params, tags: ["people"] }),
+  async (params: { role?: string; practiceArea?: string; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) => {
+    if (params.sort && params.sort !== "seniority") return apiList("/people", PersonSummary, { query: params, tags: ["people"] });
+    // Seniority: re-rank by role here so a role corrected in lib/person-overrides lands in its group
+    // (Associates before Trainee Associates). The sort is stable, so the API's order within a role stays.
+    const fetchPage = (page: number) =>
+      apiList("/people", PersonSummary, { query: { ...params, page, pageSize: 50 }, tags: ["people"] });
+    const first = await fetchPage(1);
+    const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.totalPages ?? 1) - 1) }, (_, i) => fetchPage(i + 2)));
+    const rank = (p: PersonSummary) => PersonRole.options.indexOf(p.role);
+    const all = [first, ...rest].flatMap((r) => r.data).sort((a, b) => rank(a) - rank(b));
+    const pageSize = params.pageSize ?? 15;
+    const page = params.page ?? 1;
+    return {
+      data: all.slice((page - 1) * pageSize, page * pageSize),
+      meta: { page, pageSize, total: all.length, totalPages: Math.max(1, Math.ceil(all.length / pageSize)) },
+    };
+  },
 );
 
 export const getPerson = cache((slug: string) =>
