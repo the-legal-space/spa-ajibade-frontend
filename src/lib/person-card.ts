@@ -5,7 +5,8 @@ import { cleanHtml } from "@/lib/sanitize";
 import { isPending } from "@/lib/utils";
 
 export type PersonCardDetails = {
-  primaryPracticeArea: { slug: string; title: string } | null;
+  /** In API order: the primary area comes first. */
+  practiceAreas: { slug: string; title: string }[];
   summary: string | null;
 };
 
@@ -32,12 +33,12 @@ export async function getCardDetails(people: PersonSummary[]): Promise<Record<st
         return [
           p.slug,
           {
-            primaryPracticeArea: d.primaryPracticeArea ?? d.practiceAreas[0] ?? null,
+            practiceAreas: d.practiceAreas,
             summary: excerpt(d.bio, 240) ?? quote,
           },
         ] as const;
       } catch {
-        return [p.slug, { primaryPracticeArea: null, summary: null }] as const;
+        return [p.slug, { practiceAreas: p.practiceAreas, summary: null }] as const;
       }
     }),
   );
