@@ -5,7 +5,7 @@ import DiscussProgress from "./DiscussProgress";
 import StepUserInfo from "./StepUserInfo";
 import StepStaffSelect from "./StepStaffSelect";
 import StepTimeSelect from "./StepTimeSelect";
-import { CONSENT_TEXT_VERSION, MAIL_API_URL } from "@/lib/env";
+import { CONSENT_TEXT_VERSION, FIRM_PHONE, MAIL_API_URL } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Honeypot } from "@/components/forms/fields";
 import { useTurnstile } from "@/components/forms/turnstile";
@@ -79,7 +79,7 @@ export default function DiscussApp({ preselectedStaffId }: { preselectedStaffId?
     if (wait > 0) {
       setError(
         wait > 90
-          ? `You've sent several requests recently. Please try again in about ${Math.ceil(wait / 60)} minutes, or call the firm.`
+          ? `You've sent several requests recently. Please try again in about ${Math.ceil(wait / 60)} minutes, or call the firm on ${FIRM_PHONE}.`
           : `Please wait ${wait} second${wait === 1 ? "" : "s"} before sending another request.`,
       );
       return;

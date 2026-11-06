@@ -64,7 +64,7 @@ export function validateDiscuss(body: unknown): Validation {
 
 let cached: Transporter | null | undefined;
 
-function getTransport(): Transporter | null {
+export function getTransport(): Transporter | null {
   if (process.env.MAIL_DRY_RUN === "1") return nodemailer.createTransport({ jsonTransport: true });
   if (cached !== undefined) return cached;
   const user = process.env.MAIL_USER || process.env.EMAIL_USER;
@@ -117,7 +117,7 @@ function bookingExtras(data: DiscussEmailData) {
   };
 }
 
-function mailParts(from: string) {
+export function mailParts(from: string) {
   const logoPath = path.join(process.cwd(), "public", "brand", "logo.png");
   const hasLogo = existsSync(logoPath);
   return { from, hasLogo, logo: hasLogo ? [{ filename: "logo.png", path: logoPath, cid: LOGO_CID }] : [] };

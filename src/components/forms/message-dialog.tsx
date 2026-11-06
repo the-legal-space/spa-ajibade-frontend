@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { CONSENT_TEXT_VERSION } from "@/lib/env";
+import { CONSENT_TEXT_VERSION, MAIL_API_URL } from "@/lib/env";
 import { submitForm } from "@/lib/submit";
 import { Dialog } from "@/components/ui/dialog";
 import { MotionButton } from "@/components/ui/motion-primitives";
@@ -17,7 +17,7 @@ import { useTurnstile } from "./turnstile";
 
 const empty = { fullName: "", email: "", phone: "", subject: "", message: "" };
 
-/** "Message the firm" → POST /messages */
+/** "Message the firm" → POST /messages (stored by the backend), then emailed to the Lagos office with a confirmation to the sender. */
 export function MessageDialog({
   open,
   onClose,
@@ -87,6 +87,14 @@ export function MessageDialog({
     setSubmitting(false);
     if (result.ok) {
       setReference(result.reference);
+      // The message is already stored, so the visitor sees success either way; this sends the emails.
+      // keepalive lets the request finish even if they close the dialog or leave the page straight away.
+      void fetch(`${MAIL_API_URL.replace(/\/$/, "")}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...body, reference: result.reference }),
+        keepalive: true,
+      }).catch(() => {});
       return;
     }
     turnstile.reset();

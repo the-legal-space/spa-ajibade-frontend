@@ -1,3 +1,4 @@
+import { FIRM_PHONE } from "@/lib/env";
 import { clientIp, hit, jsonResponder, preflight } from "@/lib/mail/http";
 import { mailConfigured, newReference, sendDiscussEmails, validateDiscuss } from "@/lib/mail/discuss";
 import { checkSlot, recordEmails, releaseSlot, reserveSlot } from "@/lib/discuss/bookings";
@@ -77,12 +78,12 @@ export async function POST(req: Request) {
     await recordEmails(reservation.id, { staff: result.staffSent, client: result.clientSent });
     if (!result.staffSent) {
       await releaseSlot(reservation.id); // nobody was told, so the time goes back on offer
-      return json({ ok: false, code: "SEND_FAILED", message: "We couldn't send your request. Please try again or call the firm." }, 502);
+      return json({ ok: false, code: "SEND_FAILED", message: `We couldn't send your request. Please try again or call the firm on ${FIRM_PHONE}.` }, 502);
     }
     return json({ ok: true, reference: result.reference, clientEmailSent: result.clientSent }, 201);
   } catch (err) {
     console.error("[mail] unexpected error:", err);
     await releaseSlot(reservation.id);
-    return json({ ok: false, code: "SEND_FAILED", message: "We couldn't send your request. Please try again or call the firm." }, 502);
+    return json({ ok: false, code: "SEND_FAILED", message: `We couldn't send your request. Please try again or call the firm on ${FIRM_PHONE}.` }, 502);
   }
 }

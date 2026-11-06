@@ -2,6 +2,7 @@ import { Bot, Mail, PhoneCall } from "lucide-react";
 import type { Site } from "@/lib/api/schemas";
 import { cleanHtml } from "@/lib/sanitize";
 import { isPending } from "@/lib/utils";
+import { FIRM_PHONE, FIRM_PHONE_TEL } from "@/lib/env";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
 import { SmartLink } from "@/components/ui/smart-link";
 import { FaqAccordion } from "./faq-accordion";
@@ -24,7 +25,7 @@ export function FaqSection({ section, headingLevel = "h2" }: { section: Site["fa
       id: f.id,
       question: f.question,
       answerHtml: isPending(f.answer)
-        ? "<p>We're preparing a full answer to this. In the meantime, message or call the firm and a member of the team will help directly.</p>"
+        ? `<p>We're preparing a full answer to this. In the meantime, message the firm or call us on <a href="${FIRM_PHONE_TEL}">${FIRM_PHONE}</a> and a member of the team will help directly.</p>`
         : cleanHtml(f.answer),
     }));
   const shq = section.stillHaveQuestions;
