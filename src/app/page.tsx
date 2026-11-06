@@ -13,7 +13,7 @@ import { PracticeCarousel } from "@/components/home/practice-carousel";
 import { ScrollRail } from "@/components/home/scroll-rail";
 import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
-import { FIGMA, cmsOr } from "@/lib/figma-assets";
+import { FIGMA, cmsOr, TEMPORARY_HOME_HERO_SECOND_SLIDE } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
 import { cn, withoutDefaultFocus } from "@/lib/utils";
 import { REVEAL } from "@/lib/motion";
@@ -33,6 +33,10 @@ export default async function HomePage() {
   const hero = {
     ...page.hero,
     image: withoutDefaultFocus(cmsOr(page.hero.image, FIGMA.heroHome)),
+    images: [
+      TEMPORARY_HOME_HERO_SECOND_SLIDE,
+      ...(page.hero.images ?? []).slice(1),
+    ],
   };
   const cardDetails = await getCardDetails(page.leadership);
   // The Figma carousel shows five focus areas, in this order. Anything else the CMS lists stays
