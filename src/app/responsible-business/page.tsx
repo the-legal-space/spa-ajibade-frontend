@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getInsight, getInsights, getPage } from "@/lib/api/endpoints";
+import { getInsights, getPage, insightHasArticle } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { formatLongDate, readPage } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
@@ -31,17 +31,6 @@ function hasOwnCover(i: { coverImage?: { url: string } | null } | undefined) {
   return !!url && !url.startsWith("/figma/");
 }
 
-/**
- * Whether a story has an article worth opening. While the CMS only holds placeholder text, its card and
- * banner slide show without links instead of leading to an empty page; they link once content is added.
- */
-async function hasArticle(slug: string) {
-  const detail = await getInsight(slug).catch(() => null);
-  if (!detail) return false;
-  const text = (detail.body ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
-  return text.length >= 80 || !!detail.videoUrl || !!detail.cta?.url;
-}
-
 /** "Responsible Business" listing: the CSR carousel plus every Pro Bono & Community Commitment story. */
 export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   const sp = await searchParams;
@@ -58,7 +47,7 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   // than stories, the extra slides are image-only.
   const count = Math.min(3, Math.max(list.data.length, banner.length));
   const linkable = new Set(
-    (await Promise.all(list.data.map(async (i) => ((await hasArticle(i.slug)) ? i.slug : null)))).filter(
+    (await Promise.all(list.data.map(async (i) => ((await insightHasArticle(i.slug)) ? i.slug : null)))).filter(
       (slug): slug is string => slug !== null,
     ),
   );

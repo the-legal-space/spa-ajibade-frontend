@@ -153,6 +153,24 @@ export const getInsight = cache(async (slug: string) => {
   }
 });
 
+/**
+ * Whether an insight has an article worth opening (real text, a video or an outbound link), as opposed to
+ * the placeholder the CMS holds for stories still being written. Used to keep CSR links inactive until then.
+ */
+export async function insightHasArticle(slug: string) {
+  const detail = await getInsight(slug).catch(() => null);
+  if (!detail) return false;
+  const text = (detail.body ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 80 || !!detail.videoUrl || !!detail.cta?.url;
+}
+
+/** Whether any Pro Bono & Community Commitment story is ready to read (the CSR page has something to show). */
+export const hasCsrStories = cache(async () => {
+  const list = await getInsights({ category: "pro_bono", sort: "newest", page: 1, pageSize: 15 }).catch(() => null);
+  if (!list) return false;
+  return (await Promise.all(list.data.map((i) => insightHasArticle(i.slug)))).some(Boolean);
+});
+
 export const getOffices = cache(() =>
   apiList("/offices", OfficeSchema, { tags: ["offices"] }).then((r) => r.data),
 );
