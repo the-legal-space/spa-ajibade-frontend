@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { getPage } from "@/lib/api/endpoints";
+import { getPage, getRecognitionDirectory } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { withoutDefaultFocus } from "@/lib/utils";
 import { cleanHtml } from "@/lib/sanitize";
@@ -23,7 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AboutPage() {
   const page = await getPage("about");
-  const { story, stats, missionSection, principles, awardsList } = page;
+  const { story, stats, missionSection, principles } = page;
+  // Only directories with awards listed by year: each row opens /recognitions/<slug>, and an empty one
+  // would lead to a page with nothing on it. Rows that link out (url, no slug) are kept as they are.
+  const withAwards = await Promise.all(
+    page.awardsList.items.map(async (item) => {
+      if (!item.slug) return item.url ? item : null;
+      const directory = await getRecognitionDirectory(item.slug).catch(() => null);
+      return directory && directory.awards.length > 0 ? item : null;
+    }),
+  );
+  const awardsList = { ...page.awardsList, items: withAwards.filter((item) => item !== null) };
 
   return (
     <>
