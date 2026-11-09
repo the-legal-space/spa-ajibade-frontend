@@ -80,7 +80,7 @@ const MANDATE_LINK = {
 
 /**
  * Figma partner card ("Partner Grid") with the "HOVER ANIMATION" state: hovering (or focusing)
- * the card grows the white "+" square into a panel over the photo with the role, primary practice area (the first in the list),
+ * the white "+" square grows into a panel over the photo with the role, primary practice area (the first in the list),
  * a short summary and "Discuss a Mandate". On touch screens the "+" toggles the panel.
  * The name still opens the attorney's profile.
  */
@@ -99,9 +99,6 @@ export function PersonCard({
       whileHover={INTERACTION.card.whileHover}
       transition={TRANSITIONS.hover}
       data-open={open || undefined}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") setOpen(true);
-      }}
       onPointerLeave={(event) => {
         if (event.pointerType === "mouse") setOpen(false);
       }}
@@ -129,6 +126,9 @@ export function PersonCard({
           <button
             type="button"
             onClick={() => setOpen((isOpen) => !isOpen)}
+            onPointerEnter={(event) => {
+              if (event.pointerType === "mouse") setOpen(true);
+            }}
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? "Hide" : "Show"} details for ${person.displayName}`}
