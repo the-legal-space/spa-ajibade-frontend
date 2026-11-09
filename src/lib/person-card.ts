@@ -2,22 +2,13 @@ import "server-only";
 import type { PersonSummary } from "@/lib/api/schemas";
 import { getPerson } from "@/lib/api/endpoints";
 import { cleanHtml } from "@/lib/sanitize";
-import { isPending } from "@/lib/utils";
+import { personCardSummary } from "@/lib/person-card-summary";
 
 export type PersonCardDetails = {
   /** In API order: the primary area comes first. */
   practiceAreas: { slug: string; title: string }[];
   summary: string | null;
 };
-
-function excerpt(html: string | null | undefined, max = 170) {
-  if (!html || isPending(html)) return null;
-  const text = cleanHtml(html).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
-  if (!text) return null;
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.]$/, "")}…`;
-}
 
 /**
  * Extra content for the partner card hover panel (Figma "HOVER ANIMATION"): practice areas and a
@@ -29,12 +20,11 @@ export async function getCardDetails(people: PersonSummary[]): Promise<Record<st
     people.map(async (p) => {
       try {
         const d = await getPerson(p.slug);
-        const quote = d.quote && !isPending(d.quote) ? `“${d.quote.trim().replace(/^“|”$/g, "")}”` : null;
         return [
           p.slug,
           {
             practiceAreas: d.practiceAreas,
-            summary: excerpt(d.bio, 240) ?? quote,
+            summary: personCardSummary(cleanHtml(d.bio), d.quote),
           },
         ] as const;
       } catch {

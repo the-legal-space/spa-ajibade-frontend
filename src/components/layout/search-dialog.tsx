@@ -11,15 +11,16 @@ import {
   type SearchResults as Results,
 } from "@/lib/api/schemas";
 import { Logo } from "@/components/ui/logo";
-import { InsightCard, PersonCard, PracticeAreaCard } from "@/components/sections/cards";
+import { InsightCard, PersonCard, PracticeAreaCard, type PersonCardDetails } from "@/components/sections/cards";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
+import { personCardSummary } from "@/lib/person-card-summary";
 
 type State =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
-  | { status: "done"; results: Results; warning?: string };
+  | { status: "done"; results: Results; cardDetails: Record<string, PersonCardDetails>; warning?: string };
 
 function matchesPersonName(query: string, name: string) {
   const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -78,7 +79,7 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
         const matchedPeople = parsed.data.people.filter((person) =>
           matchesPersonName(term, person.displayName),
         );
-        const publicationLookups = await Promise.allSettled(
+        const personLookups = await Promise.allSettled(
           matchedPeople.map(async (person) => {
             const personRes = await fetch(
               `${API_BASE_URL}/people/${encodeURIComponent(person.slug)}`,
@@ -91,25 +92,39 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
             const personJson = await personRes.json();
             const parsedPerson = PersonDetail.safeParse(personJson?.data);
             if (!parsedPerson.success) throw new Error("Unexpected attorney response.");
-            return [
-              ...(parsedPerson.data.recentPublications ?? []),
-              ...(parsedPerson.data.insights ?? []),
-            ];
+            return {
+              slug: person.slug,
+              publications: [
+                ...(parsedPerson.data.recentPublications ?? []),
+                ...(parsedPerson.data.insights ?? []),
+              ],
+              cardDetails: {
+                practiceAreas: parsedPerson.data.practiceAreas,
+                summary: personCardSummary(parsedPerson.data.bio, parsedPerson.data.quote),
+              },
+            };
           }),
         );
 
         const insightsBySlug = new Map(parsed.data.insights.map((insight) => [insight.slug, insight]));
-        for (const lookup of publicationLookups) {
+        const cardDetails: Record<string, PersonCardDetails> = {};
+        for (const lookup of personLookups) {
           if (lookup.status !== "fulfilled") continue;
-          for (const insight of lookup.value) insightsBySlug.set(insight.slug, insight);
+          cardDetails[lookup.value.slug] = lookup.value.cardDetails;
+          for (const insight of lookup.value.publications) insightsBySlug.set(insight.slug, insight);
         }
 
         if (controller.signal.aborted) return;
         setState({
           status: "done",
-          results: { ...parsed.data, insights: [...insightsBySlug.values()] },
-          warning: publicationLookups.some((lookup) => lookup.status === "rejected")
-            ? "Some attorney articles could not be loaded. Search results may be incomplete."
+          results: {
+            ...parsed.data,
+            people: matchedPeople,
+            insights: [...insightsBySlug.values()],
+          },
+          cardDetails,
+          warning: personLookups.some((lookup) => lookup.status === "rejected")
+            ? "Some attorney details or articles could not be loaded. Search results may be incomplete."
             : undefined,
         });
       } catch (err) {
@@ -129,6 +144,7 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
   };
 
   const r = state.status === "done" ? state.results : null;
+  const cardDetails = state.status === "done" ? state.cardDetails : {};
   const total = r ? r.practiceAreas.length + r.people.length + r.insights.length : 0;
 
   return (
@@ -202,7 +218,7 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
               <ResultGroup title="Attorneys" count={r.people.length}>
                 {r.people.map((p) => (
                   <MotionListItem key={p.id}>
-                    <PersonCard person={p} />
+                    <PersonCard person={p} details={cardDetails[p.slug]} />
                   </MotionListItem>
                 ))}
               </ResultGroup>
