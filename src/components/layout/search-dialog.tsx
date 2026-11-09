@@ -5,13 +5,30 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import { motion } from "motion/react";
 import { API_BASE_URL } from "@/lib/env";
-import { SearchResults, type SearchResults as Results } from "@/lib/api/schemas";
+import {
+  PersonDetail,
+  SearchResults,
+  type SearchResults as Results,
+} from "@/lib/api/schemas";
 import { Logo } from "@/components/ui/logo";
 import { InsightCard, PersonCard, PracticeAreaCard } from "@/components/sections/cards";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 
-type State = { status: "idle" } | { status: "loading" } | { status: "error"; message: string } | { status: "done"; results: Results };
+type State =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "done"; results: Results; warning?: string };
+
+function matchesPersonName(query: string, name: string) {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const normalizedName = name.toLocaleLowerCase();
+  if (normalizedName.includes(normalizedQuery)) return true;
+
+  const words = normalizedQuery.split(/\s+/).filter(Boolean);
+  return words.length > 0 && words.every((word) => word.length > 1 && normalizedName.includes(word));
+}
 
 /**
  * Full-screen site search, following the "NAV SEARCH" frames: a white page with the
@@ -57,7 +74,44 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
         const json = await res.json();
         const parsed = SearchResults.safeParse(json?.data);
         if (!parsed.success) throw new Error("Search is unavailable right now.");
-        setState({ status: "done", results: parsed.data });
+
+        const matchedPeople = parsed.data.people.filter((person) =>
+          matchesPersonName(term, person.displayName),
+        );
+        const publicationLookups = await Promise.allSettled(
+          matchedPeople.map(async (person) => {
+            const personRes = await fetch(
+              `${API_BASE_URL}/people/${encodeURIComponent(person.slug)}`,
+              {
+                signal: controller.signal,
+                headers: { Accept: "application/json" },
+              },
+            );
+            if (!personRes.ok) throw new Error("Could not load attorney publications.");
+            const personJson = await personRes.json();
+            const parsedPerson = PersonDetail.safeParse(personJson?.data);
+            if (!parsedPerson.success) throw new Error("Unexpected attorney response.");
+            return [
+              ...(parsedPerson.data.recentPublications ?? []),
+              ...(parsedPerson.data.insights ?? []),
+            ];
+          }),
+        );
+
+        const insightsBySlug = new Map(parsed.data.insights.map((insight) => [insight.slug, insight]));
+        for (const lookup of publicationLookups) {
+          if (lookup.status !== "fulfilled") continue;
+          for (const insight of lookup.value) insightsBySlug.set(insight.slug, insight);
+        }
+
+        if (controller.signal.aborted) return;
+        setState({
+          status: "done",
+          results: { ...parsed.data, insights: [...insightsBySlug.values()] },
+          warning: publicationLookups.some((lookup) => lookup.status === "rejected")
+            ? "Some attorney articles could not be loaded. Search results may be incomplete."
+            : undefined,
+        });
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
         setState({ status: "error", message: (err as Error).message });
@@ -89,7 +143,7 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
       className="m-0 h-dvh max-h-none w-screen max-w-none bg-white p-0 text-ink backdrop:bg-transparent"
     >
       <div className="sticky top-0 z-10 border-b border-mist-200 bg-white">
-        <div className="container-site flex h-[var(--header-h)] items-center gap-4">
+        <div className="container-site flex h-(--header-h) items-center gap-4">
           <Link href="/" onClick={close} className="hidden shrink-0 md:block" aria-label={`${firmName} home`}>
             <Logo firmName={firmName} descriptor={descriptor} tone="dark" />
           </Link>
@@ -126,6 +180,11 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
           <EmptyState title="Search The Firm's Site" text="Find practice areas, attorneys and insights. Type at least two characters." />
         ) : null}
         {state.status === "error" ? <EmptyState title="Search is unavailable" text={state.message} /> : null}
+        {state.status === "done" && state.warning ? (
+          <p role="status" className="mb-6 text-sm text-stone">
+            {state.warning}
+          </p>
+        ) : null}
         {r && total === 0 ? <EmptyState title={`No results for “${q.trim()}”`} text="Try a different word, such as a practice area or an attorney's name." /> : null}
 
         {r && total > 0 ? (
