@@ -7,7 +7,14 @@ import { cn } from "@/lib/utils";
 import { Media } from "@/components/ui/media";
 import { useAutoplay } from "@/components/home/scroll-rail";
 
-export type CsrSlide = { slug: string | null; title: string | null; date: string | null; image: ApiImage | null };
+export type CsrSlide = {
+  slug: string | null;
+  /** False while the story has no article yet: the slide shows its details but doesn't link. */
+  linkable?: boolean;
+  title: string | null;
+  date: string | null;
+  image: ApiImage | null;
+};
 
 /**
  * Responsible Business carousel: cross-fades through the latest stories. Hovering (or focusing)
@@ -37,19 +44,30 @@ export function CsrCarousel({ slides }: { slides: CsrSlide[] }) {
               </div>
             );
           }
+          const details = (
+            <div
+              className={cn(
+                "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-5 pb-6 pt-24 text-white md:px-6",
+                "translate-y-6 opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                "[@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
+              )}
+            >
+              {s.date ? <p className="text-xs leading-none">{s.date}</p> : null}
+              <p className="mt-3 text-xl leading-7 md:text-[1.75rem] md:leading-9">{s.title}</p>
+            </div>
+          );
+          if (s.linkable === false) {
+            return (
+              <div key={s.slug} aria-hidden={i !== index} className={layer}>
+                {media}
+                {details}
+              </div>
+            );
+          }
           return (
             <Link key={s.slug} href={`/insights/${s.slug}`} aria-hidden={i !== index} tabIndex={i === index ? 0 : -1} className={layer}>
               {media}
-              <div
-                className={cn(
-                  "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-5 pb-6 pt-24 text-white md:px-6",
-                  "translate-y-6 opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
-                  "[@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
-                )}
-              >
-                {s.date ? <p className="text-xs leading-none">{s.date}</p> : null}
-                <p className="mt-3 text-xl leading-7 md:text-[1.75rem] md:leading-9">{s.title}</p>
-              </div>
+              {details}
             </Link>
           );
         })}

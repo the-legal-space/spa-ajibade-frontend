@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { motion } from "motion/react";
 import type {
@@ -239,14 +239,36 @@ function AuthorLine({ author }: { author: Insight["author"] }) {
   );
 }
 
+/** The card image: a link to the article (kept out of the tab order; the title link is the one announced), or a plain block. */
+function ConditionalLink({ href, className, children }: { href: string | null; className: string; children: ReactNode }) {
+  return href ? (
+    <Link href={href} className={className} tabIndex={-1} aria-hidden>
+      {children}
+    </Link>
+  ) : (
+    <div className={className}>{children}</div>
+  );
+}
+
 export function InsightCard({
   insight,
   className,
+  linkable = true,
 }: {
   insight: Insight;
   className?: string;
+  /** False while the story has no article yet: the card shows, but nothing on it links to the empty page. */
+  linkable?: boolean;
 }) {
   const href = `/insights/${insight.slug}`;
+  const ctaLabel = (
+    <>
+      {insight.format === "video" ? "Watch Video" : insight.cta?.label || "Read More"}{" "}
+      <ArrowUpRight className="size-3.5" aria-hidden />
+    </>
+  );
+  const ctaClass =
+    "inline-flex shrink-0 origin-right items-center gap-1 rounded-sm border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors";
   const date = formatMonthYear(insight.publishedAt);
   const isVideo = insight.format === "video";
   return (
@@ -256,11 +278,9 @@ export function InsightCard({
       transition={TRANSITIONS.hover}
       className={cn("group flex h-full flex-col", className)}
     >
-      <Link
-        href={href}
+      <ConditionalLink
+        href={linkable ? href : null}
         className="relative block aspect-437/271 overflow-hidden rounded-sm"
-        tabIndex={-1}
-        aria-hidden
       >
         <Media
           image={insightCardCover(insight.slug, insight.coverImage)}
@@ -279,7 +299,7 @@ export function InsightCard({
             </motion.span>
           </span>
         ) : null}
-      </Link>
+      </ConditionalLink>
       {/* Chips and date stay on one line; long labels truncate rather than wrap. */}
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex min-w-0 gap-1">
@@ -304,22 +324,31 @@ export function InsightCard({
         ) : null}
       </div>
       <h3 className="mt-3 line-clamp-3 flex-1 text-base font-medium leading-7 text-ink">
-        <Link href={href} className="hover:underline">
-          {insight.title}
-        </Link>
+        {linkable ? (
+          <Link href={href} className="hover:underline">
+            {insight.title}
+          </Link>
+        ) : (
+          insight.title
+        )}
       </h3>
       <div className="mt-3 flex items-center justify-between gap-3 overflow-visible">
         <AuthorLine author={insight.author} />
-        <MotionLink
-          href={href}
-          whileHover={INTERACTION.button.whileHover}
-          whileTap={INTERACTION.button.whileTap}
-          transition={TRANSITIONS.hover}
-          className="inline-flex shrink-0 origin-right items-center gap-1 rounded-sm border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink transition-colors hover:border-ink"
-        >
-          {isVideo ? "Watch Video" : insight.cta?.label || "Read More"}{" "}
-          <ArrowUpRight className="size-3.5" aria-hidden />
-        </MotionLink>
+        {linkable ? (
+          <MotionLink
+            href={href}
+            whileHover={INTERACTION.button.whileHover}
+            whileTap={INTERACTION.button.whileTap}
+            transition={TRANSITIONS.hover}
+            className={cn(ctaClass, "hover:border-ink")}
+          >
+            {ctaLabel}
+          </MotionLink>
+        ) : (
+          <span aria-disabled="true" title="Coming soon" className={cn(ctaClass, "cursor-not-allowed opacity-50")}>
+            {ctaLabel}
+          </span>
+        )}
       </div>
     </motion.article>
   );
