@@ -105,14 +105,17 @@ export function PersonCard({
       className="group/card relative flex flex-col gap-1.5 rounded-3xl bg-white p-2 transition-shadow duration-300 hover:shadow-md"
     >
       <div className="relative aspect-square overflow-hidden rounded-[16px] bg-card-blue">
-        <Media
-          image={personPhoto(person.slug, person.photo)}
-          alt={`Portrait of ${person.displayName}`}
-          placeholder="portrait"
-          name={person.displayName}
-          sizes="(min-width:1024px) 440px, (min-width:640px) 50vw, 100vw"
-          className="object-top"
-        />
+        {/* The photo opens the profile too. It sits under the "+" panel, and the name link is the one in the tab order. */}
+        <Link href={href} tabIndex={-1} aria-hidden className="block size-full">
+          <Media
+            image={personPhoto(person.slug, person.photo)}
+            alt={`Portrait of ${person.displayName}`}
+            placeholder="portrait"
+            name={person.displayName}
+            sizes="(min-width:1024px) 440px, (min-width:640px) 50vw, 100vw"
+            className="object-top"
+          />
+        </Link>
 
         {/* The "+" square that grows into the panel (top-right anchored, like the Figma smart animate). */}
         <div
