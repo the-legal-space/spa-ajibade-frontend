@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getInsights, getPage } from "@/lib/api/endpoints";
+import { getInsight, getInsights, getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { formatLongDate, readPage } from "@/lib/utils";
 import { PageEnd } from "@/components/sections/page-end";
@@ -31,6 +31,17 @@ function hasOwnCover(i: { coverImage?: { url: string } | null } | undefined) {
   return !!url && !url.startsWith("/figma/");
 }
 
+/**
+ * Whether a story has an article worth opening. While the CMS only holds placeholder text, its card and
+ * banner slide show without links instead of leading to an empty page; they link once content is added.
+ */
+async function hasArticle(slug: string) {
+  const detail = await getInsight(slug).catch(() => null);
+  if (!detail) return false;
+  const text = (detail.body ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 80 || !!detail.videoUrl || !!detail.cta?.url;
+}
+
 /** "Responsible Business" listing: the CSR carousel plus every Pro Bono & Community Commitment story. */
 export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   const sp = await searchParams;
@@ -46,10 +57,16 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
   // Up to three slides: a story's details appear on hover; when the CMS has more carousel images
   // than stories, the extra slides are image-only.
   const count = Math.min(3, Math.max(list.data.length, banner.length));
+  const linkable = new Set(
+    (await Promise.all(list.data.map(async (i) => ((await hasArticle(i.slug)) ? i.slug : null)))).filter(
+      (slug): slug is string => slug !== null,
+    ),
+  );
   const slides = Array.from({ length: count }, (_, n) => {
     const i = list.data[n];
     return {
       slug: i?.slug ?? null,
+      linkable: !!i && linkable.has(i.slug),
       title: i?.title ?? null,
       date: i ? formatLongDate(i.publishedAt) : null,
       image:
@@ -87,7 +104,7 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
             <MotionList key={meta.page} className="mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
               {list.data.map((i) => (
                 <MotionListItem key={i.id}>
-                  <InsightCard insight={i} />
+                  <InsightCard insight={i} linkable={linkable.has(i.slug)} />
                 </MotionListItem>
               ))}
             </MotionList>
