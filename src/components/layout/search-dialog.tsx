@@ -117,7 +117,11 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
         if (controller.signal.aborted) return;
         setState({
           status: "done",
-          results: { ...parsed.data, insights: [...insightsBySlug.values()] },
+          results: {
+            ...parsed.data,
+            people: matchedPeople,
+            insights: [...insightsBySlug.values()],
+          },
           cardDetails,
           warning: personLookups.some((lookup) => lookup.status === "rejected")
             ? "Some attorney details or articles could not be loaded. Search results may be incomplete."
