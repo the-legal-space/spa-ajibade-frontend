@@ -24,6 +24,43 @@ import {
 
 // React.cache dedupes identical calls within one render (layout + page + metadata).
 
+const DIRECTORY_PERSON_ORDER = [
+  "babatunde-ajibade",
+  "john-onyido",
+  "kolawole-mayomi",
+  "bolaji-gabari",
+  "peter-olalere",
+  "moruf-sowunmi",
+  "magnus-ejelonu",
+  "emmanuel-bassey",
+  "david-essien",
+  "damilola-akinsanya",
+  "opeyemi-c-ojebode",
+  "mindy-okibe",
+  "maryam-abdulsalam",
+  "ahmad-oluwanishola-dasuki",
+  "idorenyin-ekpenyong",
+  "adedolapo-akano",
+  "attah-akejelu",
+  "becky-nwaroh",
+  "clement-afolabi",
+  "tolulope-adeyemi",
+  "chidumebi-nwosu",
+  "chisom-ofoma",
+  "hilda-okoduwa",
+  "oluchi-ogbodo",
+  "mary-ojo",
+  "florence-onagoruwa",
+  "abasiekeme-okon",
+  "faruq-anifowose",
+  "oluwabusayomi-elujoba",
+  "oreoluwa-adejumo",
+  "ayanfeoluwa-aina",
+  "albright-ehimze",
+  "yewande-shoyemi",
+];
+const DIRECTORY_PERSON_ORDER_BY_SLUG = new Map(DIRECTORY_PERSON_ORDER.map((slug, index) => [slug, index]));
+
 export const getSite = cache(() => apiGet("/site", SiteSchema, { tags: ["site"] }));
 
 export const getPage = cache(<K extends PageKey>(key: K): Promise<PageOf<K>> =>
@@ -56,6 +93,8 @@ export const getPeople = cache(
       .flatMap((r) => r.data)
       .sort(
         (a, b) =>
+          (DIRECTORY_PERSON_ORDER_BY_SLUG.get(a.slug) ?? Number.MAX_SAFE_INTEGER) -
+            (DIRECTORY_PERSON_ORDER_BY_SLUG.get(b.slug) ?? Number.MAX_SAFE_INTEGER) ||
           rank(a) - rank(b) ||
           (rank(a) >= rank({ role: "senior_associate" }) ? sortName(a).localeCompare(sortName(b), "en", { sensitivity: "base" }) : 0),
       );
