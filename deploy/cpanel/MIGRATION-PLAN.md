@@ -13,7 +13,8 @@ push to main ──► GitHub Actions builds a standalone Next.js app
 push to preprod ──► same build, published to branch `cpanel-build-preprod` (testing on cPanel; Vercel production untouched)
              ──► force-pushes the built app to branch `cpanel-build` (from main) or `cpanel-build-preprod` (from preprod)
 cPanel "Git Version Control" ──► clones the build branch straight into ~/spa-frontend (the Node app's root)
-                 Stage B tests `cpanel-build-preprod`; cutover switches the checked-out branch to `cpanel-build`
+                 Stage B tested `cpanel-build-preprod`, and the launch uses that same build (decided 18 Nov 2026);
+                 production moves to `cpanel-build` (from main) later, once main has caught up
                  later deploys: "Update from Remote", then Restart in Setup Node.js App
 LiteSpeed ──► serves real files in public_html first (articles/, wp-content/); everything else goes to Node
 ```
@@ -119,18 +120,26 @@ Repo Variables (public values only): `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SI
 
 ## Phase 3: cutover (Stage C; about 1 hour, quiet time, human present)
 
-1. JetBackup on-demand backup + download `public_html/.htaccess`.
-2. Create `~/site-archive-YYYY-MM-DD/` and **move** everything in `public_html` except `articles/`, `wp-content/`, `.well-known/`, `.htaccess`.
-3. Node app: URL → domain root (empty path), startup file → `server.js`. Save, Restart.
-4. Replace `public_html/.htaccess` with `deploy/cpanel/htaccess`, keeping any Passenger block cPanel added.
-5. Smoke test, then by hand: an attorney page, a practice page, an old article URL, a booking, the 404 page.
-6. Backend dev points the content webhook at `https://spaajibade.com/api/revalidate`.
+Launches the **`cpanel-build-preprod`** build that passed Stage B (no branch switch, no merge to main).
+Gate: `/spa-preflight` says "all checks passed", or you knowingly launch with email still pending.
 
-**Rollback (5 minutes):** Node app → Stop; move files back from the archive; restore the old `.htaccess`.
+Order keeps the broken window to a few minutes (real files in `public_html` win over Node, so the old
+site keeps answering until its files are moved out):
+
+1. Backup (and check it includes `public_html` and the 3 databases) + download `public_html/.htaccess`.
+2. Node app: URL → domain root (empty path), startup file → `server.js`. Save, Restart. cPanel adds its Passenger block to `public_html/.htaccess`.
+3. Replace the rest of `public_html/.htaccess` with `deploy/cpanel/htaccess`, keeping the Passenger block.
+4. Create `~/site-archive-YYYY-MM-DD/` and **move** everything in `public_html` except `articles/`, `wp-content/`, `.well-known/`, `.htaccess` and any folder cPanel manages for the app.
+5. Check pages in the browser, then `node scripts/smoke.mjs https://spaajibade.com` from a laptop.
+6. Backend dev points the content webhook at `https://spaajibade.com/api/revalidate` (with the real `REVALIDATE_SECRET`).
+
+**Rollback (5 minutes):** Node app → Stop; move files back from the archive; restore the old `.htaccess`. The prompt is in `BROWSER-AGENT-PROMPT.md`, Stage C.
 
 ## Each deploy after launch
 
-Merge to `main` → Actions rebuilds `cpanel-build` (a merge to `preprod` rebuilds `cpanel-build-preprod` for testing) → cPanel Git Version Control → Manage → **Update from Remote** → Setup Node.js App → **Restart**.
+Until production moves to `main`: merge to `preprod` → Actions rebuilds `cpanel-build-preprod` → cPanel Git Version Control → Manage → **Update from Remote** → Setup Node.js App → **Restart**. Pushes to `preprod` therefore reach the live site once someone clicks Update from Remote, so test on Vercel's preview first.
+
+Later, when `main` has caught up: switch the checked-out branch to `cpanel-build` once, then deploy from `main` the same way.
 
 ## Clean-up after launch
 
