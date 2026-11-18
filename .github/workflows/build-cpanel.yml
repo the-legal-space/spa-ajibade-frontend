@@ -28,7 +28,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moves to Ubuntu 26, and the build must match the server's x64 glibc.
+    runs-on: ubuntu-24.04
     env:
       NEXT_OUTPUT: standalone
       NEXT_TELEMETRY_DISABLED: "1"
@@ -39,7 +40,7 @@ jobs:
       OUT_BRANCH: ${{ github.ref_name == 'main' && 'cpanel-build' || 'cpanel-build-preprod' }}
       RELEASE_TAG: ${{ github.ref_name == 'main' && 'cpanel-latest' || 'cpanel-preprod' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check the public build settings
         run: |
@@ -49,7 +50,7 @@ jobs:
           done
           exit $missing
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
