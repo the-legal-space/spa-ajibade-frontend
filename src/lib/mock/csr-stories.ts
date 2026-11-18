@@ -6,14 +6,15 @@ import { isPending } from "@/lib/utils";
  * page, its carousel and the article pages have something to show until the CMS has real ones.
  *
  * Real stories from the API always come first; these only top the list up (see endpoints.ts).
- * Enabled for local development and Vercel preview deployments, disabled on Vercel production.
- * Override with MOCK_CSR=on or MOCK_CSR=off.
+ * Enabled for local development and Vercel preview deployments. Disabled on Vercel production and on
+ * any other production host (cPanel), where VERCEL_ENV is not set. Override with MOCK_CSR=on or MOCK_CSR=off.
  */
 export function mockCsrEnabled() {
   const flag = process.env.MOCK_CSR;
   if (flag === "on") return true;
   if (flag === "off") return false;
-  return process.env.VERCEL_ENV !== "production";
+  if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV !== "production";
+  return process.env.NODE_ENV !== "production";
 }
 
 const CHIP = "Pro Bono & Community Commitment";

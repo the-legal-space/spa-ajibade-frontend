@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPage } from "@/lib/api/endpoints";
+import { getPage, hasCsrStories } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PracticeAreasPage() {
-  const page = await getPage("practice-areas");
+  const [page, csrReady] = await Promise.all([getPage("practice-areas"), hasCsrStories()]);
   const csr = page.csrBanner;
   // The CSR banner is a carousel of the CMS images (older payloads send a single `image`).
   const csrSeen = new Set<string>();
@@ -88,10 +88,21 @@ export default async function PracticeAreasPage() {
                 </p>
                 <HeroDots className="mt-5" />
                 {csr.cta ? (
-                  <SmartLink
-                    link={csr.cta}
-                    className={buttonClass("ghostDark", "mt-6")}
-                  />
+                  csrReady ? (
+                    <SmartLink
+                      link={csr.cta}
+                      className={buttonClass("ghostDark", "mt-6")}
+                    />
+                  ) : (
+                    // No CSR story has been written up yet: show the button, but don't send people to an empty page.
+                    <span
+                      aria-disabled="true"
+                      title="Coming soon"
+                      className={buttonClass("ghostDark", "mt-6 cursor-not-allowed opacity-60 hover:bg-white/5")}
+                    >
+                      {csr.cta.label}
+                    </span>
+                  )
                 ) : null}
               </div>
               </HeroSlideshow>

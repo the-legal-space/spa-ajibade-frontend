@@ -79,18 +79,18 @@ export const getPracticeArea = cache((slug: string) =>
 
 export const getPeople = cache(
   async (params: { role?: string; practiceArea?: string; sort?: "seniority" | "name_asc" | "name_desc"; page?: number; pageSize?: number }) => {
-    if (params.sort && params.sort !== "seniority") return apiList("/people", PersonSummary, { query: params, tags: ["people"] });
-    // Seniority: group by role here so a role corrected in lib/person-overrides lands in its group
-    // (Associates before Trainee Associates). Associate levels are alphabetical within each role; partners and
-    // management keep the API's seniority order (the sort is stable).
+    // Fetch every page so the directory can show a whole tab at once (pageSize: Infinity).
     const fetchPage = (page: number) =>
       apiList("/people", PersonSummary, { query: { ...params, page, pageSize: 50 }, tags: ["people"] });
     const first = await fetchPage(1);
     const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.totalPages ?? 1) - 1) }, (_, i) => fetchPage(i + 2)));
+    const fetched = [first, ...rest].flatMap((r) => r.data);
+    // Name sorts keep the API's order. Seniority: group by role here so a role corrected in lib/person-overrides
+    // lands in its group (Associates before Trainee Associates). Associate levels are alphabetical within each
+    // role; partners and management keep the API's seniority order (the sort is stable).
     const rank = (p: Pick<PersonSummary, "role">) => PersonRole.options.indexOf(p.role);
     const sortName = (p: PersonSummary) => p.displayName.replace(/^(Dr|Mr|Mrs|Ms|Prof)\.?\s+/i, "");
-    const all = [first, ...rest]
-      .flatMap((r) => r.data)
+    const all = params.sort && params.sort !== "seniority" ? fetched : fetched
       .sort(
         (a, b) =>
           (DIRECTORY_PERSON_ORDER_BY_SLUG.get(a.slug) ?? Number.MAX_SAFE_INTEGER) -
@@ -190,6 +190,24 @@ export const getInsight = cache(async (slug: string) => {
     if (fallback) return fallback;
     throw error;
   }
+});
+
+/**
+ * Whether an insight has an article worth opening (real text, a video or an outbound link), as opposed to
+ * the placeholder the CMS holds for stories still being written. Used to keep CSR links inactive until then.
+ */
+export async function insightHasArticle(slug: string) {
+  const detail = await getInsight(slug).catch(() => null);
+  if (!detail) return false;
+  const text = (detail.body ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  return text.length >= 80 || !!detail.videoUrl || !!detail.cta?.url;
+}
+
+/** Whether any Pro Bono & Community Commitment story is ready to read (the CSR page has something to show). */
+export const hasCsrStories = cache(async () => {
+  const list = await getInsights({ category: "pro_bono", sort: "newest", page: 1, pageSize: 15 }).catch(() => null);
+  if (!list) return false;
+  return (await Promise.all(list.data.map((i) => insightHasArticle(i.slug)))).some(Boolean);
 });
 
 export const getOffices = cache(() =>
