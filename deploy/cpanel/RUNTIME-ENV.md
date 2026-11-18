@@ -19,7 +19,6 @@ the GitHub repo Variables (see `.github/workflows/build-cpanel.yml`).
 | `SMTP_PORT` | no | *(unset)* | Defaults to `465` (SSL). Use `587` for Microsoft 365 |
 | `SMTP_SECURE` | no | *(unset)* | Follows the port. `false` with 587 (the code still insists on TLS) |
 | `MAIL_FROM` | no | `"SPA Ajibade & Co." <address>` | Defaults to `MAIL_USER`. Must be an address the account may send as |
-
 | `MAIL_SIGNING_SECRET` | yes | 64 random characters | Signs the "forward this booking" links. Generate a new one; don't reuse a password |
 | `REVALIDATE_SECRET` | yes | 64 random characters | Shared with the backend's content-changed webhook (`/api/revalidate`) |
 | `MAIL_MESSAGE_TO` | no | `lagosoffice@spaajibade.com` | Inbox for contact messages (that's the default) |
