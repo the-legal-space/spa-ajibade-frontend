@@ -20,15 +20,16 @@ the GitHub repo Variables (see `.github/workflows/build-cpanel.yml`).
 | `SMTP_SECURE` | no | *(unset)* | Follows the port. `false` with 587 (the code still insists on TLS) |
 | `MAIL_FROM` | no | `"SPA Ajibade & Co." <address>` | Defaults to `MAIL_USER`. Must be an address the account may send as |
 
-**Mail at launch matches Vercel** (decided 18 Nov 2026): the same Gmail login, no `SMTP_*` settings. Moving to
-`bookings@spaajibade.com` on Microsoft 365 later means setting `SMTP_HOST=smtp.office365.com`, `SMTP_PORT=587`,
-`SMTP_SECURE=false`, the mailbox login and `MAIL_FROM`, with Authenticated SMTP enabled for that mailbox.
 | `MAIL_SIGNING_SECRET` | yes | 64 random characters | Signs the "forward this booking" links. Generate a new one; don't reuse a password |
 | `REVALIDATE_SECRET` | yes | 64 random characters | Shared with the backend's content-changed webhook (`/api/revalidate`) |
 | `MAIL_MESSAGE_TO` | no | `lagosoffice@spaajibade.com` | Inbox for contact messages (that's the default) |
 | `MAIL_BCC` | no | `frontoffice@spaajibade.com` | Extra inbox copied on attorney booking emails |
 | `MAIL_FORWARD_DOMAINS` | no | `spaajibade.com` | Domains a booking may be forwarded to (that's the default) |
 | `MAIL_ALLOWED_ORIGINS` | no | `https://www.spaajibade.com` | Extra origins allowed to post the forms (the site URL is always allowed) |
+
+**Mail at launch matches Vercel** (decided 18 Nov 2026): the same Gmail login, no `SMTP_*` settings. Moving to
+`bookings@spaajibade.com` on Microsoft 365 later means setting `SMTP_HOST=smtp.office365.com`, `SMTP_PORT=587`,
+`SMTP_SECURE=false`, the mailbox login and `MAIL_FROM`, with Authenticated SMTP enabled for that mailbox.
 
 To generate a random secret on a Mac: `openssl rand -hex 32`
 
