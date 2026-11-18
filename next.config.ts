@@ -42,7 +42,8 @@ const csp = [
 
 const securityHeaders = [
   { key: "Content-Security-Policy", value: csp },
-  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  // No includeSubDomains/preload: other subdomains (luncheon, Microsoft's autodiscover) aren't ours to force onto HTTPS.
+  { key: "Strict-Transport-Security", value: "max-age=63072000" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -53,6 +54,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // Keep nodemailer as a real package in the standalone build, so the cPanel preflight check can load it.
+  serverExternalPackages: ["nodemailer"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
