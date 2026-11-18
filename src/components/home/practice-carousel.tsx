@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import type { ApiLink, PracticeAreaCard } from "@/lib/api/schemas";
 import { cn } from "@/lib/utils";
 import { practiceImage } from "@/lib/figma-assets";
+import { PRACTICE_SHORT_LABELS } from "@/lib/content-overrides";
 import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
@@ -73,7 +74,7 @@ export function PracticeCarousel({ areas, cta }: { areas: PracticeAreaCard[]; ct
               i === index ? "bg-cream/16 font-semibold" : "hover:bg-cream/8",
             )}
           >
-            {a.shortLabel}
+            {PRACTICE_SHORT_LABELS[a.slug] ?? a.shortLabel}
           </motion.button>
         ))}
       </div>

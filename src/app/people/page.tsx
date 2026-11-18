@@ -3,13 +3,13 @@ import Link from "next/link";
 import { Users } from "lucide-react";
 import { getPage, getPeople } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
-import { readPage, readString } from "@/lib/utils";
+import { readString } from "@/lib/utils";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { PersonCard } from "@/components/sections/cards";
 import { getCardDetails } from "@/lib/person-card";
 import { Eyebrow, Heading, Section } from "@/components/ui/primitives";
-import { FilterTabs, ListingResults, Pagination } from "@/components/ui/listing-controls";
+import { FilterTabs, ListingResults } from "@/components/ui/listing-controls";
 import { PeopleSortMenu } from "@/components/ui/people-sort-menu";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
@@ -38,11 +38,9 @@ export default async function PeoplePage({ searchParams }: Props) {
   const practiceArea = readString(sp.practiceArea)?.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0];
   const sortRaw = readString(sp.sort);
   const sort = SORTS.find((s) => s.value === sortRaw)?.value ?? "seniority";
-  const page = readPage(sp.page);
-
-  const people = await getPeople({ role, practiceArea, sort, page, pageSize: 15 });
+  // Everyone in a tab shows on one page (no pagination); card photos lazy-load as they scroll in.
+  const people = await getPeople({ role, practiceArea, sort, pageSize: Infinity });
   const current = { role, practiceArea, sort: sort === "seniority" ? undefined : sort };
-  const meta = people.meta ?? { page, totalPages: 1 };
   const cardDetails = await getCardDetails(people.data);
   // Human-readable names of the filters in use, for the empty state ("Partners in Tax").
   const activeFilters = [
@@ -73,7 +71,7 @@ export default async function PeoplePage({ searchParams }: Props) {
 
         <ListingResults>
         {people.data.length > 0 ? (
-          <MotionList key={`${role}|${practiceArea}|${sort}|${page}`} className="mt-2 md:mt-8 grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <MotionList key={`${role}|${practiceArea}|${sort}`} className="mt-2 md:mt-8 grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {people.data.map((p) => (
               <MotionListItem key={p.id}>
                 <PersonCard person={p} details={cardDetails[p.slug]} />
@@ -97,7 +95,6 @@ export default async function PeoplePage({ searchParams }: Props) {
           </Reveal>
         )}
 
-        {people.data.length > 0 ? <Pagination page={meta.page} totalPages={meta.totalPages} base="/people" current={current} /> : null}
         </ListingResults>
       </Section>
 

@@ -15,6 +15,7 @@ import { VideoShowcase } from "@/components/home/video-showcase";
 import { RecognitionFeature } from "@/components/home/recognition-feature";
 import { FIGMA, cmsOr, TEMPORARY_HOME_HERO_SECOND_SLIDE } from "@/lib/figma-assets";
 import { getCardDetails } from "@/lib/person-card";
+import { ABOUT_FIRM_PARAGRAPHS } from "@/lib/content-overrides";
 import { cn, withoutDefaultFocus } from "@/lib/utils";
 import { REVEAL } from "@/lib/motion";
 import { MotionP } from "@/components/ui/motion-p";
@@ -28,7 +29,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const page = await getPage("home");
-  const { aboutFirm, whyChooseUs } = page;
+  const { whyChooseUs } = page;
+  const aboutFirm = { ...page.aboutFirm, paragraphs: ABOUT_FIRM_PARAGRAPHS };
   // CMS hero image and slides; the Figma photograph only fills in when the CMS has none.
   const hero = {
     ...page.hero,
