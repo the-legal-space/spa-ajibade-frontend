@@ -10,8 +10,10 @@ Vercel stays as the preview/staging host. The backend and database are out of sc
 ```
 push to main ──► GitHub Actions builds a standalone Next.js app
                  (NEXT_PUBLIC_* from repo Variables, no .env, no secrets)
-             ──► force-pushes the built app to branch `cpanel-build`
-cPanel "Git Version Control" ──► clones `cpanel-build` straight into ~/spa-frontend (the Node app's root)
+push to preprod ──► same build, published to branch `cpanel-build-preprod` (testing on cPanel; Vercel production untouched)
+             ──► force-pushes the built app to branch `cpanel-build` (from main) or `cpanel-build-preprod` (from preprod)
+cPanel "Git Version Control" ──► clones the build branch straight into ~/spa-frontend (the Node app's root)
+                 Stage B tests `cpanel-build-preprod`; cutover switches the checked-out branch to `cpanel-build`
                  later deploys: "Update from Remote", then Restart in Setup Node.js App
 LiteSpeed ──► serves real files in public_html first (articles/, wp-content/); everything else goes to Node
 ```
@@ -100,7 +102,7 @@ Firm actions: create the mailbox, enable Authenticated SMTP for it only, give it
 - [x] **`serverExternalPackages: ["nodemailer"]`** so the standalone build ships nodemailer as a package the preflight can load.
 - [x] **Health check:** `GET /api/health` → `{ ok, apiReachable, mongo, mail }`, no secrets, never sends mail.
 - [x] **`deploy/cpanel/preflight.js`** (shipped in the build): a tiny Node server for the private test. It checks outbound TCP to Atlas (SRV lookup) and `smtp.office365.com:587`, runs nodemailer's `verify()` (logs in, sends nothing), starts `server.js` on `127.0.0.1:3999`, fetches `/`, `/people`, `/practice-areas`, `/api/health`, and prints the results as plain text. No secrets in its output.
-- [x] **`.github/workflows/build-cpanel.yml`:** on push to `main` + manual. Node 22, `npm ci`, `NEXT_OUTPUT=standalone npm run build`. Assemble `.next/standalone` + `.next/static` + `public` + `preflight.js`, **fail if any `.env*` file is present**, force-push to `cpanel-build`, and attach `spa-frontend.zip` to a release (fallback route).
+- [x] **`.github/workflows/build-cpanel.yml`:** on push to `main` or `preprod` + manual. Node 22, `npm ci`, `NEXT_OUTPUT=standalone npm run build`. Assemble `.next/standalone` + `.next/static` + `public` + `preflight.js`, **fail if any `.env*` file is present**, force-push to `cpanel-build` (main) or `cpanel-build-preprod` (preprod), and attach `spa-frontend.zip` to a release (fallback route).
 - [x] **`deploy/cpanel/htaccess`:** done (keeps archived-article rules and the PHP block; drops the `/people`, `/practice-areas` and `.html` rules).
 - [x] **`deploy/cpanel/RUNTIME-ENV.md`:** every runtime variable, required or not, example shape (never a value). Never `MAIL_TEST_RECIPIENT` or `MOCK_CSR=on`.
 - [x] **`scripts/smoke.mjs <baseUrl>`:** run from a laptop after cutover.
@@ -110,7 +112,7 @@ Repo Variables (public values only): `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SI
 ## Phase 2: server prep (browser agent, Stage B; visitors see no change)
 
 1. JetBackup: confirm last night's backup exists; create an on-demand one.
-2. Git Version Control → Create: clone `https://github.com/the-legal-space/spa-ajibade-frontend.git`, branch `cpanel-build`, path `spa-frontend`.
+2. Git Version Control → Create: clone `https://github.com/the-legal-space/spa-ajibade-frontend.git`, branch `cpanel-build-preprod`, path `spa-frontend`.
 3. Setup Node.js App → Create: Node **22.23.5**, Production, root `spa-frontend`, URL `spaajibade.com/spa-preflight`, startup file **`preflight.js`**. Do not run NPM Install.
 4. Human adds the environment variables. Save, Restart.
 5. Open `https://spaajibade.com/spa-preflight` and report the output. A sub-path can't show the real site (its `/_next/` assets would hit the old static files), which is why the preflight script tests the site privately on the server.
@@ -128,7 +130,7 @@ Repo Variables (public values only): `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_SI
 
 ## Each deploy after launch
 
-Merge to `main` → Actions rebuilds `cpanel-build` → cPanel Git Version Control → Manage → **Update from Remote** → Setup Node.js App → **Restart**.
+Merge to `main` → Actions rebuilds `cpanel-build` (a merge to `preprod` rebuilds `cpanel-build-preprod` for testing) → cPanel Git Version Control → Manage → **Update from Remote** → Setup Node.js App → **Restart**.
 
 ## Clean-up after launch
 

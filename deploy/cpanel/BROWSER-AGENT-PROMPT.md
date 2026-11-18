@@ -3,7 +3,7 @@
 Paste one stage at a time, after signing in to cPanel yourself. Each stage ends with a report; send it back to Claude Code before starting the next.
 
 - **Stage A (discovery):** done 18 Nov 2026. Findings are in `MIGRATION-PLAN.md` ("Known facts").
-- **Stage B (prep):** only after the GitHub `cpanel-build` branch exists (Phase 1 merged).
+- **Stage B (prep):** only after the GitHub `cpanel-build-preprod` branch exists (Phase 1 merged into `preprod` and the workflow has run).
 - **Stage C (cutover):** only after Stage B passes and the content API is up.
 
 The account has **no shell access**, so nothing here uses Terminal or SSH.
@@ -28,7 +28,7 @@ Steps:
    - Repository Path: spa-frontend
    - Repository Name: spa-frontend
    Click Create. If cPanel refuses because shell access is disabled, STOP and report the exact message.
-   Otherwise open Manage > Basic Information, set "Checked-Out Branch" to cpanel-build, and save/update.
+   Otherwise open Manage > Basic Information, set "Checked-Out Branch" to cpanel-build-preprod, and save/update.
    Then Pull or Deploy > "Update from Remote". Report the HEAD commit shown.
    In File Manager, confirm /home/spaajibade/spa-frontend contains server.js, preflight.js, .next/ and public/,
    and that there is NO file starting with ".env" (show hidden files). If an .env file exists, STOP and tell me.
@@ -60,7 +60,9 @@ If any step fails, stop and tell me; I may ask you to run the rollback at the bo
 3. File Manager: create folder /home/spaajibade/site-archive-<today's date> (NOT inside public_html).
    MOVE into it everything at the top of public_html EXCEPT: articles/, wp-content/, .well-known/, .htaccess.
    List what you moved.
-4. Setup Node.js App: edit the spa-frontend app.
+4. Git Version Control > spa-frontend > Manage: set "Checked-Out Branch" to cpanel-build (the production build from main),
+   then Pull or Deploy > "Update from Remote". Report the HEAD commit.
+   Setup Node.js App: edit the spa-frontend app.
    - Application URL: spaajibade.com with an EMPTY path (the domain root)
    - Application startup file: server.js
    Save, then Restart. Note any Passenger/CloudLinux lines cPanel adds to public_html/.htaccess.
