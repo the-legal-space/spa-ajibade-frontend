@@ -88,12 +88,19 @@ jobs:
         working-directory: dist
         run: |
           set -euo pipefail
+          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
           git init -q -b "$OUT_BRANCH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Each build is a child of the previous one, so cPanel's "Update from Remote" (a fast-forward
+          # pull) works. A build with unrelated history makes cPanel fail with "could not contact the
+          # remote repository".
+          if git fetch -q --depth=1 "$remote" "$OUT_BRANCH"; then
+            git reset -q --soft FETCH_HEAD
+          fi
           git add -A
-          git commit -q -m "Build of ${GITHUB_REF_NAME}@${GITHUB_SHA::7} for cPanel"
-          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "$OUT_BRANCH"
+          git commit -q --allow-empty -m "Build of ${GITHUB_REF_NAME}@${GITHUB_SHA::7} for cPanel"
+          git push -q "$remote" "HEAD:refs/heads/$OUT_BRANCH"
 
       - name: Attach spa-frontend.zip to the release
         env:
