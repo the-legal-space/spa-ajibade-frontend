@@ -13,6 +13,7 @@ import { CmsIcon } from "@/components/ui/icon";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
+import { STORY } from "@/lib/content-overrides";
 import { buttonClass } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -23,7 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AboutPage() {
   const page = await getPage("about");
-  const { story, stats, missionSection, principles } = page;
+  const { stats, missionSection, principles } = page;
+  const story = { ...page.story, ...STORY };
   // Only directories with awards listed by year: each row opens /recognitions/<slug>, and an empty one
   // would lead to a page with nothing on it. Rows that link out (url, no slug) are kept as they are.
   const withAwards = await Promise.all(
