@@ -1,6 +1,9 @@
-# Builds the site for the firm's cPanel (Setup Node.js App) and publishes the result to the
-# `cpanel-build` branch, which cPanel's Git Version Control clones into ~/spa-frontend.
-# Also attaches spa-frontend.zip to the `cpanel-latest` release (fallback: upload + extract in File Manager).
+# Builds the site for the firm's cPanel (Setup Node.js App) and publishes the built app to a branch
+# that cPanel's Git Version Control clones into ~/spa-frontend:
+#   main    -> `cpanel-build`          (production)
+#   preprod -> `cpanel-build-preprod`  (testing on cPanel before a release; Vercel production is untouched)
+# Also attaches spa-frontend.zip to a release (`cpanel-latest` / `cpanel-preprod`) as a fallback:
+# upload + extract in File Manager.
 #
 # Builds on Linux x64 so native packages match the server, and in a clean runner so no .env file
 # (secrets) can end up in the published output. Server secrets are entered in cPanel, never here.
@@ -13,7 +16,7 @@ name: Build for cPanel
 
 on:
   push:
-    branches: [main]
+    branches: [main, preprod]
   workflow_dispatch:
 
 permissions:
@@ -33,6 +36,8 @@ jobs:
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
       NEXT_PUBLIC_CONSENT_TEXT_VERSION: ${{ vars.NEXT_PUBLIC_CONSENT_TEXT_VERSION }}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+      OUT_BRANCH: ${{ github.ref_name == 'main' && 'cpanel-build' || 'cpanel-build-preprod' }}
+      RELEASE_TAG: ${{ github.ref_name == 'main' && 'cpanel-latest' || 'cpanel-preprod' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -64,7 +69,7 @@ jobs:
           # Passenger's restart trigger lives here; keep the folder in git.
           mkdir -p dist/tmp && touch dist/tmp/.keep
           cat > dist/DEPLOY.md <<EOF
-          Built from ${GITHUB_REPOSITORY}@${GITHUB_SHA} on $(date -u +%Y-%m-%dT%H:%MZ).
+          Built from ${GITHUB_REPOSITORY}@${GITHUB_SHA} (${GITHUB_REF_NAME}) on $(date -u +%Y-%m-%dT%H:%MZ).
           Startup file: server.js (preflight.js for the pre-launch check). Do not run NPM Install.
           See deploy/cpanel/MIGRATION-PLAN.md on main.
           EOF
@@ -78,24 +83,24 @@ jobs:
             echo "::error::A MongoDB connection string with a password is baked into the build"; exit 1
           fi
 
-      - name: Publish to the cpanel-build branch
+      - name: Publish to the build branch
         working-directory: dist
         run: |
           set -euo pipefail
-          git init -q -b cpanel-build
+          git init -q -b "$OUT_BRANCH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -q -m "Build of ${GITHUB_SHA::7} for cPanel"
-          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" cpanel-build
+          git commit -q -m "Build of ${GITHUB_REF_NAME}@${GITHUB_SHA::7} for cPanel"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "$OUT_BRANCH"
 
-      - name: Attach spa-frontend.zip to the cpanel-latest release
+      - name: Attach spa-frontend.zip to the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           (cd dist && rm -rf .git && zip -qr ../spa-frontend.zip .)
-          gh release delete cpanel-latest --yes --cleanup-tag || true
-          gh release create cpanel-latest spa-frontend.zip --target "$GITHUB_SHA" --latest=false \
-            --title "cPanel build ${GITHUB_SHA::7}" \
+          gh release delete "$RELEASE_TAG" --yes --cleanup-tag || true
+          gh release create "$RELEASE_TAG" spa-frontend.zip --target "$GITHUB_SHA" --latest=false --prerelease \
+            --title "cPanel build ${GITHUB_REF_NAME}@${GITHUB_SHA::7}" \
             --notes "Fallback for cPanel without Git: upload spa-frontend.zip to ~/spa-frontend in File Manager and extract it there."
