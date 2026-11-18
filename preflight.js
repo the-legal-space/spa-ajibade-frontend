@@ -51,9 +51,10 @@ function checkFiles(out) {
 
 function checkEnv(out) {
   out.push("", "== Settings (present or not; values are never shown)");
-  const required = ["MONGODB_URI", "MAIL_USER", "MAIL_PASS", "SMTP_HOST", "SMTP_PORT", "MAIL_FROM", "MAIL_SIGNING_SECRET", "REVALIDATE_SECRET"];
+  // SMTP_HOST/PORT/SECURE and MAIL_FROM have code defaults (Gmail on 465, sender = MAIL_USER), as on Vercel.
+  const required = ["MONGODB_URI", "MAIL_USER", "MAIL_PASS", "MAIL_SIGNING_SECRET", "REVALIDATE_SECRET"];
   for (const name of required) out.push(line(!!process.env[name], name, process.env[name] ? "set" : "MISSING"));
-  for (const name of ["MAIL_BCC", "MAIL_MESSAGE_TO", "MAIL_FORWARD_DOMAINS", "MONGODB_DB"]) {
+  for (const name of ["SMTP_HOST", "SMTP_PORT", "SMTP_SECURE", "MAIL_FROM", "MAIL_BCC", "MAIL_MESSAGE_TO", "MAIL_FORWARD_DOMAINS", "MONGODB_DB"]) {
     out.push(line(null, name, process.env[name] ? "set" : "not set (optional)"));
   }
   const mustBeUnset = { MAIL_TEST_RECIPIENT: "sends attorney emails to a test inbox", MAIL_DRY_RUN: "sends no email at all" };
