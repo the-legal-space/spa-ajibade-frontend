@@ -1,5 +1,5 @@
 export const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://spaaco.onrender.com/api/v1"
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://spaaco-m9cs.onrender.com/api/v1"
 ).replace(/\/$/, "");
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
