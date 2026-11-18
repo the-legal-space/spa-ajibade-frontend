@@ -13,12 +13,16 @@ the GitHub repo Variables (see `.github/workflows/build-cpanel.yml`).
 | `NODE_ENV` | yes | `production` | Production mode (cPanel's "Production" mode usually sets it; set it anyway) |
 | `MONGODB_URI` | yes | `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/` | Stores bookings and blocks double bookings. Atlas must allow `91.204.209.21/32` |
 | `MONGODB_DB` | no | `spa_ajibade` | Database name (default `spa_ajibade`) |
-| `SMTP_HOST` | yes | `smtp.office365.com` | Firm's Microsoft 365 |
-| `SMTP_PORT` | yes | `587` | STARTTLS port |
-| `SMTP_SECURE` | yes | `false` | `false` on 587 (the connection is upgraded to TLS; the code refuses to continue without it) |
-| `MAIL_USER` | yes | `bookings@spaajibade.com` | Mailbox that sends the site's emails (SMTP AUTH enabled for it only) |
-| `MAIL_PASS` | yes | *(the mailbox password)* | |
-| `MAIL_FROM` | yes | `"SPA Ajibade & Co." <bookings@spaajibade.com>` | Must be the same mailbox as `MAIL_USER` (or one it may send as) |
+| `MAIL_USER` | yes | *(same as Vercel)* | The sending account. Today this is the Gmail account Vercel uses |
+| `MAIL_PASS` | yes | *(same as Vercel)* | Its app password |
+| `SMTP_HOST` | no | *(unset, as on Vercel)* | Defaults to `smtp.gmail.com`. Set `smtp.office365.com` only when moving to a Microsoft 365 mailbox |
+| `SMTP_PORT` | no | *(unset)* | Defaults to `465` (SSL). Use `587` for Microsoft 365 |
+| `SMTP_SECURE` | no | *(unset)* | Follows the port. `false` with 587 (the code still insists on TLS) |
+| `MAIL_FROM` | no | `"SPA Ajibade & Co." <address>` | Defaults to `MAIL_USER`. Must be an address the account may send as |
+
+**Mail at launch matches Vercel** (decided 18 Nov 2026): the same Gmail login, no `SMTP_*` settings. Moving to
+`bookings@spaajibade.com` on Microsoft 365 later means setting `SMTP_HOST=smtp.office365.com`, `SMTP_PORT=587`,
+`SMTP_SECURE=false`, the mailbox login and `MAIL_FROM`, with Authenticated SMTP enabled for that mailbox.
 | `MAIL_SIGNING_SECRET` | yes | 64 random characters | Signs the "forward this booking" links. Generate a new one; don't reuse a password |
 | `REVALIDATE_SECRET` | yes | 64 random characters | Shared with the backend's content-changed webhook (`/api/revalidate`) |
 | `MAIL_MESSAGE_TO` | no | `lagosoffice@spaajibade.com` | Inbox for contact messages (that's the default) |
