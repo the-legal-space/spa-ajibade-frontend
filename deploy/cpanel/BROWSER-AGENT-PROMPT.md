@@ -49,9 +49,16 @@ Steps:
 
 ## Stage C: cutover (human present, quiet time)
 
-Launches the `cpanel-build-preprod` build that passed Stage B: no branch switch, no merge to `main`.
-**Before pasting:** `/spa-preflight` should say "all checks passed" (or you accept launching with email
-still pending), and nobody should push to `preprod` during the switch.
+Launches the `cpanel-build-preprod` build: no branch switch, no merge to `main`. A full trial of these steps
+ran on 18 Nov 2026 (switched, checked, rolled back); the lessons are built in below.
+
+**Before pasting, all of these:**
+- [ ] Git Version Control > spa-frontend > Update from Remote, then Setup Node.js App > **Stop, then Start**
+      (Restart alone can leave the old process running).
+- [ ] `/spa-preflight` (hard reload) says "all checks passed", including `SMTP login (nothing sent)`.
+- [ ] `REVALIDATE_SECRET` in cPanel is a real random value, not a placeholder.
+- [ ] The backend dev is ready to point the webhook at `https://spaajibade.com/api/revalidate`.
+- [ ] Nobody pushes to `preprod` until the launch is done.
 
 ```text
 I'm signed in to cPanel and I'm watching. We are switching spaajibade.com from the old static site to the
@@ -67,8 +74,11 @@ Rules:
    a. JetBackup 5 > Create Backup On Demand. Wait until it finishes; report its time and size.
    b. Open that backup's details and confirm it includes the home directory files (public_html) and the
       3 MySQL databases. If it doesn't, stop and tell me.
-   c. File Manager: download public_html/.htaccess to my computer (the rollback copy). Report its modified
-      date. If it's later than 18 Nov 2026 04:02 (server time), STOP: someone else has edited it.
+   If the new backup sits in "Pending" for more than 5 minutes, use last night's nightly backup instead.
+   c. Create the folder /home/spaajibade/site-archive-<today's date, YYYY-MM-DD> (home directory, NOT in
+      public_html). Save the current public_html/.htaccess text into it as htaccess.original.txt and confirm
+      it's byte-for-byte identical. Also download public_html/.htaccess to my computer.
+      If .htaccess was modified after 18 Nov 2026 04:02 (server time), STOP: someone else has edited it.
 
 2. POINT THE APP AT THE DOMAIN ROOT
    Setup Node.js App > edit the app spaajibade.com/spa-preflight:
@@ -76,7 +86,7 @@ Rules:
    - Application startup file: server.js
    Keep everything else (Node 22.23.5, Production, root spa-frontend, all environment variables).
    If cPanel won't let you change the URL without deleting the app, STOP (deleting it would lose the variables).
-   Save, then Restart. Report the status line.
+   Save, then Stop, then Start (not Restart). Report the status line.
    Then show me the full text of public_html/.htaccess: cPanel should have added a block between
    "# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN" and "... END". Also report whether
    public_html/spa-preflight/ still exists.
@@ -116,14 +126,13 @@ Rules:
    # php -- END cPanel-generated handler, do not edit
 
 4. MOVE THE OLD SITE OUT
-   File Manager: create the folder /home/spaajibade/site-archive-<today's date, YYYY-MM-DD>
-   (in the home directory, NOT inside public_html).
-   MOVE into it everything at the top level of public_html EXCEPT:
+   MOVE into /home/spaajibade/site-archive-<date> (created in step 1c) everything at the top level of public_html EXCEPT:
      articles/   wp-content/   .well-known/   .htaccess
      and any folder cPanel created for the Node app (for example spa-preflight/ if it still exists).
    Show hidden files. List exactly what you moved before you move it, and wait for my "yes".
 
-5. CHECK THE NEW SITE (read-only, in a new tab; report status code + one line on what you see)
+5. CHECK THE NEW SITE (read-only, in a new tab, HARD RELOAD each page: browsers keep the old site cached;
+   report status code + one line on what you see)
    https://spaajibade.com/
    https://spaajibade.com/about
    https://spaajibade.com/people
@@ -137,16 +146,19 @@ Rules:
    One old article: pick any file in public_html/articles/ named YYYY-MM-DD-slug.html and open
    https://spaajibade.com/YYYY/MM/DD/slug/ ; it should show that archived article.
    If the home page still looks like the old site, tell me before doing anything else (it may be a cache).
-   Also open the browser console on the home page and report any red errors.
+   Also open the browser console on the home page and report any red errors, and report any images
+   that fail to load (especially the home page hero) and whether the home page tab has a title.
 
 6. REPORT
    Summarise what changed, where the archive folder is, and anything that looked wrong.
 
-ROLLBACK (only if I say "roll back"), asking me before each step:
-a. Setup Node.js App: Stop the spa-frontend app.
-b. Move everything from site-archive-<date> back into public_html.
-c. Replace public_html/.htaccess with the copy downloaded in step 1c (upload it over the current file).
-d. Confirm https://spaajibade.com/ shows the old site again (title "SPAACO | S.P.A. Ajibade & Co.").
+ROLLBACK (only if I say "roll back"), asking me before each step, in this order:
+a. Move everything from site-archive-<date> back into public_html, except htaccess.original.txt
+   (the old home page comes back first).
+b. Setup Node.js App: set the app's URL path back to spa-preflight and its startup file to preflight.js;
+   Save, then Stop, then Start (detaches the app from the domain root).
+c. Replace the whole of public_html/.htaccess with site-archive-<date>/htaccess.original.txt; confirm identical.
+d. Hard-reload https://spaajibade.com/ and confirm the old site is back (title "SPAACO | S.P.A. Ajibade & Co.").
 ```
 
 After Stage C, from a laptop: `node scripts/smoke.mjs https://spaajibade.com`, then ask the backend dev to
