@@ -90,13 +90,16 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
                 <span className="text-center text-sm font-semibold md:text-base">
                   {award.year}
                 </span>
+                {/* No badge yet (e.g. a new year before the firm sends the image): keep the column empty
+                    so rows stay aligned, rather than showing a placeholder that reads as a broken image. */}
                 <div className="size-14 justify-self-end md:size-16">
-                  <Media
-                    image={award.badge}
-                    alt={award.badge?.alt || `${award.title} badge`}
-                    className="object-contain"
-                    placeholder="pattern"
-                  />
+                  {award.badge ? (
+                    <Media
+                      image={award.badge}
+                      alt={award.badge.alt || `${award.title} badge`}
+                      className="object-contain"
+                    />
+                  ) : null}
                 </div>
               </li>
             ))}
