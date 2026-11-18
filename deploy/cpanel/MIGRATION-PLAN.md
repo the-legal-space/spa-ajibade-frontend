@@ -43,7 +43,7 @@ File Manager and extracted into `~/spa-frontend`.
 | `.htaccess` | **Edited 18 Nov 04:02 by someone.** Redirects `/people*` and `/practice-areas/*` to `/`, and rewrites every extensionless URL to `.html`. Both break the new app. Replacement: `deploy/cpanel/htaccess` |
 | PHP on main domain | alt-php74 (only matters for leftover PHP; the new site doesn't use it) |
 | Backups | JetBackup daily incrementals (latest 18 Nov, 6.5 GB, 32 kept). Full Account restore/download available |
-| Content API | `https://spaaco.onrender.com/api/v1`, **currently suspended** |
+| Content API | `https://spaaco-m9cs.onrender.com/api/v1` (the old `spaaco.onrender.com` is suspended). Baked in at build time from the repo Variable `NEXT_PUBLIC_API_BASE_URL`: changing it needs a rebuild, not a cPanel setting |
 
 ## Backend on the same cPanel (decided 18 Nov 2026)
 

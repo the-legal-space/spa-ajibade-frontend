@@ -1,6 +1,6 @@
 # SPA Ajibade & Co. website (frontend)
 
-The public website for SPA Ajibade & Co., built with Next.js (App Router), TypeScript and Tailwind CSS v4, from the Figma file "SPA AJIBADE & Co." and against the content API at `https://spaaco.onrender.com/api/v1` ([API reference](https://spaaco.onrender.com/docs)).
+The public website for SPA Ajibade & Co., built with Next.js (App Router), TypeScript and Tailwind CSS v4, from the Figma file "SPA AJIBADE & Co." and against the content API at `https://spaaco-m9cs.onrender.com/api/v1` ([API reference](https://spaaco-m9cs.onrender.com/docs)).
 
 Almost every word and image comes from the API. The code only defines layout and styling, so the firm edits content in the admin dashboard (a separate app) and the site updates on its own.
 
@@ -25,7 +25,7 @@ Node 20.9 or later is required.
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `NEXT_PUBLIC_API_BASE_URL` | yes | Content API base, e.g. `https://spaaco.onrender.com/api/v1` |
+| `NEXT_PUBLIC_API_BASE_URL` | yes | Content API base, e.g. `https://spaaco-m9cs.onrender.com/api/v1` |
 | `NEXT_PUBLIC_SITE_URL` | yes | Canonical URL for metadata, sitemap and robots |
 | `NEXT_PUBLIC_CONSENT_TEXT_VERSION` | yes | Label for the consent wording on the forms. Change it whenever the wording in `src/components/forms/fields.tsx` changes |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | no | Cloudflare Turnstile key. Empty means the forms send `"disabled"`, which the API accepts while the captcha is off |

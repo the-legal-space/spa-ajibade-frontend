@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const apiOrigin = (() => {
   try {
-    return new URL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://spaaco.onrender.com/api/v1").origin;
+    return new URL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://spaaco-m9cs.onrender.com/api/v1").origin;
   } catch {
-    return "https://spaaco.onrender.com";
+    return "https://spaaco-m9cs.onrender.com";
   }
 })();
 
