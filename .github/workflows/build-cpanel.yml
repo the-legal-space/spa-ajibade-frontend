@@ -65,7 +65,9 @@ jobs:
           rm -rf dist && mkdir dist
           cp -a .next/standalone/. dist/
           mkdir -p dist/.next && cp -a .next/static dist/.next/static
-          cp -a public dist/public
+          # Merge into the public/ the standalone output may already contain (copying the folder itself
+          # would nest it as public/public/ and break every /figma/ image).
+          mkdir -p dist/public && cp -a public/. dist/public/
           cp deploy/cpanel/preflight.js dist/preflight.js
           # Passenger's restart trigger lives here; keep the folder in git.
           mkdir -p dist/tmp && touch dist/tmp/.keep

@@ -10,7 +10,8 @@ export function pageMetadata(
   const description = seo?.description ?? fallback.description ?? undefined;
   const og = seo && "ogImage" in seo ? seo.ogImage : undefined;
   return {
-    title: title ? (fallback.absoluteTitle ? { absolute: title } : title) : undefined,
+    // Leave title out when there is none: an explicit `title: undefined` would erase the layout's default title.
+    ...(title ? { title: fallback.absoluteTitle ? { absolute: title } : title } : {}),
     description,
     alternates: { canonical: fallback.path },
     openGraph: {
