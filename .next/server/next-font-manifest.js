@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/home/runner/work/spa-ajibade-frontend/spa-ajibade-frontend/src/app/layout":["static/media/6e8c7cb283336a9d-s.p.woff2","static/media/4fcd55e2c741afb8-s.p.woff2","static/media/e4af272ccee01ff0-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';
