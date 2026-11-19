@@ -9,6 +9,7 @@ import { Media } from "@/components/ui/media";
 import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { HeroSlides, HeroSlideshow } from "@/components/sections/hero-slideshow";
+import { directoryLabel, relabelAwardTitle } from "@/lib/content-overrides";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const page = await load(slug);
   return pageMetadata(undefined, {
-    title: page.hero.title,
+    title: relabelAwardTitle(page.hero.title, page.directory.name, page.directory.slug),
     description: page.hero.subtitle,
     path: `/recognitions/${slug}`,
   });
@@ -35,6 +36,8 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
   const { slug } = await params;
   const page = await load(slug);
   const images = page.hero.images ?? [];
+  const { name, slug: directorySlug } = page.directory;
+  const heroTitle = page.hero.title === name ? directoryLabel(directorySlug, name) : page.hero.title;
 
   return (
     <>
@@ -54,7 +57,7 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
           <div className="container-site relative flex min-h-[400px] items-center pt-[var(--header-h)] max-md:px-4 md:min-h-[493px]">
             <div className="max-w-[776px] py-8 md:py-12">
               <Heading as="h1" size="display" reveal={false}>
-                {page.hero.title}
+                {heroTitle}
               </Heading>
               {page.hero.subtitle ? (
                 <p className="mt-1 text-lg leading-8 text-mist md:mt-5 md:text-xl md:leading-9">
@@ -85,18 +88,21 @@ export default async function RecognitionDirectoryPage({ params }: Props) {
             {page.awards.map((award) => (
               <li key={award.id} className="grid min-h-[92px] grid-cols-[minmax(0,1fr)_52px_64px] items-center gap-3 border-b border-mist-200 py-3 md:grid-cols-[minmax(0,1fr)_90px_76px] md:gap-6">
                 <h2 className="font-serif text-base leading-snug md:text-xl">
-                  {award.title}
+                  {relabelAwardTitle(award.title, name, directorySlug)}
                 </h2>
                 <span className="text-center text-sm font-semibold md:text-base">
                   {award.year}
                 </span>
+                {/* No badge yet (e.g. a new year before the firm sends the image): keep the column empty
+                    so rows stay aligned, rather than showing a placeholder that reads as a broken image. */}
                 <div className="size-14 justify-self-end md:size-16">
-                  <Media
-                    image={award.badge}
-                    alt={award.badge?.alt || `${award.title} badge`}
-                    className="object-contain"
-                    placeholder="pattern"
-                  />
+                  {award.badge ? (
+                    <Media
+                      image={award.badge}
+                      alt={award.badge.alt || `${award.title} badge`}
+                      className="object-contain"
+                    />
+                  ) : null}
                 </div>
               </li>
             ))}
