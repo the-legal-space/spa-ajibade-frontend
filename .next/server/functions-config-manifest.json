@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/discuss/availability": {},
+    "/api/discuss/forward": {},
+    "/api/discuss": {},
+    "/api/discuss/message": {},
+    "/api/health": {}
+  }
+}
