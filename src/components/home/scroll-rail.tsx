@@ -1,4 +1,4 @@
-image.pngI "use client";
+"use client";
 
 import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import { CarouselArrow } from "./carousel-arrow";
