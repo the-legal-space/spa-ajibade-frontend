@@ -3,7 +3,7 @@ import { withPersonOverrides } from "@/lib/person-overrides";
 
 /**
  * Zod schemas for the public SPA Ajibade content API.
- * Mirrors https://spaaco.onrender.com/docs (OpenAPI 1.0.0).
+ * Mirrors https://spaaco-m9cs.onrender.com/docs (OpenAPI 1.0.0).
  * Every response is parsed at the boundary so a shape change on the backend
  * fails loudly in one place instead of rendering `undefined` across the site.
  */

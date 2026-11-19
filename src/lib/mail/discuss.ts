@@ -12,7 +12,8 @@ import type { ForwardPayload } from "./token";
  *
  * Configuration (environment variables, never committed):
  *   MAIL_USER / MAIL_PASS   SMTP login (EMAIL_USER / EMAIL_PASS are accepted too)
- *   SMTP_HOST, SMTP_PORT    default smtp.gmail.com : 465 (SSL). Use any SMTP provider, e.g. Brevo.
+ *   SMTP_HOST, SMTP_PORT    default smtp.gmail.com : 465 (SSL). For the firm's Microsoft 365:
+ *                           smtp.office365.com : 587 (STARTTLS), with SMTP AUTH enabled for that mailbox.
  *   MAIL_FROM               "SPA Ajibade & Co." <address>. Defaults to MAIL_USER.
  *   MAIL_BCC                optional extra inbox copied on the attorney email (e.g. the front office)
  *   MAIL_TEST_RECIPIENT     while testing, the attorney's email goes here instead of the real attorney (the client
@@ -73,13 +74,29 @@ export function getTransport(): Transporter | null {
   // Google shows app passwords as four groups of four ("abcd efgh ijkl mnop"); the spaces are not part of it.
   const pass = /^[a-z]{4}( [a-z]{4}){3}$/i.test(rawPass.trim()) ? rawPass.replace(/\s+/g, "") : rawPass.trim();
   const port = Number(process.env.SMTP_PORT || 465);
+  const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
   cached = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
     port,
-    secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465,
+    secure,
+    // On a STARTTLS port, refuse to continue (and send the password) if the server won't encrypt.
+    requireTLS: !secure,
     auth: { user, pass },
   });
   return cached;
+}
+
+/** The SMTP error with a hint for the failures we expect at launch (logged only, never shown to visitors). */
+export function describeMailError(err: unknown): string {
+  const message = (err as Error)?.message ?? String(err);
+  if (/5\.7\.139|SmtpClientAuthentication is disabled/i.test(message)) {
+    return `${message} [hint: Microsoft 365 has SMTP AUTH turned off for this mailbox; an admin must enable Authenticated SMTP]`;
+  }
+  if (/\b535\b|Invalid login|authentication unsuccessful/i.test(message)) return `${message} [hint: check MAIL_USER / MAIL_PASS]`;
+  if (/ETIMEDOUT|ECONNREFUSED|ECONNRESET|EHOSTUNREACH/i.test(message)) {
+    return `${message} [hint: the server can't reach ${process.env.SMTP_HOST || "smtp.gmail.com"}:${process.env.SMTP_PORT || 465}; the host may block outbound SMTP]`;
+  }
+  return message;
 }
 
 export function mailConfigured() {
@@ -185,8 +202,8 @@ export async function sendDiscussEmails(input: DiscussInput, reference: string =
   if (process.env.MAIL_DRY_RUN === "1") {
     for (const r of [staffRes, clientRes]) if (r.status === "fulfilled") console.info("[mail dry-run]", (r.value as { message?: string }).message);
   }
-  if (staffRes.status === "rejected") console.error("[mail] attorney email failed:", staffRes.reason?.message ?? staffRes.reason);
-  if (clientRes.status === "rejected") console.error("[mail] client email failed:", clientRes.reason?.message ?? clientRes.reason);
+  if (staffRes.status === "rejected") console.error("[mail] attorney email failed:", describeMailError(staffRes.reason));
+  if (clientRes.status === "rejected") console.error("[mail] client email failed:", describeMailError(clientRes.reason));
   return { reference, staffSent: staffRes.status === "fulfilled", clientSent: clientRes.status === "fulfilled" };
 }
 
@@ -248,7 +265,7 @@ export async function sendForwardEmail(p: ForwardPayload, input: ForwardInput): 
     if (process.env.MAIL_DRY_RUN === "1") console.info("[mail dry-run]", (info as { message?: string }).message);
     return { sent: true };
   } catch (err) {
-    console.error("[mail] forward failed:", (err as Error)?.message ?? err);
+    console.error("[mail] forward failed:", describeMailError(err));
     return { sent: false };
   }
 }

@@ -1,0 +1,27 @@
+RewriteEngine On
+
+# BEGIN archived articles (added 2026-10-29): serve old post URLs from /articles/ when a page exists
+RewriteCond %{DOCUMENT_ROOT}/articles/$1-$2-$3-$4.html -f
+RewriteRule ^([0-9]{4})/([0-9]{2})/([0-9]{2})/([^/]+)/?$ /articles/$1-$2-$3-$4.html [L]
+# END archived articles
+
+# BEGIN legacy WordPress URLs
+# Old posts with no archived page, and old tag/category/author listings, go to the article archive.
+# /people and /practice-areas are NOT redirected any more: the Node app serves them.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^[0-9]{4}/[0-9]{2}/[0-9]{2}/[^/]+/?$ /articles/? [R=302,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(tag|category|author)(/.*)?$ /articles/? [R=302,L]
+# END legacy WordPress URLs
+
+# Removed for the Node app: the "/page -> /page.html" rule from the static export.
+# Everything that isn't a real file now goes to Node (cPanel adds the Passenger block for that).
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “alt-php74” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-alt-php74___lsphp .php .php7 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

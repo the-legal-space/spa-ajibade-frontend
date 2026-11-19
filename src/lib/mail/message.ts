@@ -1,4 +1,4 @@
-import { getTransport, mailParts } from "./discuss";
+import { describeMailError, getTransport, mailParts } from "./discuss";
 import { officeMessageEmail, senderMessageEmail, type MessageEmailData } from "./templates";
 
 /**
@@ -71,7 +71,7 @@ export async function sendMessageEmails(input: MessageInput, reference: string):
   if (process.env.MAIL_DRY_RUN === "1") {
     for (const r of [officeRes, senderRes]) if (r.status === "fulfilled") console.info("[mail dry-run]", (r.value as { message?: string }).message);
   }
-  if (officeRes.status === "rejected") console.error("[mail] office message email failed:", officeRes.reason?.message ?? officeRes.reason);
-  if (senderRes.status === "rejected") console.error("[mail] sender confirmation failed:", senderRes.reason?.message ?? senderRes.reason);
+  if (officeRes.status === "rejected") console.error("[mail] office message email failed:", describeMailError(officeRes.reason));
+  if (senderRes.status === "rejected") console.error("[mail] sender confirmation failed:", describeMailError(senderRes.reason));
   return { officeSent: officeRes.status === "fulfilled", senderSent: senderRes.status === "fulfilled" };
 }
