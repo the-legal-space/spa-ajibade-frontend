@@ -13,7 +13,7 @@ import { CmsIcon } from "@/components/ui/icon";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { personPhoto } from "@/lib/figma-assets";
-import { STORY } from "@/lib/content-overrides";
+import { STORY, directoryLabel } from "@/lib/content-overrides";
 import { buttonClass } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -28,11 +28,17 @@ export default async function AboutPage() {
   const story = { ...page.story, ...STORY };
   // Only directories with awards listed by year: each row opens /recognitions/<slug>, and an empty one
   // would lead to a page with nothing on it. Rows that link out (url, no slug) are kept as they are.
+  // Each row also shows that directory's most recent year of awards, so the latest rankings are visible here.
   const withAwards = await Promise.all(
     page.awardsList.items.map(async (item) => {
-      if (!item.slug) return item.url ? item : null;
+      const label = directoryLabel(item.slug, item.name);
+      if (!item.slug) return item.url ? { ...item, label, latest: null } : null;
       const directory = await getRecognitionDirectory(item.slug).catch(() => null);
-      return directory && directory.awards.length > 0 ? item : null;
+      if (!directory || directory.awards.length === 0) return null;
+      const year = Math.max(...directory.awards.map((a) => a.year ?? 0));
+      // "Chambers Global: Dispute Resolution, Band 3" → "Dispute Resolution, Band 3" (the row already names the directory).
+      const titles = directory.awards.filter((a) => a.year === year).map((a) => a.title.replace(/^[^:]*:\s*/, ""));
+      return { ...item, label, latest: year > 0 ? { year, titles } : null };
     }),
   );
   const awardsList = { ...page.awardsList, items: withAwards.filter((item) => item !== null) };
@@ -188,7 +194,15 @@ export default async function AboutPage() {
 
                   return (
                     <MotionListItem key={a.slug ?? a.url ?? `${a.name}-${index}`} className="flex items-center justify-between gap-5 border-b border-white/15 py-4">
-                      <span className="text-base">{a.name}</span>
+                      <div className="min-w-0">
+                        <span className="text-base">{a.label}</span>
+                        {a.latest ? (
+                          <p className="mt-1 text-sm leading-6 text-white/70">
+                            {a.latest.year}: {a.latest.titles.slice(0, 4).join(" · ")}
+                            {a.latest.titles.length > 4 ? ` · and ${a.latest.titles.length - 4} more` : ""}
+                          </p>
+                        ) : null}
+                      </div>
                       {href ? (
                         /^https?:\/\//i.test(href) ? (
                           <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{button}</a>
