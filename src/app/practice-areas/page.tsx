@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getPage, hasCsrStories } from "@/lib/api/endpoints";
+import Link from "next/link";
+import { getPage } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
@@ -7,7 +8,6 @@ import { HeroDots, HeroSlides, HeroSlideshow } from "@/components/sections/hero-
 import { PracticeAreaCard } from "@/components/sections/cards";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
-import { SmartLink } from "@/components/ui/smart-link";
 import { buttonClass } from "@/components/ui/button";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { FIGMA } from "@/lib/figma-assets";
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PracticeAreasPage() {
-  const [page, csrReady] = await Promise.all([getPage("practice-areas"), hasCsrStories()]);
+  const page = await getPage("practice-areas");
   const csr = page.csrBanner;
   // The CSR banner is a carousel of the CMS images (older payloads send a single `image`).
   const csrSeen = new Set<string>();
@@ -88,21 +88,12 @@ export default async function PracticeAreasPage() {
                 </p>
                 <HeroDots className="mt-5" />
                 {csr.cta ? (
-                  csrReady ? (
-                    <SmartLink
-                      link={csr.cta}
-                      className={buttonClass("ghostDark", "mt-6")}
-                    />
-                  ) : (
-                    // No CSR story has been written up yet: show the button, but don't send people to an empty page.
-                    <span
-                      aria-disabled="true"
-                      title="Coming soon"
-                      className={buttonClass("ghostDark", "mt-6 cursor-not-allowed opacity-60 hover:bg-white/5")}
-                    >
-                      {csr.cta.label}
-                    </span>
-                  )
+                  <Link
+                    href="/responsible-business"
+                    className={buttonClass("ghostDark", "mt-6")}
+                  >
+                    {csr.cta.label}
+                  </Link>
                 ) : null}
               </div>
               </HeroSlideshow>

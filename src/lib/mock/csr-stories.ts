@@ -6,15 +6,13 @@ import { isPending } from "@/lib/utils";
  * page, its carousel and the article pages have something to show until the CMS has real ones.
  *
  * Real stories from the API always come first; these only top the list up (see endpoints.ts).
- * Enabled for local development and Vercel preview deployments. Disabled on Vercel production and on
- * any other production host (cPanel), where VERCEL_ENV is not set. Override with MOCK_CSR=on or MOCK_CSR=off.
+ * Disabled by default so the public Responsible Business page never invents stories that are not in the CMS.
+ * Enable explicitly with MOCK_CSR=on only for a local/demo environment.
  */
 export function mockCsrEnabled() {
   const flag = process.env.MOCK_CSR;
   if (flag === "on") return true;
-  if (flag === "off") return false;
-  if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV !== "production";
-  return process.env.NODE_ENV !== "production";
+  return false;
 }
 
 const CHIP = "Pro Bono & Community Commitment";
@@ -37,12 +35,10 @@ type Seed = { slug: string; title: string; publishedAt: string; body: string; wa
 
 const SEEDS: Seed[] = [
   {
-    // The one story that already exists in the CMS; the API copy wins when present.
-    slug: "spa-ajibade-co-sponsors-team-titans-an-american-flag-football-team",
-    title: "SPA AJIBADE & Co. Sponsors Team Titans, an American Flag Football Team",
-    publishedAt: "2025-09-16T09:00:00.000Z",
-    body: `<p>${LOREM}</p>`,
-    watchVideo: true,
+    slug: "lagos-food-bank-and-spa-ajibade-co-unite-against-food-insecurity-in-lagos-island",
+    title: "LAGOS FOOD BANK AND SPA AJIBADE & CO. UNITE AGAINST FOOD INSECURITY IN LAGOS ISLAND.",
+    publishedAt: "2026-03-07T09:00:00.000Z",
+    body: "<p>This Responsible Business story is being updated by the firm.</p>",
   },
   {
     slug: "free-legal-clinic-for-small-business-owners-in-lagos",

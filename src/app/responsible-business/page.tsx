@@ -11,6 +11,14 @@ import { ListingResults, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
 
+const CSR_CARD_COVER = {
+  url: "/figma/csr-lagos-food-bank.jpg",
+  alt: "Lagos Food Bank and SPA Ajibade & Co. community outreach",
+  width: 437,
+  height: 271,
+};
+const CSR_CARD_SLUG = "lagos-food-bank-and-spa-ajibade-co-unite-against-food-insecurity-in-lagos-island";
+
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -39,27 +47,52 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
     getPage("responsible-business"),
     getInsights({ category: "pro_bono", sort: "newest", page, pageSize: 15 }),
   ]);
+  const stories = list.data.filter((story) => story.slug !== "spa-ajibade-co-sponsors-team-titans-an-american-flag-football-team");
+  const lagosFoodBankStory = stories.find((story) => story.slug === CSR_CARD_SLUG);
+  const shownStories = lagosFoodBankStory
+    ? stories
+    : [
+        {
+          id: "lagos-food-bank-csr",
+          slug: CSR_CARD_SLUG,
+          title: "LAGOS FOOD BANK AND SPA AJIBADE & CO. UNITE AGAINST FOOD INSECURITY IN LAGOS ISLAND.",
+          excerpt: null,
+          format: "article" as const,
+          categories: ["pro_bono" as const],
+          categoryLabels: ["Pro Bono & Community Commitment"],
+          practiceAreas: [],
+          chips: ["Pro Bono & Community Commitment"],
+          author: { type: "firm" as const, name: "SPA AJIBADE & Co.", label: "Law Firm" },
+          coverImage: CSR_CARD_COVER,
+          publishedAt: "2026-03-07T09:00:00.000Z",
+          featured: false,
+          cta: { label: "Read More", kind: "read_more" as const },
+        },
+        ...stories,
+      ];
   // The banner shows the first three stories on this page. Each slide uses its story's own CMS cover,
   // otherwise the page's CMS carousel images in turn (bundled placeholder thumbnails don't count),
   // so the banner is never empty.
   const banner = content.images.filter((img) => img?.url);
   // Up to three slides: a story's details appear on hover; when the CMS has more carousel images
   // than stories, the extra slides are image-only.
-  const count = Math.min(3, Math.max(list.data.length, banner.length));
+  const count = Math.min(3, Math.max(shownStories.length, banner.length));
   const linkable = new Set(
-    (await Promise.all(list.data.map(async (i) => ((await insightHasArticle(i.slug)) ? i.slug : null)))).filter(
+    (await Promise.all(shownStories.map(async (i) => ((await insightHasArticle(i.slug)) ? i.slug : null)))).filter(
       (slug): slug is string => slug !== null,
     ),
   );
   const slides = Array.from({ length: count }, (_, n) => {
-    const i = list.data[n];
+    const i = shownStories[n];
     return {
       slug: i?.slug ?? null,
       linkable: !!i && linkable.has(i.slug),
       title: i?.title ?? null,
       date: i ? formatLongDate(i.publishedAt) : null,
       image:
-        (hasOwnCover(i)
+        (i?.slug === CSR_CARD_SLUG
+          ? CSR_CARD_COVER
+          : hasOwnCover(i)
           ? i?.coverImage
           : (banner[n % Math.max(1, banner.length)] ?? i?.coverImage)) ?? null,
     };
@@ -89,11 +122,22 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
           </Reveal>
 
           <ListingResults>
-          {list.data.length > 0 ? (
+          {shownStories.length > 0 ? (
             <MotionList key={meta.page} className="mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-              {list.data.map((i) => (
+              {shownStories.map((i, index) => (
                 <MotionListItem key={i.id}>
-                  <InsightCard insight={i} linkable={linkable.has(i.slug)} />
+                  <InsightCard
+                    insight={{
+                      ...i,
+                      coverImage:
+                        i.slug === CSR_CARD_SLUG
+                          ? CSR_CARD_COVER
+                          : hasOwnCover(i)
+                            ? i.coverImage
+                            : banner[index % Math.max(1, banner.length)] ?? i.coverImage,
+                    }}
+                    linkable={linkable.has(i.slug)}
+                  />
                 </MotionListItem>
               ))}
             </MotionList>
