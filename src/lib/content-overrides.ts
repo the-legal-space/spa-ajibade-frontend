@@ -26,3 +26,18 @@ export const STORY = {
 export const PRACTICE_SHORT_LABELS: Record<string, string> = {
   "dispute-resolution-arbitration": "Dispute Resolution & Arbitration",
 };
+
+/** Recognition directory names the firm wants shown differently from the CMS, keyed by slug. */
+export const DIRECTORY_LABELS: Record<string, string> = {
+  "chambers-global": "Chambers and Partners",
+};
+
+export function directoryLabel(slug: string | null | undefined, name: string) {
+  return (slug && DIRECTORY_LABELS[slug]) || name;
+}
+
+/** Award titles repeat the directory name ("Chambers Global: Band 3"); show the firm's label there too. */
+export function relabelAwardTitle(title: string, name: string, slug: string | null | undefined) {
+  const label = directoryLabel(slug, name);
+  return label !== name && title.startsWith(name) ? label + title.slice(name.length) : title;
+}
