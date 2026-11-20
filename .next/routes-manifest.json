@@ -89,6 +89,14 @@
         "nxtPslug": "nxtPslug"
       },
       "namedRegex": "^/recognitions/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/responsible-business/[slug]",
+      "regex": "^/responsible\\-business/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/responsible\\-business/(?<nxtPslug>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
