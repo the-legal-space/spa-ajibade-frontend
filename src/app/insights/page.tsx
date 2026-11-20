@@ -14,6 +14,7 @@ import { Heading, Section } from "@/components/ui/primitives";
 import { FilterMenu, FilterTabs, ListingResults, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
+import { RESPONSIBLE_BUSINESS_STORY_SLUG } from "@/lib/mock/csr-stories";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -39,13 +40,19 @@ export default async function InsightsPage({ searchParams }: Props) {
   ]);
   const current = { category, practiceArea, sort: sort === "newest" ? undefined : sort, author: author?.slug };
   const meta = list.meta ?? { page, totalPages: 1 };
+  const featuredInsights = content.featured.filter(
+    (insight) => insight.slug !== RESPONSIBLE_BUSINESS_STORY_SLUG,
+  );
+  const listedInsights = list.data.filter(
+    (insight) => insight.slug !== RESPONSIBLE_BUSINESS_STORY_SLUG,
+  );
 
   return (
     <>
       {/* An attorney's "View more" list shows only their publications: no hero or featured block. */}
       {!author && content.hero ? <PageHero hero={content.hero} /> : null}
-      {!author && !content.hero && content.featured.length > 0 ? <FeaturedInsights items={content.featured} /> : null}
-      {author || (!content.hero && content.featured.length === 0) ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
+      {!author && !content.hero && featuredInsights.length > 0 ? <FeaturedInsights items={featuredInsights} /> : null}
+      {author || (!content.hero && featuredInsights.length === 0) ? <div className="-mt-[var(--header-h)] h-[var(--header-h)] bg-ink" aria-hidden /> : null}
 
       <Section tone="mist" labelledBy="listing-heading" id="listing">
         {author ? (
@@ -70,9 +77,9 @@ export default async function InsightsPage({ searchParams }: Props) {
         </Reveal>
 
         <ListingResults>
-        {list.data.length > 0 ? (
+        {listedInsights.length > 0 ? (
           <MotionList key={`${category}|${practiceArea}|${sort}|${page}|${author?.slug}`} className="mt-4 md:mt-10 grid min-w-0 gap-x-4 gap-y-4 md:gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-            {list.data.map((i) => (
+            {listedInsights.map((i) => (
               <MotionListItem key={i.id} className="min-w-0">
                 <InsightCard insight={i} />
               </MotionListItem>

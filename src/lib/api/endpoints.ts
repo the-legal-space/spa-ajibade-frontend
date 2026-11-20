@@ -1,9 +1,9 @@
 import "server-only";
 import { cache } from "react";
 import { z } from "zod";
-import { ApiNotFoundError, apiGet, apiList } from "./client";
+import { apiGet, apiList } from "./client";
 import { CURATED_PUBLICATIONS } from "@/lib/curated-publications";
-import { MOCK_CSR_CARDS, mockCsrDetail, mockCsrEnabled, withMockGaps } from "@/lib/mock/csr-stories";
+import { RESPONSIBLE_BUSINESS_STORY_SLUG } from "@/lib/mock/csr-stories";
 import {
   InsightCard,
   InsightCategory,
@@ -112,7 +112,7 @@ export const getPerson = cache((slug: string) =>
 );
 
 export const getInsights = cache(
-  (params: {
+  async (params: {
     category?: z.infer<typeof InsightCategory>;
     practiceArea?: string;
     sort?: "newest" | "oldest";
@@ -122,9 +122,11 @@ export const getInsights = cache(
     author?: string;
   }) => {
     if (params.author) return byAuthor({ ...params, author: params.author });
-    // Pro bono stories only: top the list up with placeholders while the CMS has few (dev/preview only).
-    if (params.category === "pro_bono" && mockCsrEnabled()) return withMockStories(params);
-    return apiList("/insights", InsightCard, { query: params, tags: ["insights"] });
+    const result = await apiList("/insights", InsightCard, { query: params, tags: ["insights"] });
+    return {
+      ...result,
+      data: result.data.filter((insight) => insight.slug !== RESPONSIBLE_BUSINESS_STORY_SLUG),
+    };
   },
 );
 
@@ -134,7 +136,9 @@ const getAllInsights = cache(async (category?: z.infer<typeof InsightCategory>, 
     apiList("/insights", InsightCard, { query: { category, practiceArea, sort, page, pageSize: 50 }, tags: ["insights"] });
   const first = await fetchPage(1);
   const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.totalPages ?? 1) - 1) }, (_, i) => fetchPage(i + 2)));
-  return [first, ...rest].flatMap((r) => r.data);
+  return [first, ...rest]
+    .flatMap((r) => r.data)
+    .filter((insight) => insight.slug !== RESPONSIBLE_BUSINESS_STORY_SLUG);
 });
 
 /** The publications a profile shows: a curated list where one exists, else the API's own (newest first). */
@@ -162,52 +166,8 @@ async function byAuthor(params: { category?: z.infer<typeof InsightCategory>; pr
   };
 }
 
-async function withMockStories(params: { sort?: "newest" | "oldest"; page?: number; pageSize?: number }) {
-  // The real set is small: fetch it whole, merge the placeholders in, then paginate the result here.
-  const real = await apiList("/insights", InsightCard, { query: { category: "pro_bono", pageSize: 50 }, tags: ["insights"] });
-  const pageSize = params.pageSize ?? 9;
-  const page = params.page ?? 1;
-  const realSlugs = new Set(real.data.map((r) => r.slug));
-  const merged = [...real.data, ...MOCK_CSR_CARDS.filter((m) => !realSlugs.has(m.slug))];
-  merged.sort((a, b) => {
-    const diff = new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
-    return params.sort === "oldest" ? -diff : diff;
-  });
-  const totalPages = Math.max(1, Math.ceil(merged.length / pageSize));
-  return {
-    data: merged.slice((page - 1) * pageSize, page * pageSize),
-    meta: { page, pageSize, total: merged.length, totalPages },
-  };
-}
-
 export const getInsight = cache(async (slug: string) => {
-  const mock = mockCsrEnabled();
-  try {
-    const real = await apiGet(`/insights/${encodeURIComponent(slug)}`, InsightDetail, { tags: ["insights", `insight:${slug}`] });
-    return mock ? withMockGaps(real) : real;
-  } catch (error) {
-    const fallback = mock && error instanceof ApiNotFoundError ? mockCsrDetail(slug) : null;
-    if (fallback) return fallback;
-    throw error;
-  }
-});
-
-/**
- * Whether an insight has an article worth opening (real text, a video or an outbound link), as opposed to
- * the placeholder the CMS holds for stories still being written. Used to keep CSR links inactive until then.
- */
-export async function insightHasArticle(slug: string) {
-  const detail = await getInsight(slug).catch(() => null);
-  if (!detail) return false;
-  const text = (detail.body ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
-  return text.length >= 80 || !!detail.videoUrl || !!detail.cta?.url;
-}
-
-/** Whether any Pro Bono & Community Commitment story is ready to read (the CSR page has something to show). */
-export const hasCsrStories = cache(async () => {
-  const list = await getInsights({ category: "pro_bono", sort: "newest", page: 1, pageSize: 15 }).catch(() => null);
-  if (!list) return false;
-  return (await Promise.all(list.data.map((i) => insightHasArticle(i.slug)))).some(Boolean);
+  return apiGet(`/insights/${encodeURIComponent(slug)}`, InsightDetail, { tags: ["insights", `insight:${slug}`] });
 });
 
 export const getOffices = cache(() =>
