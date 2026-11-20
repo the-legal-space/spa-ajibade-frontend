@@ -76,35 +76,35 @@ export default async function PersonPage({ params }: Props) {
   return (
     <>
       <section className="bg-white">
-        <div className="container-site grid gap-12 py-12 md:py-16 lg:grid-cols-[1fr_1fr] lg:gap-16">
+        <div className="container-site grid gap-10 py-6 md:py-8 lg:grid-cols-[1fr_1fr] lg:gap-16">
           {/* Photo and details stay in view while the bio and accordion scroll past on desktop. */}
-          <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:self-start">
+          <div className="lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:self-start">
             {back ? (
               <Link
                 href="/people"
-                className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-stone hover:text-ink"
+                className="mb-3 inline-flex items-center gap-1.5 text-[13px] text-stone hover:text-ink"
               >
                 <ArrowLeft className="size-3.5" aria-hidden /> {back}
               </Link>
             ) : null}
             <p className="text-lg">{p.roleLabel}</p>
-            <Heading as="h1" reveal={false} className="mt-2">
+            <Heading as="h1" reveal={false} className="mt-1">
               {p.displayName}
             </Heading>
-            <div className="mt-8 aspect-[395/390] w-full max-w-[395px] overflow-hidden bg-card-blue">
+            <div className="mt-4 aspect-[395/390] w-full max-w-[300px] overflow-hidden bg-card-blue">
               <Media
                 image={personPhoto(p.slug, p.photo)}
                 placeholder="portrait"
                 name={p.displayName}
                 alt={`Portrait of ${p.displayName}`}
                 priority
-                sizes="395px"
+                sizes="300px"
                 className="object-top"
               />
             </div>
             {/* One list in API order (the primary area comes first). */}
             {p.practiceAreas.length > 0 ? (
-              <div className="mt-6">
+              <div className="mt-4">
                 <p className="text-xs text-stone">
                   {p.practiceAreas.length === 1 ? "Practice Area" : "Practice Areas"}
                 </p>
@@ -122,7 +122,7 @@ export default async function PersonPage({ params }: Props) {
                 </ul>
               </div>
             ) : null}
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-3">
               {p.email ? (
                 <a
                   href={`mailto:${p.email}`}
@@ -173,7 +173,7 @@ export default async function PersonPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="lg:pt-10">
+          <div className="lg:pt-6">
             {bio ? (
               <div
                 className="prose-firm person-bio text-[15px] leading-7"
