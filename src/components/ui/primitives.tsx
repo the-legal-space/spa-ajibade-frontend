@@ -74,18 +74,28 @@ export function Chip({
   title,
   compact = false,
   href,
+  target,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
   compact?: boolean;
   href?: string;
+  target?: "_blank";
 }) {
   const base = cn(
     "inline-block min-w-0 truncate whitespace-nowrap rounded-[4px] border-[0.5px] border-gray bg-white py-2 text-[10px] leading-none text-ink",
     compact ? "px-3" : "px-4",
     className,
   );
+
+  if (href && target === "_blank") {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" title={title} className={base}>
+        {children}
+      </a>
+    );
+  }
 
   if (href) {
     return (

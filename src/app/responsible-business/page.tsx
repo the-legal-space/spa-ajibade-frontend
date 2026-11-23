@@ -7,6 +7,7 @@ import { ListingResults, Pagination } from "@/components/ui/listing-controls";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Chip } from "@/components/ui/primitives";
 import { Media } from "@/components/ui/media";
+import { AuthorAvatar, authorView } from "@/components/ui/author";
 import { MOCK_CSR_STORIES } from "@/lib/mock/csr-stories";
 import { formatMonthYear, readPage } from "@/lib/utils";
 const PAGE_SIZE = 15;
@@ -58,16 +59,17 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
                   <article className="flex h-full flex-col">
                     <Link
                       href={`/responsible-business/${i.slug}`}
-                      className="relative block aspect-437/271 overflow-hidden rounded-sm"
+                      className="relative block aspect-square overflow-hidden rounded-sm"
                     >
                       <Media
                         image={i.coverImage}
                         alt=""
                         sizes="(min-width:1024px) 437px, (min-width:640px) 50vw, 85vw"
+                        className="object-contain"
                       />
                     </Link>
                     <div className="mt-3 flex items-center justify-between gap-2">
-                      <Chip href={i.website.url} title={i.website.label} className="underline underline-offset-2">
+                      <Chip href={i.website.url} target="_blank" title={i.website.label} className="underline underline-offset-2">
                         {i.website.label}
                       </Chip>
                       <Chip compact className="shrink-0">{formatMonthYear(i.publishedAt)}</Chip>
@@ -77,13 +79,21 @@ export default async function ResponsibleBusinessPage({ searchParams }: Props) {
                         {i.title}
                       </Link>
                     </h2>
-                    <p className="mt-3 text-xs text-stone">{i.partner.name}</p>
-                    <Link
-                      href={`/responsible-business/${i.slug}`}
-                      className="mt-3 inline-flex items-center gap-1 self-start rounded-sm border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink hover:border-ink"
-                    >
-                      Read More <ArrowUpRight className="size-3.5" aria-hidden />
-                    </Link>
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <AuthorAvatar view={authorView(i.partner)} className="size-8" sizes="32px" />
+                        <span className="flex min-w-0 flex-col gap-0.5 leading-none">
+                          <span className="truncate text-xs text-ink">{i.partner.name}</span>
+                          <span className="text-[10px] text-ink/80">{i.partner.label}</span>
+                        </span>
+                      </span>
+                      <Link
+                        href={`/responsible-business/${i.slug}`}
+                        className="inline-flex shrink-0 items-center gap-1 rounded-sm border-[0.5px] border-gray px-3 py-2 text-xs leading-none text-ink hover:border-ink"
+                      >
+                        Read More <ArrowUpRight className="size-3.5" aria-hidden />
+                      </Link>
+                    </div>
                   </article>
                 </MotionListItem>
               ))}
