@@ -3,8 +3,8 @@
   "functions": {
     "/api/discuss/availability": {},
     "/api/discuss/forward": {},
-    "/api/health": {},
     "/api/discuss/message": {},
-    "/api/discuss": {}
+    "/api/discuss": {},
+    "/api/health": {}
   }
 }
