@@ -66,7 +66,7 @@ export default async function ResponsibleBusinessStoryPage({ params }: Props) {
           </Link>
 
           <div className="mt-8 flex items-start justify-between gap-4">
-            <Chip href={story.website.url} title={story.website.label} className="underline underline-offset-2">
+            <Chip href={story.website.url} target="_blank" title={story.website.label} className="underline underline-offset-2">
               {story.website.label}
             </Chip>
             {date ? (

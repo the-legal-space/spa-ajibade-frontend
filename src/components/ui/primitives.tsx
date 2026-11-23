@@ -74,12 +74,14 @@ export function Chip({
   title,
   compact = false,
   href,
+  target,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
   compact?: boolean;
   href?: string;
+  target?: "_blank";
 }) {
   const base = cn(
     "inline-block min-w-0 truncate whitespace-nowrap rounded-[4px] border-[0.5px] border-gray bg-white py-2 text-[10px] leading-none text-ink",
@@ -87,8 +89,8 @@ export function Chip({
     className,
   );
 
-  if (href && /^https?:\/\//i.test(href)) {
-    // Other sites open in a new tab, like external links in article bodies.
+  if (href && (target === "_blank" || /^https?:\/\//i.test(href))) {
+    // Other sites always open in a new tab, like external links in article bodies; target="_blank" forces it.
     return (
       <a href={href} title={title} target="_blank" rel="noopener noreferrer" className={base}>
         {children}
