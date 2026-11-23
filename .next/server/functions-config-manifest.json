@@ -4,7 +4,7 @@
     "/api/discuss/availability": {},
     "/api/discuss/forward": {},
     "/api/discuss/message": {},
-    "/api/discuss": {},
-    "/api/health": {}
+    "/api/health": {},
+    "/api/discuss": {}
   }
 }
