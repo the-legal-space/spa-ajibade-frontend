@@ -50,15 +50,18 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
 ];
 
+// A static export can't send headers; they move to .htaccess (scripts/build-static.sh writes them there).
+const securityHeadersConfig = async () => [{ source: "/:path*", headers: securityHeaders }];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // NEXT_OUTPUT=export is the static build for plain hosting (scripts/build-static.sh); headers then go in .htaccess.
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : process.env.NEXT_OUTPUT === "export" ? "export" : undefined,
+  ...(process.env.NEXT_OUTPUT === "export" ? { trailingSlash: true, images: { unoptimized: true } } : {}),
   // Keep nodemailer as a real package in the standalone build, so the cPanel preflight check can load it.
   serverExternalPackages: ["nodemailer"],
-  async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
-  },
+  ...(process.env.NEXT_OUTPUT === "export" ? {} : { headers: securityHeadersConfig }),
 };
 
 export default nextConfig;

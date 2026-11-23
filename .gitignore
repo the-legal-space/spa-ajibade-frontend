@@ -12,3 +12,5 @@ npm-debug.log*
 .vercel
 /test-results
 /screenshots
+dist-static/
+dist-static.zip
