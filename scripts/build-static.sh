@@ -18,7 +18,9 @@ rsync -a --exclude node_modules --exclude .next --exclude out --exclude .git --e
 ln -s "$ROOT/node_modules" "$TMP/node_modules"
 cd "$TMP"
 
-rm -rf src/app/api
+rm -rf src/app/api src/app/forward  # server-only: API routes and the signed booking-forward page
+# The layout calls connection() to render every request live; a static export renders once at build time.
+sed -i.bak -e '/^import { connection } from "next\/server";$/d' -e '/^  await connection();$/d' src/app/layout.tsx && rm src/app/layout.tsx.bak
 
 inject() { # file, key, param name
   printf '\nexport const dynamicParams = false;\nexport async function generateStaticParams() {\n  const { staticParams } = await import("@/lib/static-params");\n  return staticParams.%s();\n}\n' "$2" >> "$1"
@@ -32,6 +34,9 @@ inject "src/app/responsible-business/[slug]/page.tsx" responsibleBusiness
 
 for f in insights people discuss responsible-business; do
   printf '\nexport const dynamic = "force-static";\n' >> "src/app/$f/page.tsx"
+done
+for f in robots sitemap; do
+  printf '\nexport const dynamic = "force-static";\n' >> "src/app/$f.ts"
 done
 
 NEXT_OUTPUT=export NEXT_TELEMETRY_DISABLED=1 npx next build

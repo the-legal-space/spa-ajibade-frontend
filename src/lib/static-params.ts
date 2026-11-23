@@ -18,7 +18,11 @@ export const staticParams = {
   },
   people: async () => (await getPeople({ pageSize: Infinity })).data.map((p) => ({ slug: p.slug })),
   practiceAreas: async () => (await getPracticeAreas()).map((a) => ({ slug: a.slug })),
-  careers: async () => (await getJobs()).map((j) => ({ id: String(j.id) })),
+  // An empty list counts as "missing" for the export, so with no jobs listed one placeholder page is built (it 404s).
+  careers: async () => {
+    const ids = (await getJobs()).map((j) => ({ id: String(j.id) }));
+    return ids.length > 0 ? ids : [{ id: "none" }];
+  },
   recognitions: async () =>
     (await getPage("about")).awardsList.items.filter((i) => i.slug).map((i) => ({ slug: i.slug as string })),
   responsibleBusiness: async () => MOCK_CSR_STORIES.map((s) => ({ slug: s.slug })),
