@@ -1,0 +1,66 @@
+# Keeps the static site on spaajibade.com up to date with the CMS.
+# Builds the static export (scripts/build-static.sh) from the latest backend content and uploads only the
+# changed files to public_html over FTPS. Runs when the backend reports a content change
+# (repository_dispatch "content-changed"), every 20 minutes as a safety net, and on demand.
+#
+# Repo secrets: FTP_SERVER (gin.hostns.io), FTP_USERNAME (deploy@spaajibade.com), FTP_PASSWORD.
+# The FTP account's home is public_html. Folders the old server setup needs are never touched.
+
+name: Deploy static site
+
+on:
+  repository_dispatch:
+    types: [content-changed]
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a change that arrives mid-deploy waits and runs next (never two uploads at once).
+concurrency:
+  group: deploy-static
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      NEXT_PUBLIC_CONSENT_TEXT_VERSION: ${{ vars.NEXT_PUBLIC_CONSENT_TEXT_VERSION }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build the static site from the latest content
+        run: scripts/build-static.sh
+      - name: Refuse to publish secrets
+        run: |
+          if find dist-static -name '.env*' | grep -q .; then echo "::error::.env file in the export"; exit 1; fi
+      - name: Upload changed files to public_html
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./dist-static/
+          server-dir: ./
+          # Only files this workflow uploaded are ever updated or deleted; these are also never touched.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            articles/**
+            wp-content/**
+            .well-known/**
+            spa-new/**
+            spa-preflight/**
