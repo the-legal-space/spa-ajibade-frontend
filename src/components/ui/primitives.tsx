@@ -87,6 +87,15 @@ export function Chip({
     className,
   );
 
+  if (href && /^https?:\/\//i.test(href)) {
+    // Other sites open in a new tab, like external links in article bodies.
+    return (
+      <a href={href} title={title} target="_blank" rel="noopener noreferrer" className={base}>
+        {children}
+      </a>
+    );
+  }
+
   if (href) {
     return (
       <Link href={href} title={title} className={base}>
