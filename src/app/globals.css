@@ -106,6 +106,10 @@
   .prose-firm ol { @apply mb-5 list-decimal pl-6; }
   .prose-firm li { @apply mb-2; }
   .prose-firm a { @apply text-cobalt underline underline-offset-2; }
+  /* Contact block at the end of migrated articles (lib/article-contact.ts), as in the firm's Word template. */
+  .prose-firm p.article-contact {
+    @apply mx-auto mt-12 max-w-xl border-t border-ink-700 pt-3 text-center text-sm leading-6 text-ink-800;
+  }
   .prose-firm blockquote { @apply my-6 border-l-2 border-ink pl-5 font-serif text-xl italic; }
   .prose-firm strong { @apply font-semibold text-ink; }
   .prose-firm p:has(+ ul a[href^="mailto:"]) {

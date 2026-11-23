@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getInsight, getInsights, getSite } from "@/lib/api/endpoints";
 import { ApiNotFoundError } from "@/lib/api/client";
 import { cleanHtml } from "@/lib/sanitize";
+import { formatContactFooter } from "@/lib/article-contact";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/env";
 import { cn, formatMonthYear } from "@/lib/utils";
@@ -68,7 +69,7 @@ export default async function InsightPage({ params }: Props) {
     getSite(),
     getInsights({ sort: "newest", page: 1, pageSize: 50 }),
   ]);
-  const body = cleanHtml(i.body);
+  const body = formatContactFooter(cleanHtml(i.body));
   const date = formatMonthYear(i.publishedAt);
   const readMore = i.cta;
   const relatedInsights = recentInsights.data

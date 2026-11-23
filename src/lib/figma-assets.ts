@@ -49,6 +49,15 @@ const PEOPLE: Record<string, ApiImage> = {
   "kolawole-mayomi": img("/figma/people/kolawole-mayomi.jpg", 682, 682, "Portrait of Dr. Kolawole Mayomi"),
 };
 
+/**
+ * New headshots the firm supplied that replace the CMS photo until they are uploaded there.
+ * Unlike PEOPLE (used only when the CMS has no photo), these win over the CMS.
+ */
+const PHOTO_OVERRIDES: Record<string, ApiImage> = {
+  "emmanuel-bassey": img("/figma/people/emmanuel-bassey.jpg", 1000, 1000, "Portrait of Emmanuel Bassey"),
+  "mindy-okibe": img("/figma/people/mindy-okibe.jpg", 1000, 1000, "Portrait of Mindy Okibe"),
+};
+
 const AVATARS: Record<string, string> = {
   "john-onyido": "/figma/avatar-onyido.png",
   "peter-olalere": "/figma/avatar-olalere.png",
@@ -75,11 +84,13 @@ const INSIGHTS: Record<string, ApiImage> = {
 export function personPhoto(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
   // The CMS default focal point (centre) crops the top of the head on tall portraits; the Media
   // callers add `object-top` so headshots keep their headroom unless an editor set a focal point.
+  if (PHOTO_OVERRIDES[slug]) return PHOTO_OVERRIDES[slug];
   return cms?.url ? withoutDefaultFocus(cms) : (PEOPLE[slug] ?? null);
 }
 
 /** Small author avatar: CMS photo first, then the Figma avatar or portrait. */
 export function personAvatar(slug: string, cms: ApiImage | null | undefined): ApiImage | null {
+  if (PHOTO_OVERRIDES[slug]) return PHOTO_OVERRIDES[slug];
   if (cms?.url) return cms;
   const a = AVATARS[slug];
   return a ? img(a, 60, 60) : (PEOPLE[slug] ?? null);
