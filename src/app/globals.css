@@ -108,6 +108,28 @@
   .prose-firm a { @apply text-cobalt underline underline-offset-2; }
   .prose-firm blockquote { @apply my-6 border-l-2 border-ink pl-5 font-serif text-xl italic; }
   .prose-firm strong { @apply font-semibold text-ink; }
+  .prose-firm p:has(+ ul a[href^="mailto:"]) {
+    @apply mx-auto mt-10 mb-0 max-w-3xl border-t border-mist-300 bg-white px-6 pt-3 text-center;
+  }
+  .prose-firm p:has(+ ul a[href^="mailto:"]) a[href*="spaajibade.com"]::before {
+    content: "\A";
+    white-space: pre;
+  }
+  .prose-firm p:has(+ ul a[href^="mailto:"]) br,
+  .prose-firm ul:has(a[href^="mailto:"]) > br,
+  .prose-firm ul:has(a[href^="mailto:"]) + br {
+    display: none;
+  }
+  .prose-firm ul:has(a[href^="mailto:"]) {
+    @apply mx-auto mb-0 max-w-3xl list-none bg-white px-6 pt-1 text-center;
+  }
+  .prose-firm ul:has(a[href^="mailto:"]) li { @apply mb-0; }
+  .prose-firm ul:has(a[href^="mailto:"]) ~ p:has(a[href*="spaajibade.com"]) {
+    @apply mx-auto mt-0 mb-8 max-w-3xl bg-white text-center;
+  }
+  .prose-firm ul:has(a[href^="mailto:"]) ~ a[href*="spaajibade.com"] {
+    @apply mx-auto block max-w-3xl text-center;
+  }
   .person-bio :is(strong, b) { @apply font-normal text-ink-800; }
   .prose-invert-firm { @apply text-mist; }
   .prose-invert-firm strong { @apply text-white; }
