@@ -5,6 +5,7 @@ import { Media } from "@/components/ui/media";
 import { Eyebrow, Heading } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
+import { withAwardBadge } from "@/lib/award-overrides";
 
 /**
  * Home "Recognition" band from the Figma: heading, a strip of award badges that slides
@@ -24,6 +25,7 @@ export function RecognitionFeature({
 }) {
   // Badges come from the CMS recognition records; the Figma set is only used when none has an image.
   const fromCms: Badge[] = section.badges
+    .map(withAwardBadge)
     .filter((r) => r.badge?.url)
     .map((r) => {
       const organization = r.organization || r.directory?.name || "";

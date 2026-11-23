@@ -4,6 +4,7 @@ import { z } from "zod";
 import { apiGet, apiList } from "./client";
 import { CURATED_PUBLICATIONS } from "@/lib/curated-publications";
 import { RESPONSIBLE_BUSINESS_STORY_SLUG } from "@/lib/mock/csr-stories";
+import { withAwardOverrides } from "@/lib/award-overrides";
 import {
   InsightCard,
   InsightCategory,
@@ -183,5 +184,5 @@ export const getJob = cache((id: string) =>
 export const getRecognitionDirectory = cache((slug: string) =>
   apiGet(`/recognitions/${encodeURIComponent(slug)}`, RecognitionDirectoryPage, {
     tags: ["recognitions", `recognition:${slug}`],
-  }),
+  }).then(withAwardOverrides),
 );

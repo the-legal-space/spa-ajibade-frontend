@@ -11,8 +11,8 @@ const FIRM = { type: "firm", name: "SPA AJIBADE & Co.", label: "Law Firm" } as c
 const COVER_IMAGE: ApiImage = {
   url: "/figma/foodinsecurity.png",
   alt: "Lagos Food Bank and SPA Ajibade & Co. food insecurity outreach",
-  width: 1200,
-  height: 800,
+  width: 512,
+  height: 512,
 };
 
 export type ResponsibleBusinessStory = {
