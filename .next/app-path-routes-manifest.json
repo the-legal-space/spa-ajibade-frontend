@@ -2,11 +2,11 @@
   "/_not-found/page": "/_not-found",
   "/api/revalidate/route": "/api/revalidate",
   "/robots.txt/route": "/robots.txt",
-  "/api/discuss/availability/route": "/api/discuss/availability",
   "/api/discuss/forward/route": "/api/discuss/forward",
   "/api/discuss/message/route": "/api/discuss/message",
-  "/api/health/route": "/api/health",
   "/api/discuss/route": "/api/discuss",
+  "/api/discuss/availability/route": "/api/discuss/availability",
+  "/api/health/route": "/api/health",
   "/sitemap.xml/route": "/sitemap.xml",
   "/about/page": "/about",
   "/careers/[id]/page": "/careers/[id]",
@@ -25,7 +25,7 @@
   "/discuss/page": "/discuss",
   "/forward/page": "/forward",
   "/offices/page": "/offices",
-  "/privacy/page": "/privacy",
   "/unsubscribe/page": "/unsubscribe",
+  "/privacy/page": "/privacy",
   "/terms/page": "/terms"
 }
