@@ -7,7 +7,9 @@
 # Builds from a temporary copy so the normal server build is never touched. In that copy it:
 #   - removes src/app/api (server routes can't be exported; forms need a separately hosted API),
 #   - adds generateStaticParams to every dynamic route (all articles, people, practice areas, ...),
-#   - makes pages that read ?query parameters static (they render their default view).
+#   - swaps in the People and Insights pages from src/static-export, which filter in the browser from
+#     /data/people.json and /data/insights.json (built here too), so tabs, sorting, paging and ?author= work,
+#   - makes the other pages that read ?query parameters static (they render their default view).
 # Output: dist-static/ (upload its contents to public_html) and dist-static.zip.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -32,7 +34,13 @@ inject "src/app/careers/[id]/page.tsx" careers
 inject "src/app/recognitions/[slug]/page.tsx" recognitions
 inject "src/app/responsible-business/[slug]/page.tsx" responsibleBusiness
 
-for f in insights people discuss responsible-business; do
+cp src/static-export/people-page.tsx src/app/people/page.tsx
+cp src/static-export/insights-page.tsx src/app/insights/page.tsx
+mkdir -p src/app/data/people.json src/app/data/insights.json
+cp src/static-export/people-data.ts src/app/data/people.json/route.ts
+cp src/static-export/insights-data.ts src/app/data/insights.json/route.ts
+
+for f in discuss responsible-business; do
   printf '\nexport const dynamic = "force-static";\n' >> "src/app/$f/page.tsx"
 done
 for f in robots sitemap; do
