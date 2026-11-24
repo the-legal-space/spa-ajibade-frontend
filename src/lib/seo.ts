@@ -7,7 +7,7 @@ export const SITE_NAME = "S.P.A. Ajibade & Co.";
 export const SITE_DESCRIPTION =
   "Commercial law firm in Lagos, Abuja and Ibadan. Counsel to institutions shaping Nigeria's economy since 1967.";
 
-/** Link-preview image (public/og-image.jpg: the firm's logo on black) for pages whose CMS entry has none. */
+/** Link-preview image (public/og-image.jpg: the homepage header and hero) for pages whose CMS entry has none. */
 export const DEFAULT_OG_IMAGE = { url: "/og-image.jpg", width: 1200, height: 630, alt: "S.P.A. Ajibade & Co., Lagos, Abuja and Ibadan" };
 
 /** Turns a CMS seo block into Next metadata, with sensible fallbacks. */
