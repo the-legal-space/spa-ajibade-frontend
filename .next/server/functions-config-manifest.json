@@ -2,9 +2,9 @@
   "version": 1,
   "functions": {
     "/api/discuss/availability": {},
-    "/api/discuss/message": {},
     "/api/discuss/forward": {},
     "/api/discuss": {},
-    "/api/health": {}
+    "/api/health": {},
+    "/api/discuss/message": {}
   }
 }
