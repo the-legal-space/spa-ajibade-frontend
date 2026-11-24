@@ -86,13 +86,6 @@
       "static/chunks/main-app-ea2ba694f622fcc4.js",
       "static/chunks/app/api/discuss/forward/route-7c1b3aabdb574214.js"
     ],
-    "/api/discuss/route": [
-      "static/chunks/webpack-1a4050617a35e5f6.js",
-      "static/chunks/4bd1b696-f785427dddbba9fb.js",
-      "static/chunks/1255-0f12d1d68e0b5948.js",
-      "static/chunks/main-app-ea2ba694f622fcc4.js",
-      "static/chunks/app/api/discuss/route-7c1b3aabdb574214.js"
-    ],
     "/api/discuss/message/route": [
       "static/chunks/webpack-1a4050617a35e5f6.js",
       "static/chunks/4bd1b696-f785427dddbba9fb.js",
@@ -106,6 +99,13 @@
       "static/chunks/1255-0f12d1d68e0b5948.js",
       "static/chunks/main-app-ea2ba694f622fcc4.js",
       "static/chunks/app/api/health/route-7c1b3aabdb574214.js"
+    ],
+    "/api/discuss/route": [
+      "static/chunks/webpack-1a4050617a35e5f6.js",
+      "static/chunks/4bd1b696-f785427dddbba9fb.js",
+      "static/chunks/1255-0f12d1d68e0b5948.js",
+      "static/chunks/main-app-ea2ba694f622fcc4.js",
+      "static/chunks/app/api/discuss/route-7c1b3aabdb574214.js"
     ],
     "/sitemap.xml/route": [
       "static/chunks/webpack-1a4050617a35e5f6.js",
@@ -305,14 +305,6 @@
       "static/chunks/main-app-ea2ba694f622fcc4.js",
       "static/chunks/app/faq/page-7c1b3aabdb574214.js"
     ],
-    "/forward/page": [
-      "static/chunks/webpack-1a4050617a35e5f6.js",
-      "static/chunks/4bd1b696-f785427dddbba9fb.js",
-      "static/chunks/1255-0f12d1d68e0b5948.js",
-      "static/chunks/main-app-ea2ba694f622fcc4.js",
-      "static/css/900483704b216459.css",
-      "static/chunks/app/forward/page-5d24f1604e152de2.js"
-    ],
     "/discuss/page": [
       "static/chunks/webpack-1a4050617a35e5f6.js",
       "static/chunks/4bd1b696-f785427dddbba9fb.js",
@@ -325,6 +317,14 @@
       "static/chunks/7893-7663673e0010ba64.js",
       "static/chunks/9876-67c2f0cb9556dce7.js",
       "static/chunks/app/discuss/page-da27654a20b0f56a.js"
+    ],
+    "/forward/page": [
+      "static/chunks/webpack-1a4050617a35e5f6.js",
+      "static/chunks/4bd1b696-f785427dddbba9fb.js",
+      "static/chunks/1255-0f12d1d68e0b5948.js",
+      "static/chunks/main-app-ea2ba694f622fcc4.js",
+      "static/css/900483704b216459.css",
+      "static/chunks/app/forward/page-5d24f1604e152de2.js"
     ],
     "/offices/page": [
       "static/chunks/webpack-1a4050617a35e5f6.js",
