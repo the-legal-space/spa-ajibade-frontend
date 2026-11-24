@@ -21,6 +21,7 @@ import { PeopleSortMenu } from "@/components/ui/people-sort-menu";
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonClass } from "@/components/ui/button";
+import { loadInsightsIndex, publicationsOf, type InsightsIndex } from "@/lib/insights-index";
 
 type Params = Pick<URLSearchParams, "get"> | null;
 
@@ -204,16 +205,9 @@ function PeopleGrid({ people, details, listKey }: { people: PersonSummary[]; det
 
 const INSIGHTS_PAGE_SIZE = 15;
 
-export type InsightsIndex = {
-  /** Every insight, newest first. */
-  items: Insight[];
-  /** Hand-picked publication lists (lib/curated-publications), keyed by person slug. */
-  curated: Record<string, string[]>;
-  /** Display names of everyone with a profile, keyed by slug. */
-  authors: Record<string, string>;
-};
+export type { InsightsIndex };
 
-const loadInsights = loader<InsightsIndex>("/data/insights.json");
+const loadInsights = loadInsightsIndex;
 
 type InsightsProps = {
   title: string;
@@ -255,13 +249,10 @@ function InsightsView({ title, categoryFilters, practiceAreaFilters, initial, pa
   let totalPages = initial.totalPages;
   let shownPage = 1;
   if (!isDefault && data) {
-    const curated = author ? data.curated[author.slug] : undefined;
-    const wanted = curated ? new Set(curated) : null;
-    let all = data.items.filter(
+    let all = (author ? publicationsOf(data, author.slug) : data.items).filter(
       (i) =>
         (!category || i.categories.includes(category as Insight["categories"][number])) &&
-        (!practiceArea || i.practiceAreas.some((p) => p.slug === practiceArea)) &&
-        (!author || (wanted ? wanted.has(i.slug) : i.author.type === "person" && i.author.person.slug === author.slug)),
+        (!practiceArea || i.practiceAreas.some((p) => p.slug === practiceArea)),
     );
     if (sort === "oldest") all = [...all].reverse();
     totalPages = Math.max(1, Math.ceil(all.length / INSIGHTS_PAGE_SIZE));

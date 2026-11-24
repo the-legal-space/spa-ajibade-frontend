@@ -74,7 +74,11 @@ export default async function InsightPage({ params }: Props) {
   const readMore = i.cta;
   const relatedInsights = recentInsights.data
     .filter((insight) => insight.slug !== i.slug)
-    .sort(() => Math.random() - 0.5)
+    // A mix that varies by article but is the same on every build (a random one changed every page on every
+    // static deploy, so each 20-minute run re-uploaded all of them).
+    .map((insight) => ({ insight, rank: hashString(`${i.slug}|${insight.slug}`) }))
+    .sort((a, b) => a.rank - b.rank)
+    .map(({ insight }) => insight)
     .slice(0, 5);
   // The author first, then each co-author in the order given (co-authors only come on the detail response).
   const authors = [i.author, ...i.coAuthors].map(authorView);
@@ -237,4 +241,11 @@ export default async function InsightPage({ params }: Props) {
       />
     </>
   );
+}
+
+/** FNV-1a: a small, stable string hash for ordering. */
+function hashString(value: string) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) hash = Math.imul(hash ^ value.charCodeAt(i), 0x01000193);
+  return hash >>> 0;
 }
