@@ -1,3 +1,4 @@
+import { DEFAULT_OG_IMAGE } from "@/lib/seo";
 import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -38,7 +39,8 @@ const inter = Inter({
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite().catch(() => null);
-  if (!site) return { metadataBase: new URL(SITE_URL) };
+  const icons = { icon: "/favicon.ico", apple: "/apple-touch-icon.png" };
+  if (!site) return { metadataBase: new URL(SITE_URL), icons };
   const name = site.settings.firmName;
   const description = site.settings.tagline;
   return {
@@ -49,13 +51,15 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     applicationName: name,
+    icons,
     openGraph: {
       type: "website",
       siteName: name,
       locale: "en_NG",
       description,
+      images: [DEFAULT_OG_IMAGE],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: { card: "summary_large_image", images: [DEFAULT_OG_IMAGE.url] },
     formatDetection: { telephone: false },
   };
 }
