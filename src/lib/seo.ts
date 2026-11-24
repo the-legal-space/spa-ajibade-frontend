@@ -25,6 +25,8 @@ export function pageMetadata(
     alternates: { canonical: fallback.path },
     openGraph: {
       title: title ?? SITE_TITLE,
+      siteName: SITE_NAME,
+      type: "website",
       description,
       url: fallback.path,
       // A page's openGraph replaces the layout's whole block, so the default image has to be repeated here.
