@@ -1,4 +1,4 @@
-import { DEFAULT_OG_IMAGE, SITE_TITLE } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/seo";
 import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const icons = { icon: "/favicon.ico", apple: "/apple-touch-icon.png" };
   if (!site) return { metadataBase: new URL(SITE_URL), icons };
   const name = site.settings.firmName;
-  const description = site.settings.tagline;
+  const description = SITE_DESCRIPTION;
   return {
     metadataBase: new URL(SITE_URL),
     title: {
@@ -54,8 +54,9 @@ export async function generateMetadata(): Promise<Metadata> {
     icons,
     openGraph: {
       type: "website",
-      siteName: name,
+      siteName: SITE_NAME,
       title: SITE_TITLE,
+      url: "/",
       locale: "en_NG",
       description,
       images: [DEFAULT_OG_IMAGE],
