@@ -44,7 +44,22 @@ function buildPath(path: string, query?: Query) {
   return qs ? `${path}?${qs}` : path;
 }
 
+/** A busy or waking API (503, 429, a dropped connection) usually answers on a second try. */
+const RETRY_DELAYS_MS = [1000, 3000, 8000];
+
 async function request(path: string, tags: string[], bypassCache = false): Promise<unknown> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await requestOnce(path, tags, bypassCache);
+    } catch (error) {
+      const retryable = error instanceof ApiError && !(error instanceof ApiNotFoundError) && (error.status === 429 || error.status >= 500);
+      if (!retryable || attempt >= RETRY_DELAYS_MS.length) throw error;
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS_MS[attempt]));
+    }
+  }
+}
+
+async function requestOnce(path: string, tags: string[], bypassCache: boolean): Promise<unknown> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {

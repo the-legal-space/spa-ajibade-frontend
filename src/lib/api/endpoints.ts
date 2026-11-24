@@ -132,7 +132,7 @@ export const getInsights = cache(
 );
 
 /** Every insight matching the filters: the API caps pages at 50, so walk them all. */
-const getAllInsights = cache(async (category?: z.infer<typeof InsightCategory>, practiceArea?: string, sort?: "newest" | "oldest") => {
+export const getAllInsights = cache(async (category?: z.infer<typeof InsightCategory>, practiceArea?: string, sort?: "newest" | "oldest") => {
   const fetchPage = (page: number) =>
     apiList("/insights", InsightCard, { query: { category, practiceArea, sort, page, pageSize: 50 }, tags: ["insights"] });
   const first = await fetchPage(1);
