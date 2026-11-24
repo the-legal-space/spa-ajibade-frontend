@@ -58,6 +58,12 @@ Options -MultiViews
 DirectorySlash On
 ErrorDocument 404 /404.html
 RewriteEngine On
+# Next.js loads /<page>/index.txt in the background when a link is clicked. If that load fails, or comes from a
+# newer build than the open page (every deploy is a new build), it opens that same address in the browser,
+# which shows the raw data file.
+# A browser opening it (no RSC header) is sent to the page itself; the query string (filters) is kept.
+RewriteCond %{HTTP:RSC} !^1$
+RewriteRule ^(.*/)?index\.txt$ /$1 [R=302,L]
 RewriteCond %{DOCUMENT_ROOT}/articles/$1-$2-$3-$4.html -f
 RewriteRule ^([0-9]{4})/([0-9]{2})/([0-9]{2})/([^/]+)/?$ /articles/$1-$2-$3-$4.html [L]
 RewriteCond %{REQUEST_FILENAME} !-f
