@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { Seo, SeoBasic } from "@/lib/api/schemas";
 
 /** The site's own title (home page, browser tab, link previews), as the firm approved it. */
-export const SITE_TITLE = "S.P.A. Ajibade & Co. | Legal practitioners";
+export const SITE_TITLE = "S.P.A. Ajibade & Co.";
 export const SITE_NAME = "S.P.A. Ajibade & Co.";
 export const SITE_DESCRIPTION =
   "Commercial law firm in Lagos, Abuja and Ibadan. Counsel to institutions shaping Nigeria's economy since 1967.";

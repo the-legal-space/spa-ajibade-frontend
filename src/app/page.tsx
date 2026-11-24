@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPage } from "@/lib/api/endpoints";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/seo";
 import { PageHero } from "@/components/sections/page-hero";
 import { PageEnd } from "@/components/sections/page-end";
 import { InsightCard, PersonCard } from "@/components/sections/cards";
@@ -24,7 +24,8 @@ import { Reveal } from "@/components/ui/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPage("home");
-  return pageMetadata(page.seo, { absoluteTitle: true, path: "/" });
+  // The firm's approved title and description win over the CMS entry, which still has the old WordPress wording.
+  return pageMetadata({ ...page.seo, title: SITE_TITLE, description: SITE_DESCRIPTION }, { absoluteTitle: true, path: "/" });
 }
 
 export default async function HomePage() {
