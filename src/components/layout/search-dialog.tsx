@@ -15,6 +15,7 @@ import { InsightCard, PersonCard, PracticeAreaCard, type PersonCardDetails } fro
 import { MotionList, MotionListItem } from "@/components/ui/motion-primitives";
 import { INTERACTION, TRANSITIONS } from "@/lib/motion";
 import { personCardSummary } from "@/lib/person-card-summary";
+import { loadInsightsIndex, publicationsOf } from "@/lib/insights-index";
 
 type State =
   | { status: "idle" }
@@ -106,7 +107,13 @@ export function SearchDialog({ open, onClose, firmName, descriptor }: { open: bo
           }),
         );
 
+        // On the static site, an attorney's full publication list (the same one "View all" on their profile shows);
+        // the profile response only carries a few recent ones.
+        const index = matchedPeople.length > 0 ? await loadInsightsIndex().catch(() => null) : null;
         const insightsBySlug = new Map(parsed.data.insights.map((insight) => [insight.slug, insight]));
+        for (const person of index ? matchedPeople : []) {
+          for (const insight of publicationsOf(index!, person.slug)) insightsBySlug.set(insight.slug, insight);
+        }
         const cardDetails: Record<string, PersonCardDetails> = {};
         for (const lookup of personLookups) {
           if (lookup.status !== "fulfilled") continue;

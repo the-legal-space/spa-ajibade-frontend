@@ -58,7 +58,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // NEXT_OUTPUT=export is the static build for plain hosting (scripts/build-static.sh); headers then go in .htaccess.
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : process.env.NEXT_OUTPUT === "export" ? "export" : undefined,
-  ...(process.env.NEXT_OUTPUT === "export" ? { trailingSlash: true, images: { unoptimized: true } } : {}),
+  // Static export: a page may wait out the CMS rate limit (300 requests a minute) and /data/insights.json reads every
+  // article, so allow longer than the default 60 seconds per page.
+  ...(process.env.NEXT_OUTPUT === "export" ? { trailingSlash: true, images: { unoptimized: true }, staticPageGenerationTimeout: 600 } : {}),
+  // The static export is rebuilt every 20 minutes. A random build id would change every page on every run, so each
+  // deploy would re-upload the whole site and send open pages to a full reload on their next click. Tied to the
+  // commit (scripts/build-static.sh), unchanged content builds to identical files and only real changes upload.
+  ...(process.env.NEXT_OUTPUT === "export" && process.env.STATIC_BUILD_ID
+    ? { generateBuildId: async () => process.env.STATIC_BUILD_ID! }
+    : {}),
   // Keep nodemailer as a real package in the standalone build, so the cPanel preflight check can load it.
   serverExternalPackages: ["nodemailer"],
   ...(process.env.NEXT_OUTPUT === "export" ? {} : { headers: securityHeadersConfig }),

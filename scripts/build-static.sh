@@ -13,7 +13,12 @@
 # Output: dist-static/ (upload its contents to public_html) and dist-static.zip.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TMP="$(mktemp -d)"
+# Same code, same build id (next.config.ts): a rebuild with unchanged content gives identical files.
+export STATIC_BUILD_ID="${STATIC_BUILD_ID:-$(git -C "$ROOT" rev-parse --short=12 HEAD 2>/dev/null || date +%s)}"
+# A fixed folder, not mktemp: Next.js derives module ids from the absolute path, so a random folder would
+# give every build different JavaScript file names and re-upload all of them.
+TMP="${STATIC_BUILD_DIR:-/tmp/spa-static-build}"
+rm -rf "$TMP" && mkdir -p "$TMP"
 trap 'rm -rf "$TMP"' EXIT
 
 rsync -a --exclude node_modules --exclude .next --exclude out --exclude .git --exclude 'dist-static*' --exclude '.env*' "$ROOT/" "$TMP/"

@@ -19,7 +19,8 @@ export async function GET() {
     list({ sort: "name_asc" }),
     list({ sort: "name_desc" }),
   ]);
-  const people = [...everyone.values()];
+  // Sorted so the file is byte-identical between builds (the lists above resolve in any order).
+  const people = [...everyone.values()].sort((a, b) => a.slug.localeCompare(b.slug));
   const index: PeopleIndex = {
     roles: Object.fromEntries(roles),
     areas: Object.fromEntries(areas),
