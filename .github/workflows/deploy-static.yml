@@ -12,7 +12,8 @@ on:
   repository_dispatch:
     types: [content-changed]
   schedule:
-    - cron: "*/20 * * * *"
+    # Off the top of the hour: GitHub delays or drops scheduled runs at busy minutes.
+    - cron: "7,27,47 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +27,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # A deploy after a code change re-uploads most files (~25 min). Cut off before it finishes, it never saves its
+    # record of what is on the server, and the next run starts over; leave plenty of room.
+    timeout-minutes: 90
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
