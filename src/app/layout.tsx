@@ -1,4 +1,4 @@
-import { DEFAULT_OG_IMAGE } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_TITLE } from "@/lib/seo";
 import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: `${name} | ${site.settings.legalDescriptor}`,
+      default: SITE_TITLE,
       template: `%s | ${name}`,
     },
     description,
@@ -55,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       siteName: name,
+      title: SITE_TITLE,
       locale: "en_NG",
       description,
       images: [DEFAULT_OG_IMAGE],
