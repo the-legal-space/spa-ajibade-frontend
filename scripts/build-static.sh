@@ -69,6 +69,8 @@ RewriteEngine On
 # A browser opening it (no RSC header) is sent to the page itself; the query string (filters) is kept.
 RewriteCond %{HTTP:RSC} !^1$
 RewriteRule ^(.*/)?index\.txt$ /$1 [R=302,L]
+# Old WordPress booking page (still a Google sitelink) -> Discuss a Mandate
+RewriteRule ^book(/.*)?$ /discuss/ [R=301,L]
 RewriteCond %{DOCUMENT_ROOT}/articles/$1-$2-$3-$4.html -f
 RewriteRule ^([0-9]{4})/([0-9]{2})/([0-9]{2})/([^/]+)/?$ /articles/$1-$2-$3-$4.html [L]
 RewriteCond %{REQUEST_FILENAME} !-f
